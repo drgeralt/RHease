@@ -1,12 +1,11 @@
 <?php require_once BASE_PATH . '/app/Views/templates/header.php'; ?>
 
 <h2>Resumo da Rescisão</h2>
-<h2>Resumo da Rescisão</h2>
 <p>O processo de demissão para <strong><?= htmlspecialchars($data['resumo']['nome_completo']) ?></strong> foi concluído.</p>
 
-<div style="margin-bottom: 20px; padding: 10px; border: 1px solid #eee; border-radius: 5px;">
-    <p style="margin: 5px 0;"><strong>Cargo:</strong> <?= htmlspecialchars($data['resumo']['cargo']) ?></p>
-    <p style="margin: 5px 0;"><strong>Data de Admissão:</strong> <?= date('d/m/Y', strtotime($data['resumo']['data_admissao'])) ?></p>
+<div class="demissao-info-box">
+    <p><strong>Cargo:</strong> <?= htmlspecialchars($data['resumo']['cargo']) ?></p>
+    <p><strong>Data de Admissão:</strong> <?= date('d/m/Y', strtotime($data['resumo']['data_admissao'])) ?></p>
 </div>
 
 <div class="resumo-box">
@@ -41,7 +40,7 @@
     </div>
 </div>
 
-<p style="margin-top: 20px; text-align: center; font-style: italic; color: #777;">
+<p class="demissao-aviso">
     <strong>Aviso:</strong> O status do funcionário foi alterado para "inativo". Este é um cálculo simplificado.
 </p>
 

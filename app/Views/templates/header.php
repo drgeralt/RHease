@@ -10,6 +10,7 @@
     <header>
         <h1>Rhease</h1>
         <nav>
+            <a href="<?= BASE_URL ?>/">Home</a>
             <a href="<?= BASE_URL ?>/beneficios">Benefícios</a>
             <a href="<?= BASE_URL ?>/demissao">Demissão</a>
             <a href="<?= BASE_URL ?>/funcionarios/demitidos">Demitidos</a> </nav>
