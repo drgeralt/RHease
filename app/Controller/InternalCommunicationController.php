@@ -19,9 +19,19 @@ class InternalCommunicationController
 
             $model = new InternalCommunicationModel();
 
+            $senderId = $_POST['sender_id'] ?? null;
+            $receiverId = $_POST['receiver_id'] ?? null;
+
+            if ($senderId === null || $receiverId === null) {
+                // Handle error: sender_id or receiver_id not provided
+                // For now, we'll just redirect back or show an error
+                header('Location: /comunicacao?error=missing_ids');
+                exit;
+            }
+
             $data = [
-                'sender_id' => 1,
-                'receiver_id' => 1,
+                'sender_id' => $senderId,
+                'receiver_id' => $receiverId,
                 'content' => $content
             ];
 

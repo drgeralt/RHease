@@ -15,6 +15,8 @@
         <br>
         <textarea name="content" id="content" rows="4" cols="50" required></textarea>
     </div>
+    <input type="hidden" name="sender_id" value="1">
+    <input type="hidden" name="receiver_id" value="2">
     <br>
     <button type="submit">Enviar Mensagem</button>
 </form>

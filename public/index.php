@@ -35,9 +35,22 @@ $router->addRoute('GET', '/payrolls', 'PayrollController', 'show_payrolls');
 $router->addRoute('POST', '/payroll/remove', 'PayrollController', 'remove_payroll');
 $router->addRoute('GET', '/thank_you', 'CommonController', 'show_thank_you');
 $router->addRoute('GET', '/error', 'CommonController', 'show_error');
-$router->addRoute('GET', '/comunicacao', 'InternalCommunicationController', 'index');
-$router->addRoute('POST', '/comunicacao/enviar', 'InternalCommunicationController', 'sendMessage');
 
+// ROTAS - MÓDulos DE BENEFÍCIOS E DEMISSÃO
+$router->addRoute('GET', '/beneficios', 'BeneficioController', 'index');
+$router->addRoute('GET', '/beneficios/criar', 'BeneficioController', 'create');
+$router->addRoute('POST', '/beneficios', 'BeneficioController', 'store');
+$router->addRoute('GET', '/beneficios/editar/(\d+)', 'BeneficioController', 'edit');
+$router->addRoute('POST', '/beneficios/editar/(\d+)', 'BeneficioController', 'update');
+$router->addRoute('POST', '/beneficios/deletar/(\d+)', 'BeneficioController', 'destroy');
+$router->addRoute('GET', '/demissao', 'DemissaoController', 'showIniciarForm');
+$router->addRoute('POST', '/demissao', 'DemissaoController', 'processar');
+$router->addRoute('GET', '/demissao/resumo/(\d+)', 'DemissaoController', 'verResumo');
+$router->addRoute('GET', '/funcionarios/demitidos', 'FuncionarioController', 'listarDemitidos');
+
+// Rotas de Comunicação Interna
+$router->addRoute('GET', '/comunicacao', InternalCommunicationController::class, 'index');
+$router->addRoute('POST', '/comunicacao/enviar', InternalCommunicationController::class, 'sendMessage');
 
 // ----------------------
 // Inicia o roteamento

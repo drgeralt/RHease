@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS `rhease` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `rhease`;
-
+CREATE DATABASE IF NOT EXISTS `rhease` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `rhease`;
+
 -- TABELAS DO SEU TIME --
 CREATE TABLE IF NOT EXISTS `applications` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -86,3 +86,13 @@ INSERT INTO `beneficios` (`nome_beneficio`, `descricao`, `valor_mensal`, `tipo`)
 
 INSERT INTO `funcionarios` (`nome_completo`, `cpf`, `cargo`, `salario`, `data_admissao`, `status`) VALUES
 ('Ana Maria Teste', '123.456.789-10', 'Analista de Testes', 3500.00, '2023-01-15', 'ativo');
+
+-- TABLE FOR INTERNAL COMMUNICATION MESSAGES --
+CREATE TABLE IF NOT EXISTS `messages` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `sender_id` INT(11) NOT NULL,
+  `receiver_id` INT(11) NOT NULL,
+  `content` TEXT COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
