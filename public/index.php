@@ -9,7 +9,7 @@ session_start();
 
 // Define o caminho base do projeto
 define('BASE_PATH', dirname(__DIR__));
-define('BASE_URL', '/Rhease/public'); // Defina a URL base do seu projeto aqui
+
 
 // Carrega as configurações principais (DB_HOST, BASE_URL, etc.)
 require_once BASE_PATH . '/config.php';
