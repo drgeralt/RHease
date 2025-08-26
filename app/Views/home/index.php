@@ -23,6 +23,7 @@
 <a href="/RHEase/public/payroll/add" class="button1">Criar Pagamento</a>
 <a href="/RHEase/public/payrolls" class="button2">Ver Pagamentos</a>
 <a href="/RHEase/public/demissao" class="button1"> Iniciar Demissão </a>
+<a href="/RHEase/public/comunicacao" class="button2"> Comunicação Interna </a>
 
 
 </body>

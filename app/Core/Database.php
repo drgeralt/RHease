@@ -8,7 +8,7 @@ class Database {
         $host = 'localhost';
         $user = 'root';
         $password = ''; // Default XAMPP password
-        $database = 'Rhease';
+        $database = 'rhease';
 
         try {
             $this->connection = new PDO("mysql:host=$host;dbname=$database", $user, $password);
