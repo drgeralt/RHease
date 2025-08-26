@@ -30,9 +30,7 @@ class Router {
             $route_pattern = preg_replace('/\{([a-zA-Z0-9_]+)}/', '(?P<$1>[a-zA-Z0-9_]+)', $route['path']);
             $route_pattern = '#^' . $route_pattern . '$#';
 
-            echo "DEBUG: Request URI: " . $request_uri . "<br>";
-            echo "DEBUG: Route Pattern: " . $route_pattern . "<br>";
-            echo "DEBUG: Request Method: " . $request_method . " | Route Method: " . $route['method'] . "<br>";
+            
             if(preg_match($route_pattern, $request_uri, $matches) && $request_method === $route['method']){
                 $controller_name = $route['controller'];
                 $action = $route['action'];
