@@ -1,4 +1,4 @@
-<?php require_once BASE_PATH . '/app/views/templates/header.php'; ?>
+<?php require_once BASE_PATH . '/app/Views/templates/header.php'; ?>
 
 <h2> Editar Benefício: <?= htmlspecialchars($data['beneficio']['nome_beneficio']) ?> </h2>
 
@@ -25,4 +25,4 @@
     <button type="submit" class="btn"> Atualizar </button>
 </form>
 
-<?php require_once BASE_PATH . '/app/views/templates/footer.php'; ?>
+<?php require_once BASE_PATH . '/app/Views/templates/footer.php'; ?>

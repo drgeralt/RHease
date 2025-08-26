@@ -1,5 +1,4 @@
 <?php
-require_once BASE_PATH . '/app/models/BeneficioModel.php';
 
 class BeneficioController
 {
@@ -7,12 +6,12 @@ class BeneficioController
     {
         $model = new BeneficioModel();
         $data['beneficios'] = $model->listarTodosBeneficios();
-        require_once BASE_PATH . '/app/views/beneficios/index.php';
+        require_once BASE_PATH . '/app/Views/beneficios/index.php';
     }
 
     public function create()
     {
-        require_once BASE_PATH . '/app/views/beneficios/criar.php';
+        require_once BASE_PATH . '/app/Views/beneficios/criar.php';
     }
 
     public function store()
@@ -37,7 +36,7 @@ class BeneficioController
     {
         $model = new BeneficioModel();
         $data['beneficio'] = $model->getById($id);
-        require_once BASE_PATH . '/app/views/beneficios/editar.php';
+        require_once BASE_PATH . '/app/Views/beneficios/editar.php';
     }
 
     public function update($id)

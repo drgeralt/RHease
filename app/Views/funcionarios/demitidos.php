@@ -1,4 +1,4 @@
-<?php require_once BASE_PATH . '/app/views/templates/header.php'; ?>
+<?php require_once BASE_PATH . '/app/Views/templates/header.php'; ?>
 
 <h2>Funcionários Demitidos</h2>
 <p>Esta é a lista de todos os funcionários com status "inativo" no sistema.</p>
@@ -31,4 +31,4 @@
     </tbody>
 </table>
 
-<?php require_once BASE_PATH . '/app/views/templates/footer.php'; ?>
+<?php require_once BASE_PATH . '/app/Views/templates/footer.php'; ?>

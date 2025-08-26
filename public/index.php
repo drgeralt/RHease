@@ -13,18 +13,22 @@ define('BASE_PATH', dirname(__DIR__));
 // Carrega as configurações principais (DB_HOST, BASE_URL, etc.)
 require_once BASE_PATH . '/config.php';
 
-// Carrega as classes principais
-require_once BASE_PATH . '/app/Core/Router.php';
-require_once BASE_PATH . '/app/models/Database.php';
+// Autoloader simples
+spl_autoload_register(function ($class_name) {
+    $paths = [
+        BASE_PATH . '/app/Core/',
+        BASE_PATH . '/app/Controller/',
+        BASE_PATH . '/app/Models/'
+    ];
 
-// Carrega os controladores
-require_once BASE_PATH . '/app/Controller/HomeController.php';
-require_once BASE_PATH . '/app/Controller/JobController.php';
-require_once BASE_PATH . '/app/Controller/PayrollController.php';
-require_once BASE_PATH . '/app/Controller/CommonController.php';
-require_once BASE_PATH . '/app/Controller/BeneficioController.php';
-require_once BASE_PATH . '/app/Controller/DemissaoController.php';
-require_once BASE_PATH . '/app/Controller/FuncionarioController.php';
+    foreach ($paths as $path) {
+        $file = $path . $class_name . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
+    }
+});
 
 // Instancia o roteador
 $router = new Router();

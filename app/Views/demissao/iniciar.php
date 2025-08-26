@@ -1,4 +1,4 @@
-<?php require_once BASE_PATH . '/app/views/templates/header.php'; ?>
+<?php require_once BASE_PATH . '/app/Views/templates/header.php'; ?>
 
 <h2>Iniciar Processo de Demissão</h2>
 <p>Selecione o funcionário e preencha os dados para calcular a rescisão.</p>
@@ -38,4 +38,4 @@
     <button type="submit" class="btn">Processar e Calcular Rescisão</button>
 </form>
 
-<?php require_once BASE_PATH . '/app/views/templates/footer.php'; ?>
+<?php require_once BASE_PATH . '/app/Views/templates/footer.php'; ?>

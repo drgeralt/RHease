@@ -1,6 +1,4 @@
 <?php
-require_once BASE_PATH . '/app/models/FuncionarioModel.php';
-require_once BASE_PATH . '/app/models/DemissaoModel.php';
 
 class DemissaoController
 {
@@ -8,7 +6,7 @@ class DemissaoController
     {
         $funcionarioModel = new FuncionarioModel();
         $data['funcionarios'] = $funcionarioModel->getAllAtivos();
-        require_once BASE_PATH . '/app/views/demissao/iniciar.php';
+        require_once BASE_PATH . '/app/Views/demissao/iniciar.php';
     }
 
     public function processar()
@@ -25,7 +23,7 @@ class DemissaoController
 
             if ($resultado) {
                 $data['resumo'] = $resultado;
-                require_once BASE_PATH . '/app/views/demissao/resumo.php';
+                require_once BASE_PATH . '/app/Views/demissao/resumo.php';
             } else {
                 $_SESSION['flash_error'] = "Ocorreu um erro ao processar a demissão.";
                 header('Location: ' . BASE_URL . '/demissao');

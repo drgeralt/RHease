@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS `projeto_rhease` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `projeto_rhease`;
+CREATE DATABASE IF NOT EXISTS `rhease` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `rhease`;
 
 -- TABELAS DO SEU TIME --
 CREATE TABLE IF NOT EXISTS `applications` (

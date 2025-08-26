@@ -1,4 +1,4 @@
-<?php require_once BASE_PATH . '/app/views/templates/header.php'; ?>
+<?php require_once BASE_PATH . '/app/Views/templates/header.php'; ?>
 
 <h2> Gestão de Tipos de Benefícios </h2>
 <a href="<?= BASE_URL ?>/beneficios/criar" class="btn"> Criar Novo Benefício </a>
@@ -30,4 +30,4 @@
     </tbody>
 </table>
 
-<?php require_once BASE_PATH . '/app/views/templates/footer.php'; ?>
+<?php require_once BASE_PATH . '/app/Views/templates/footer.php'; ?>

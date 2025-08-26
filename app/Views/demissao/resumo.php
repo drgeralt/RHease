@@ -1,4 +1,4 @@
-<?php require_once BASE_PATH . '/app/views/templates/header.php'; ?>
+<?php require_once BASE_PATH . '/app/Views/templates/header.php'; ?>
 
 <h2>Resumo da Rescisão</h2>
 <h2>Resumo da Rescisão</h2>
@@ -45,4 +45,4 @@
     <strong>Aviso:</strong> O status do funcionário foi alterado para "inativo". Este é um cálculo simplificado.
 </p>
 
-<?php require_once BASE_PATH . '/app/views/templates/footer.php'; ?>
+<?php require_once BASE_PATH . '/app/Views/templates/footer.php'; ?>

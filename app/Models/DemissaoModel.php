@@ -1,20 +1,18 @@
 <?php
-require_once 'FuncionarioModel.php';
-class DemissaoModel
-{
-    private $conn;
 
-    public function __construct()
-    {
-        $this->conn = Database::getInstance()->getConnection();
-    }
+require_once BASE_PATH . '/app/Core/Model.php';
+
+class DemissaoModel extends Model
+{
+    
 
     public function processarDemissao($funcionarioId, $dataDemissao, $tipoDemissao, $motivo, $possuiFeriasVencidas = false)
     {
-        
+        require_once BASE_PATH . '/app/Models/FuncionarioModel.php';
         $funcionarioModel = new FuncionarioModel();
         $funcionario = $funcionarioModel->getById($funcionarioId);
         if (!$funcionario) {
+            error_log("Funcionário não encontrado para demissão: ID " . $funcionarioId);
             return false;
         }
 
@@ -42,22 +40,25 @@ class DemissaoModel
             'ferias_proporcionais' => $feriasProporcionais, 'terco_ferias' => $tercoFerias, 'decimo_terceiro_proporcional' => $decimoTerceiro,
             'valor_total_rescisao' => $totalRescisao
         ];
+
+        $sql = "INSERT INTO demissoes (funcionario_id, data_demissao, tipo_demissao, motivo, saldo_salario, aviso_previo, ferias_vencidas, ferias_proporcionais, terco_ferias, decimo_terceiro_proporcional, valor_total_rescisao) VALUES (:funcionario_id, :data_demissao, :tipo_demissao, :motivo, :saldo_salario, :aviso_previo, :ferias_vencidas, :ferias_proporcionais, :terco_ferias, :decimo_terceiro_proporcional, :valor_total_rescisao)";
+
         try {
-            $this->conn->beginTransaction();
-            $sql = "INSERT INTO demissoes (funcionario_id, data_demissao, tipo_demissao, motivo, saldo_salario, aviso_previo, ferias_vencidas, ferias_proporcionais, terco_ferias, decimo_terceiro_proporcional, valor_total_rescisao) VALUES (:funcionario_id, :data_demissao, :tipo_demissao, :motivo, :saldo_salario, :aviso_previo, :ferias_vencidas, :ferias_proporcionais, :terco_ferias, :decimo_terceiro_proporcional, :valor_total_rescisao)";
-            $stmt = $this->conn->prepare($sql);
+            $this->db_connection->beginTransaction();
+            $stmt = $this->db_connection->prepare($sql);
             $stmt->execute($calculos);
             $funcionarioModel->updateStatus($funcionarioId, 'inativo');
-            $this->conn->commit();
-        
-        return array_merge($calculos, [
-            'nome_completo' => $funcionario['nome_completo'],
-            'cargo' => $funcionario['cargo'],
-            'data_admissao' => $funcionario['data_admissao']
-        ]);
+            $this->db_connection->commit();
+
+            return array_merge($calculos, [
+                'nome_completo' => $funcionario['nome_completo'],
+                'cargo' => $funcionario['cargo'],
+                'data_admissao' => $funcionario['data_admissao']
+            ]);
 
         } catch (Exception $e) {
-            $this->conn->rollBack();
+            $this->db_connection->rollBack();
+            error_log("Erro ao processar demissão: " . $e->getMessage());
             return false;
         }
     }
@@ -68,9 +69,14 @@ class DemissaoModel
                 FROM demissoes d
                 JOIN funcionarios f ON d.funcionario_id = f.id
                 WHERE d.funcionario_id = :id";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['id' => $funcionarioId]);
-        return $stmt->fetch();
+
+        try {
+            $stmt = $this->db_connection->prepare($sql);
+            $stmt->execute(['id' => $funcionarioId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Erro ao buscar resumo de demissão: " . $e->getMessage());
+            return null;
+        }
     }
 }
