@@ -9,6 +9,7 @@ session_start();
 
 // Define o caminho base do projeto
 define('BASE_PATH', dirname(__DIR__));
+define('BASE_URL', '/Rhease/public'); // Defina a URL base do seu projeto aqui
 
 // Carrega as configurações principais (DB_HOST, BASE_URL, etc.)
 require_once BASE_PATH . '/config.php';
@@ -36,16 +37,11 @@ $router = new Router();
 // ----------------------
 // Registro de rotas
 // ----------------------
-
-// Rotas da Home
-$router->addRoute('GET', '/', HomeController::class, 'show_index');
-
-// Rotas de Job
+$router->addRoute('GET', '/', 'HomeController', 'show_index');
 $router->addRoute('GET', '/job-application', 'JobController', 'show_job');
 $router->addRoute('POST', '/submit-application', 'JobController', 'store_application');
 $router->addRoute('GET', '/applications', 'JobController', 'show_applications');
 $router->addRoute('GET', '/view-bio/{id}', 'JobController', 'show_bio');
-$router->addRoute('GET', '/application/edit/{id}', 'JobController', 'show_update_form');
 $router->addRoute('POST', '/application/update/{id}', 'JobController', 'process_update');
 $router->addRoute('GET', '/delete-application/{id}', 'JobController', 'delete_application');
 
@@ -70,6 +66,10 @@ $router->addRoute('GET', '/demissao', 'DemissaoController', 'showIniciarForm');
 $router->addRoute('POST', '/demissao', 'DemissaoController', 'processar');
 $router->addRoute('GET', '/demissao/resumo/(\d+)', 'DemissaoController', 'verResumo');
 $router->addRoute('GET', '/funcionarios/demitidos', 'FuncionarioController', 'listarDemitidos');
+
+// Rotas de Comunicação Interna
+$router->addRoute('GET', '/comunicacao', InternalCommunicationController::class, 'index');
+$router->addRoute('POST', '/comunicacao/enviar', InternalCommunicationController::class, 'sendMessage');
 
 // ----------------------
 // Inicia o roteamento
