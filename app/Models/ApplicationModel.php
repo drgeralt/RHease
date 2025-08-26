@@ -1,11 +1,9 @@
 <?php
 
-class ApplicationModel{
-      private $db_connection;
-      public function __construct(){
-         require_once BASE_PATH . '/app/Core/Database.php';
-         $this->db_connection = Database::getInstance();
-      }
+require_once BASE_PATH . '/app/Core/Model.php';
+
+class ApplicationModel extends Model {
+      
 
        public function saveApplication($data): bool{
         $sql = "INSERT INTO applications (name, email, phone, years_experience, expected_salary, bio) 

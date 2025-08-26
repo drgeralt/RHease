@@ -1,7 +1,5 @@
 <?php
 
-require_once BASE_PATH . '/app/Models/PayrollModel.php';
-
 class PayrollController {
     public function show_payroll_form() {
         require_once BASE_PATH . '/app/Views/payroll/form.php';

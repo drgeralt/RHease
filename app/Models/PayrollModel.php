@@ -1,11 +1,9 @@
 <?php
-class PayrollModel{
-   private $db_connection;
 
-   public function __construct(){
-      require_once BASE_PATH . '/app/Core/Database.php';
-      $this->db_connection = Database::getInstance();
-   }
+require_once BASE_PATH . '/app/Core/Model.php';
+
+class PayrollModel extends Model{
+   
 
    public function savePayroll($data){
       $sql = "INSERT INTO payroll (name, email, position, salary)

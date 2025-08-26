@@ -1,7 +1,5 @@
 <?php
 
-require_once BASE_PATH . '/app/Models/ApplicationModel.php';
-
 class JobController {
 
     public function show_job() {
