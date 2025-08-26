@@ -20,9 +20,9 @@ class JobController {
         $success = $applicationModel->saveApplication($_POST);
 
         if ($success) {
-            header('Location: /Rhease/public/thank_you.php');
+            header('Location: ' . BASE_URL . '/thank_you');
         } else {
-            header('Location: /Rhease/public/error.php');
+            header('Location: ' . BASE_URL . '/error');
         }
         exit;
     }
@@ -44,7 +44,7 @@ class JobController {
         $application = $applicationModel->getApplicationById($id);
 
         if (!$application) {
-            header('Location: /Rhease/public/error');
+            header('Location: ' . BASE_URL . '/error');
             exit;
         }
 
@@ -56,9 +56,9 @@ class JobController {
         $success = $applicationModel->updateApplicationById($id, $_POST);
 
         if ($success) {
-            header('Location: /Rhease/public/applications');
+            header('Location: ' . BASE_URL . '/applications');
         } else {
-            header('Location: /Rhease/public/error');
+            header('Location: ' . BASE_URL . '/error');
         }
         exit;
     }
@@ -68,9 +68,9 @@ class JobController {
         $success = $applicationModel->deleteApplicationById($id);
 
         if ($success) {
-            header('Location: /Rhease/public/applications');
+            header('Location: ' . BASE_URL . '/applications');
         } else {
-            header('Location: /Rhease/public/error');
+            header('Location: ' . BASE_URL . '/error');
         }
         exit;
     }

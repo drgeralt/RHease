@@ -34,7 +34,7 @@ class PayrollController {
 
         if (!empty($errors)) {
             // For simplicity, redirect to error page. In a real app, you'd pass errors back to the form.
-            header('Location: /Rhease/public/error'); // Changed to route
+            header('Location: ' . BASE_URL . '/error'); // Changed to route
             exit;
         }
 
@@ -49,9 +49,9 @@ class PayrollController {
         $success = $payrollModel->savePayroll($data);
 
         if ($success) {
-            header('Location: /Rhease/public/payrolls'); // Redirect to payrolls list
+            header('Location: ' . BASE_URL . '/payrolls'); // Redirect to payrolls list
         } else {
-            header('Location: /Rhease/public/error'); // Changed to route
+            header('Location: ' . BASE_URL . '/error'); // Changed to route
         }
         exit;
     }
@@ -79,7 +79,7 @@ class PayrollController {
         $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
 
         if (empty($id)) {
-            header('Location: /Rhease/public/error');
+            header('Location: ' . BASE_URL . '/error');
             exit;
         }
 
@@ -87,9 +87,9 @@ class PayrollController {
         $success = $payrollModel->deletePayroll($id);
 
         if ($success) {
-            header('Location: /Rhease/public/payrolls');
+            header('Location: ' . BASE_URL . '/payrolls');
         } else {
-            header('Location: /Rhease/public/error');
+            header('Location: ' . BASE_URL . '/error');
         }
         exit;
     }
