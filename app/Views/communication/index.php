@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comunicação Interna - RH</title>
-</head>
-<body>
+<?php require_once BASE_PATH . '/app/Views/templates/header.php'; ?>
+
 <h1>Página de Comunicação Interna</h1>
 
 <h2>Nova Mensagem</h2>
-<form action="/Rhease/public/comunicacao/enviar" method="POST">
+<form action="<?= BASE_URL ?>/comunicacao/enviar" method="POST">
     <div>
         <label for="content">Sua Mensagem:</label>
         <br>
@@ -25,10 +19,10 @@
 
 <h2>Mensagens Recentes</h2>
 
-<?php if (empty($messages)): ?>
+<?php if (empty($messages)) : ?>
     <p>Nenhuma mensagem encontrada.</p>
-<?php else: ?>
-    <?php foreach ($messages as $message): ?>
+<?php else : ?>
+    <?php foreach ($messages as $message) : ?>
         <div>
             <p><strong>Enviado por:</strong> <?php echo htmlspecialchars($message['sender_id']); ?></p>
             <p><?php echo htmlspecialchars($message['content']); ?></p>
@@ -38,5 +32,4 @@
     <?php endforeach; ?>
 <?php endif; ?>
 
-</body>
-</html>
+<?php require_once BASE_PATH . '/app/Views/templates/footer.php'; ?>
