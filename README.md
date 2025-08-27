@@ -56,11 +56,11 @@ O sistema abrange todo o ciclo de vida do colaborador, desde a entrada até a sa
 | Eduardo Alves Silva           | 2023110516  | [@dudupn](https://github.com/dudupn)     |
 | Lean de Albuquerque Pereira   | [Matrícula] | [@LeanAlbu](https://github.com/LeanAlbu) |
 | Maria Fernanda Gomes Mendonça | [Matrícula] | [@mafezzzz](https://github.com/mafezzzz) |
-| Rhyan Nascimento de Sousa     | [Matrícula] | [@drgeralt](https://github.com/drgeralt) |
+| Rhyan Nascimento de Sousa     | 2024110375  | [@drgeralt](https://github.com/drgeralt) |
 
 ## 🎥 Apresentação do Projeto
 
-📹 **[Link do Vídeo de Apresentação](https://youtube.com/watch?v=VIDEO_ID)**
+📹 **[Link do Vídeo de Apresentação](https://youtu.be/N42ZZCQRpSQ)**
 
 *Vídeo demonstrando o funcionamento completo do sistema RHEase e explicando as principais funcionalidades implementadas para automação de RH.*
 
