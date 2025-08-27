@@ -1,23 +1,157 @@
-# **RHease: Sistema de Automação de Recursos Humanos**
+# 💼 RHEase
+
+Sistema completo de automação para Recursos Humanos
+
+## 📚 Informações Acadêmicas
+
+**Universidade:** Universidade Federal do Tocantins - Campus Palmas  
+**Curso:** Ciência da Computação  
+**Disciplina:** Engenharia de Software  
+**Semestre:** 2025/2  
+**Professor:** Edeilson Milhomem
+
+## 📋 Descrição do Projeto
+
+O RHEase é uma solução de software completa, projetada para automatizar e otimizar os processos-chave do departamento de Recursos Humanos de uma empresa. Com o objetivo de aumentar a eficiência, reduzir a carga de trabalho manual e melhorar a experiência dos colaboradores, este sistema centraliza e simplifica as tarefas diárias, permitindo que a equipe de RH se concentre em atividades mais estratégicas.
+
+O sistema abrange todo o ciclo de vida do colaborador, desde a entrada até a saída da empresa, oferecendo uma plataforma integrada que facilita a gestão de pessoas e processos organizacionais.
+
+## 🎯 Objetivos
+
+- **Automatizar processos de RH:** Reduzir tarefas manuais e repetitivas através de fluxos automatizados
+- **Centralizar informações:** Unificar dados de colaboradores em uma plataforma única e segura
+- **Melhorar a experiência do colaborador:** Facilitar o acesso a informações e serviços de RH
+- **Aumentar a eficiência operacional:** Otimizar tempo e recursos da equipe de RH
+- **Facilitar tomadas de decisão:** Fornecer relatórios e métricas para gestão estratégica
+
+## ✅ Funcionalidades Implementadas
+
+### 🔍 Recrutamento e Seleção
+- [ ] **RF01** - Gerenciamento de vagas de emprego
+- [ ] **RF02** - Sistema de banco de currículos
+
+### 💬 Comunicação Interna
+- [ ] **RF21** - Canal de comunicação integrado
+- [ ] **RF22** - Sistema de anúncios e comunicados
+
+### 💰 Folha de Pagamento
+- [ ] **RF26** - Automação do cálculo de salários
+
+### 🏥 Gestão de Benefícios
+- [ ] **RF31** - Gerenciamento de planos de saúde
+- [ ] **RF32** - Controle de vale-refeição e vale-transporte
+- [ ] **RF33** - Gestão de seguro de vida
+
+### 👋 Demissões (Offboarding)
+- [ ] **RF36** - Fluxo de trabalho estruturado para saídas
+- [ ] **RF37** - Coleta automatizada de feedback de saída
+
+
+*Legenda: ✅ Implementado | ❌ Não implementado | 🔄 Em desenvolvimento*
+
+## 👥 Integrantes da Equipe
+
+| Nome                          | Matrícula   | GitHub User                              |
+|-------------------------------|-------------|------------------------------------------|
+| Eduardo Alves Silva           | 2023110516  | [@dudupn](https://github.com/dudupn)     |
+| Lean de Albuquerque Pereira   | [Matrícula] | [@LeanAlbu](https://github.com/LeanAlbu) |
+| Maria Fernanda Gomes Mendonça | [Matrícula] | [@mafezzzz](https://github.com/mafezzzz) |
+| Rhyan Nascimento de Sousa     | [Matrícula] | [@drgeralt](https://github.com/drgeralt) |
+
+## 🎥 Apresentação do Projeto
+
+📹 **[Link do Vídeo de Apresentação](https://youtube.com/watch?v=VIDEO_ID)**
+
+*Vídeo demonstrando o funcionamento completo do sistema RHEase e explicando as principais funcionalidades implementadas para automação de RH.*
+
+## 🛠️ Tecnologias Utilizadas
+
+*[Preencher com as tecnologias específicas do projeto após análise do código]*
+
+**Frontend:**
+- HTML, CSS JavaScript
+
+**Backend:**
+- PHP
+
+**Banco de Dados:**
+- MySQL
+
+**Outras Ferramentas:**
+- GitFlow
+- Padrão MVC
+
+## ⚙️ Configuração e Execução
+
+### Pré-requisitos
+
+Antes de executar o RHEase, certifique-se de ter instalado:
+
+- XAMPP
+
+### Instalação
+
+1. **Clone o repositório:**
+   ```bash
+   git clone https://github.com/drgeralt/RHEase.git
+   cd RHEase
+   Obs: O clone deve ser feito sob o diretório htdocs, sob o diretório de instalação do XAMPP
+   ```
+
+
+2. **Configure o banco de dados:**
+   ```bash
+   Após rodar o XAMPP e iniciar o Apache e o MySQL, acesse o endereço 127.0.0.1, vá em phpadmin e use o backup do banco de dados chamado database.db
+   ```
+
+
+### Execução
+
+1. **Inicie o sistema:**
+   ```Inicie o Apache e MySQL a partir do XAMPP Control panel
+   ```
+
+2. **Acesse a aplicação:**
+    - Sistema Principal: `http://localhost/RHease/public`
+
+
+## 📁 Estrutura do Projeto
+
+```
+RHEase/
+├── app/                # Código do servidor
+│   ├── Controller/        # Controladores do RHease
+│   ├── models/            # Modelos de dados
+│   ├── Core/              # Códigos comuns
+│   └── views/             # Interfaces de usuário
+├── public/              
+│   ├── src/
+│   │   ├── css/           # Estilização
+│   │   ├── js/            # Scripts .js
+├── config.php             # Configurações do banco de dados
+├── README.md
+└── database.sql
+```
+
+## 🤝 Contribuição
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade de RH'`)
+4. Push para a branch (`git push origin feature/nova-funcionalidade`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto foi desenvolvido para fins acadêmicos como parte da disciplina de Engenharia de Software da UFT.
+
+## 📞 Contato
+
+Para dúvidas ou sugestões sobre o RHEase, entre em contato com a equipe:
+
+- 📧 Email: [rhyan.sousa@mail.uft.edu.br]
+- 🐙 GitHub: [RHEase Repository](https://github.com/drgeralt/RHEase)
 
 ---
 
-## **Visão Geral**
-
-O **RHease** é uma solução de software completa, projetada para automatizar e otimizar os processos-chave do departamento de Recursos Humanos de uma empresa fictícia. Com o objetivo de aumentar a eficiência, reduzir a carga de trabalho manual e melhorar a experiência dos colaboradores, este sistema centraliza e simplifica as tarefas diárias, permitindo que a equipe de RH se concentre em atividades mais estratégicas.
-
----
-
-## **Funcionalidades**
-
-O RHease abrange diversas áreas críticas do ciclo de vida do colaborador, desde a entrada até a saída da empresa. As principais funcionalidades incluem:
-
-* **Recrutamento e Seleção:** Gerenciamento de vagas, banco de currículos, agendamento de entrevistas e acompanhamento do status dos candidatos.
-* **Integração (Onboarding):** Fluxo de trabalho automatizado para novos colaboradores, incluindo envio de documentos, agendamento de reuniões e atribuição de tarefas iniciais.
-* **Treinamento e Desenvolvimento:** Criação e gestão de trilhas de aprendizado, agendamento de treinamentos, acompanhamento do progresso e avaliação de eficácia.
-* **Avaliação de Desempenho:** Ciclos de avaliação personalizáveis (360°, pares, gestor), feedback contínuo e criação de planos de desenvolvimento individuais.
-* **Comunicação Interna:** Canal de comunicação integrado para anúncios, comunicados importantes e pesquisa de clima organizacional.
-* **Folha de Pagamento:** Automação do cálculo de salários, horas extras, descontos e geração de holerites.
-* **Benefícios:** Gerenciamento e acompanhamento de planos de saúde, vale-refeição, seguro de vida, entre outros.
-* **Demissões (Offboarding):** Fluxo de trabalho estruturado para a saída de colaboradores, incluindo a coleta de feedback e o gerenciamento de documentos de desligamento.
-
+*Desenvolvido️ por estudantes de Ciência da Computação na UFT - Campus Palmas*
