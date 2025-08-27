@@ -54,7 +54,7 @@ O sistema abrange todo o ciclo de vida do colaborador, desde a entrada até a sa
 | Nome                          | Matrícula   | GitHub User                              |
 |-------------------------------|-------------|------------------------------------------|
 | Eduardo Alves Silva           | 2023110516  | [@dudupn](https://github.com/dudupn)     |
-| Lean de Albuquerque Pereira   | [Matrícula] | [@LeanAlbu](https://github.com/LeanAlbu) |
+| Lean de Albuquerque Pereira   | 2024110745  | [@LeanAlbu](https://github.com/LeanAlbu) |
 | Maria Fernanda Gomes Mendonça | [Matrícula] | [@mafezzzz](https://github.com/mafezzzz) |
 | Rhyan Nascimento de Sousa     | 2024110375  | [@drgeralt](https://github.com/drgeralt) |
 
