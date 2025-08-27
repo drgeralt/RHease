@@ -42,6 +42,7 @@ $router->addRoute('GET', '/job-application', 'JobController', 'show_job');
 $router->addRoute('POST', '/submit-application', 'JobController', 'store_application');
 $router->addRoute('GET', '/applications', 'JobController', 'show_applications');
 $router->addRoute('GET', '/view-bio/{id}', 'JobController', 'show_bio');
+$router->addRoute('GET', '/application/edit/{id}', 'JobController', 'show_update_form');
 $router->addRoute('POST', '/application/update/{id}', 'JobController', 'process_update');
 $router->addRoute('GET', '/delete-application/{id}', 'JobController', 'delete_application');
 

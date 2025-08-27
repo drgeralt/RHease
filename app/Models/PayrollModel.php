@@ -49,7 +49,7 @@ class PayrollModel extends Model{
        $allowedOrderDirection = ['ASC', 'DESC'];
 
        $orderBy = in_array($orderBy, $allowedOrderBy) ? $orderBy : 'id';
-       $orderDirection = in_array(strtoupper($orderDirection), $allowedOrderDirection) ? strtoupper($orderDirection) : 'DESC';
+       $orderDirection = in_array(strtoupper($orderDirection ?? 'DESC'), $allowedOrderDirection) ? strtoupper($orderDirection ?? 'DESC') : 'DESC';
 
        $sql .= " ORDER BY $orderBy $orderDirection";
 

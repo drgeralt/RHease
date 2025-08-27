@@ -9,7 +9,7 @@ class PayrollController {
         $errors = [];
 
         // Validate name
-        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+        $name = filter_input(INPUT_POST, 'name', FILTER_DEFAULT);
         if (empty($name)) {
             $errors[] = 'O nome é obrigatório.';
         }
@@ -21,7 +21,7 @@ class PayrollController {
         }
 
         // Validate position
-        $position = filter_input(INPUT_POST, 'position', FILTER_SANITIZE_STRING);
+        $position = filter_input(INPUT_POST, 'position', FILTER_DEFAULT);
         if (empty($position)) {
             $errors[] = 'O cargo é obrigatório.';
         }
@@ -57,10 +57,10 @@ class PayrollController {
     }
 
     public function show_payrolls() {
-        $orderBy = filter_input(INPUT_GET, 'order_by', FILTER_SANITIZE_STRING);
-        $orderDirection = filter_input(INPUT_GET, 'order_direction', FILTER_SANITIZE_STRING);
-        $positionFilter = filter_input(INPUT_GET, 'position', FILTER_SANITIZE_STRING);
-        $nameSearch = filter_input(INPUT_GET, 'search_name', FILTER_SANITIZE_STRING);
+        $orderBy = filter_input(INPUT_GET, 'order_by', FILTER_DEFAULT);
+        $orderDirection = filter_input(INPUT_GET, 'order_direction', FILTER_DEFAULT);
+        $positionFilter = filter_input(INPUT_GET, 'position', FILTER_DEFAULT);
+        $nameSearch = filter_input(INPUT_GET, 'search_name', FILTER_DEFAULT);
 
         $payrollModel = new PayrollModel();
         $payrolls = $payrollModel->getPayrolls($orderBy, $orderDirection, $positionFilter, $nameSearch);

@@ -42,7 +42,7 @@ class DemissaoController
 
         if ($resumo) {
             $data['resumo'] = $resumo;
-            require_once BASE_PATH . '/app/views/demissao/resumo.php';
+            require_once BASE_PATH . '/app/Views/demissao/resumo.php';
         } else {
             // Se não encontrar uma demissão para esse funcionário, mostra um erro.
             http_response_code(404);

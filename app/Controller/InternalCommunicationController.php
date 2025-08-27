@@ -25,7 +25,7 @@ class InternalCommunicationController
             if ($senderId === null || $receiverId === null) {
                 // Handle error: sender_id or receiver_id not provided
                 // For now, we'll just redirect back or show an error
-                header('Location: /comunicacao?error=missing_ids');
+                header('Location: ' . BASE_URL . '/comunicacao?error=missing_ids');
                 exit;
             }
 
@@ -37,7 +37,7 @@ class InternalCommunicationController
 
             $model->sendMessage($data);
 
-            header('Location: /comunicacao');
+            header('Location: ' . BASE_URL . '/comunicacao');
             exit;
         }
     }
