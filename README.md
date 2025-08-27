@@ -112,7 +112,7 @@ Antes de executar o RHEase, certifique-se de ter instalado:
    ```
 
 2. **Acesse a aplicação:**
-    - Sistema Principal: `http://localhost/RHease/public`
+    - Sistema Principal: `http://localhost/RHEase/public`
 
 
 ## 📁 Estrutura do Projeto
