@@ -1,5 +1,7 @@
 # 💼 RHEase
 
+<img width="777" height="202" alt="image" src="https://github.com/user-attachments/assets/a8f8eb07-5703-458e-8c70-ce1bd9c591af" />
+
 Sistema completo de automação para Recursos Humanos
 
 ## 📚 Informações Acadêmicas
