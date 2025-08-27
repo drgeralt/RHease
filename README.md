@@ -55,7 +55,7 @@ O sistema abrange todo o ciclo de vida do colaborador, desde a entrada até a sa
 |-------------------------------|-------------|------------------------------------------|
 | Eduardo Alves Silva           | 2023110516  | [@dudupn](https://github.com/dudupn)     |
 | Lean de Albuquerque Pereira   | 2024110745  | [@LeanAlbu](https://github.com/LeanAlbu) |
-| Maria Fernanda Gomes Mendonça | [Matrícula] | [@mafezzzz](https://github.com/mafezzzz) |
+| Maria Fernanda Gomes Mendonça | 2021112536  | [@mafezzzz](https://github.com/mafezzzz) |
 | Rhyan Nascimento de Sousa     | 2024110375  | [@drgeralt](https://github.com/drgeralt) |
 
 ## 🎥 Apresentação do Projeto
