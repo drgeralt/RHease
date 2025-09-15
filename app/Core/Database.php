@@ -1,6 +1,6 @@
 <?php
 
-class Database {
+class   Database {
     private static $instance = null;
     private $connection;
 
@@ -24,6 +24,7 @@ class Database {
         if (!self::$instance) {
             self::$instance = new Database();
         }
+
         return self::$instance->connection;
     }
 }
