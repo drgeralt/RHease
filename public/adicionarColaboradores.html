@@ -16,14 +16,14 @@
         <h2 style="color: #25621C; font-weight: 600;">Adicionar Colaborador</h2>
         <form action="processa.php" method="POST">
 
-            <!--dados pessoais-->
+            <!--dados pessoais -->
             <section>
                 <h3>1. Dados Pessoais</h3>
                 <div class="grid">
-                    <div><label>Nome completo</label><input type="text" name="nome" placeholder="Ex.: Maria Oliveira da Silva"></div>
-                    <div><label>CPF</label><input type="text" name="cpf" placeholder="999.999.999-99"></div>
+                    <div><label>Nome completo</label><input type="text" name="nome" placeholder="Ex.: Maria Oliveira da Silva" required></div>
+                    <div><label>CPF</label><input type="text" name="cpf" placeholder="999.999.999-99" required oninput="mascaraCPF(this)"></div>
                     <div><label>RG</label><input type="text" name="rg"></div>
-                    <div><label>Data de nascimento</label><input type="date" name="data_nascimento"></div>
+                    <div><label>Data de nascimento</label><input type="date" name="data_nascimento" required></div>
                     <div>
                         <label>Gênero</label>
                         <select name="genero">
@@ -31,18 +31,19 @@
                             <option value="Feminino">Feminino</option>
                             <option value="Masculino">Masculino</option>
                             <option value="Outro">Outro</option>
+                            <option value="Prefiro não informar">Prefiro não informar</option>
                         </select>
                     </div>
-                    <div><label>E-mail</label><input type="email" name="email" placeholder="exemplo@gmail.com"></div>
-                    <div><label>Telefone celular</label><input type="text" name="telefone" placeholder="(99) 9 9999-9999"></div>
+                    <div><label>E-mail</label><input type="email" name="email" placeholder="exemplo@gmail.com" required></div>
+                    <div><label>Telefone celular</label><input type="text" name="telefone" placeholder="(99) 99999-9999" oninput="mascaraTelefone(this)"></div>
                 </div>
             </section>
 
-            <!-- Endereço -->
+            <!--endereço-->
             <section>
                 <h3>2. Endereço</h3>
                 <div class="grid">
-                    <div><label>CEP</label><input type="text" name="cep" placeholder="99999-999"></div>
+                    <div><label>CEP</label><input type="text" name="cep" placeholder="99999-999" oninput="mascaraCEP(this)" onblur="buscaCEP(this.value)"></div>
                     <div class="col-2"><label>Logradouro</label><input type="text" name="logradouro" placeholder="Rua, Avenida, Travessa etc."></div>
                     <div><label>Número</label><input type="text" name="numero" placeholder="Ex.: 123"></div>
                     <div><label>Complemento</label><input type="text" name="complemento" placeholder="Ex.: Apt 202, Bloco B"></div>
@@ -84,21 +85,23 @@
                 </div>
             </section>
 
-            <!-- Dados Profissionais -->
+            <!--dados profissionais-->
             <section>
                 <h3>3. Dados Profissionais</h3>
                 <div class="grid">
                     <div><label>ID (Matrícula)</label><input type="text" name="matricula" placeholder="99999-999"></div>
-                    <div><label>Cargo</label><input type="text" name="cargo" placeholder="Ex.: Analista de Sistemas"></div>
-                    <div><label>Departamento</label><input type="text" name="departamento" placeholder="Ex.: TI, Financeiro"></div>
-                    <div><label>Salário (R$)</label><input type="text" name="salario" placeholder="Ex.: 3.500,75"></div>
-                    <div><label>Data de Admissão</label><input type="date" name="data_admissao"></div>
+                    <div><label>Cargo</label><input type="text" name="cargo" placeholder="Ex.: Analista de Sistemas" required></div>
+                    <div><label>Departamento</label><input type="text" name="departamento" placeholder="Ex.: TI, Financeiro" required></div>
+                    <div><label>Salário (R$)</label><input type="text" name="salario" placeholder="Ex.: 3.500,75" required></div>
+                    <div><label>Data de Admissão</label><input type="date" name="data_admissao" required></div>
                     <div>
                         <label>Tipo de Contrato</label>
-                        <select name="tipo_contrato">
+                        <select name="tipo_contrato" required>
+                            <option value="">Selecione</option>
                             <option value="CLT">CLT</option>
                             <option value="PJ">PJ</option>
                             <option value="Estágio">Estágio</option>
+                            <option value="Temporário">Temporário</option>
                         </select>
                     </div>
                     <div><label>E-mail Corporativo</label><input type="email" name="email_corporativo" placeholder="usuario@empresa.com"></div>
@@ -110,5 +113,57 @@
             </div>
         </form>
     </main>
+
+    <script>
+        // máscara CPF
+        function mascaraCPF(i){
+            let v = i.value.replace(/\D/g,'');
+            v = v.replace(/(\d{3})(\d)/,'$1.$2');
+            v = v.replace(/(\d{3})(\d)/,'$1.$2');
+            v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+            i.value = v;
+        }
+
+        // máscara Telefone
+        function mascaraTelefone(i){
+            let v = i.value.replace(/\D/g,'');
+            if(v.length <= 10){
+                v = v.replace(/(\d{2})(\d)/,'($1) $2');
+                v = v.replace(/(\d{4})(\d)/,'$1-$2');
+            } else {
+                v = v.replace(/(\d{2})(\d)/,'($1) $2');
+                v = v.replace(/(\d{5})(\d)/,'$1-$2');
+            }
+            i.value = v;
+        }
+
+        // máscara CEP
+        function mascaraCEP(i){
+            let v = i.value.replace(/\D/g,'');
+            v = v.replace(/(\d{5})(\d)/,'$1-$2');
+            i.value = v;
+        }
+
+        // preenchimento automático de endereço via CEP
+        async function buscaCEP(cep){
+            cep = cep.replace(/\D/g,'');
+            if(cep.length === 8){
+                try{
+                    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    const data = await res.json();
+                    if(!data.erro){
+                        document.querySelector('input[name="logradouro"]').value = data.logradouro;
+                        document.querySelector('input[name="bairro"]').value = data.bairro;
+                        document.querySelector('input[name="cidade"]').value = data.localidade;
+                        document.querySelector('select[name="estado"]').value = data.uf;
+                    } else {
+                        alert("CEP não encontrado.");
+                    }
+                } catch(e){
+                    alert("Erro ao buscar CEP.");
+                }
+            }
+        }
+    </script>
 </body>
 </html>
