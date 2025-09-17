@@ -59,6 +59,7 @@ O sistema abrange todo o ciclo de vida do colaborador, desde a entrada até a sa
 | Matheus de Sousa Silva   | 2024110828  | [@math3us-sousa](https://github.com/math3us-sousa)         |
 | Vitória Ferreira Leal Santos | 2024111649  | [@vitorialeal06](https://github.com/vitorialeal06)     |
 | Rhyan Nascimento de Sousa     | 2024110375  | [@drgeralt](https://github.com/drgeralt)              |
+| Gabriel Rodrigues Costa Ferreira | 2024111694 | [@Gabbilless](https://github.com/Gabbilless)        |
 
 ## 🎥 Apresentação do Projeto
 
