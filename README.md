@@ -56,8 +56,8 @@ O sistema abrange todo o ciclo de vida do colaborador, desde a entrada até a sa
 | Nome                          | Matrícula   | GitHub User                                           |
 |-------------------------------|-------------|-------------------------------------------------------|
 | Vitória Milhomem Soares       | 2024111648  | [@vitoriamilhomem](https://github.com/vitoriamilhomem)|
-| Matheus de Sousa Silva   | 2024110828  | [@math3us-sousa](https://github.com/math3us-sousa)              |
-| Maria Fernanda Gomes Mendonça | 2021112536  | [@mafezzzz](https://github.com/mafezzzz)              |
+| Matheus de Sousa Silva   | 2024110828  | [@math3us-sousa](https://github.com/math3us-sousa)         |
+| Vitória Ferreira Leal Santos | 2024111649  | [@vitorialeal06](https://github.com/vitorialeal06)     |
 | Rhyan Nascimento de Sousa     | 2024110375  | [@drgeralt](https://github.com/drgeralt)              |
 
 ## 🎥 Apresentação do Projeto
