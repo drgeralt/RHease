@@ -113,5 +113,56 @@
             </div>
         </form>
     </main>
+    <script>
+        // Máscara CPF
+        function mascaraCPF(i){
+            let v = i.value.replace(/\D/g,'');
+            v = v.replace(/(\d{3})(\d)/,'$1.$2');
+            v = v.replace(/(\d{3})(\d)/,'$1.$2');
+            v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+            i.value = v;
+        }
+
+        // Máscara Telefone
+        function mascaraTelefone(i){
+            let v = i.value.replace(/\D/g,'');
+            if(v.length <= 10){
+                v = v.replace(/(\d{2})(\d)/,'($1) $2');
+                v = v.replace(/(\d{4})(\d)/,'$1-$2');
+            } else {
+                v = v.replace(/(\d{2})(\d)/,'($1) $2');
+                v = v.replace(/(\d{5})(\d)/,'$1-$2');
+            }
+            i.value = v;
+        }
+
+        // Máscara CEP
+        function mascaraCEP(i){
+            let v = i.value.replace(/\D/g,'');
+            v = v.replace(/(\d{5})(\d)/,'$1-$2');
+            i.value = v;
+        }
+
+        // Preenchimento automático de endereço via CEP
+        async function buscaCEP(cep){
+            cep = cep.replace(/\D/g,'');
+            if(cep.length === 8){
+                try{
+                    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    const data = await res.json();
+                    if(!data.erro){
+                        document.querySelector('input[name="logradouro"]').value = data.logradouro;
+                        document.querySelector('input[name="bairro"]').value = data.bairro;
+                        document.querySelector('input[name="cidade"]').value = data.localidade;
+                        document.querySelector('select[name="estado"]').value = data.uf;
+                    } else {
+                        alert("CEP não encontrado.");
+                    }
+                } catch(e){
+                    alert("Erro ao buscar CEP.");
+                }
+            }
+        }
+    </script>
 </body>
 </html>
