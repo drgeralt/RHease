@@ -38,5 +38,51 @@
                     <div><label>Telefone celular</label><input type="text" name="telefone" placeholder="(99) 99999-9999" oninput="mascaraTelefone(this)"></div>
                 </div>
             </section>
+
+            <!-- Endereço -->
+            <section>
+                <h3>2. Endereço</h3>
+                <div class="grid">
+                    <div><label>CEP</label><input type="text" name="cep" placeholder="99999-999" oninput="mascaraCEP(this)" onblur="buscaCEP(this.value)"></div>
+                    <div class="col-2"><label>Logradouro</label><input type="text" name="logradouro" placeholder="Rua, Avenida, Travessa etc."></div>
+                    <div><label>Número</label><input type="text" name="numero" placeholder="Ex.: 123"></div>
+                    <div><label>Complemento</label><input type="text" name="complemento" placeholder="Ex.: Apt 202, Bloco B"></div>
+                    <div><label>Bairro</label><input type="text" name="bairro" placeholder="Ex.: Centro"></div>
+                    <div><label>Cidade</label><input type="text" name="cidade" placeholder="Ex.: Palmas"></div>
+                    <div>
+                        <label>Estado (UF)</label>
+                        <select name="estado">
+                            <option value="">Selecione</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
 </body>
 </html>
