@@ -57,7 +57,12 @@ die("Erro ao buscar os dados dos colaboradores: " . $e->getMessage());
 </header>
 
 <main class="container mt-4">
-    <h1 class="mb-4">Lista de Colaboradores</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Lista de Colaboradores</h1>
+        <a href="#" onclick="history.back(); return false;" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
 
     <div class="card p-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
