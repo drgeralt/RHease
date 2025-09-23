@@ -1,0 +1,13 @@
+
+{
+  "name": "your-vendor/rhease",
+  "description": "Project description.",
+  "autoload": {
+    "psr-4": {
+      "App\\": "App/"
+    }
+  },
+  "require": {
+    "ext-pdo": "*"
+  }
+}

@@ -1,43 +1,3 @@
-<?php
-// Inclui a classe de conexão com o banco de dados
-// Ajuste o caminho se o seu arquivo não estiver na raiz do projeto.
-require_once '../app/Core/Database.php';
-
-try {
-    // Obtém a instância da conexão PDO
-    $pdo = Database::getInstance();
-
-    // Cria a consulta SQL para buscar os dados, unindo as tabelas
-    $sql = "
-        SELECT 
-            c.id_colaborador, 
-            c.nome_completo,
-            c.data_admissao,
-            c.situacao,
-            ca.nome_cargo AS cargo,
-            s.nome_setor AS departamento
-        FROM 
-            colaborador AS c
-        LEFT JOIN 
-            cargo AS ca ON c.id_cargo = ca.id_cargo
-        LEFT JOIN 
-            setor AS s ON c.id_setor = s.id_setor
-        ORDER BY
-            c.nome_completo ASC
-    ";
-
-    // Executa a consulta
-    $stmt = $pdo->query($sql);
-
-// Busca todos os resultados como um array associativo
-$colaboradores = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-} catch (PDOException $e) {
-// Em caso de erro, exibe uma mensagem amigável e interrompe o script
-die("Erro ao buscar os dados dos colaboradores: " . $e->getMessage());
-}
-
-?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -49,11 +9,11 @@ die("Erro ao buscar os dados dos colaboradores: " . $e->getMessage());
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/tabelaColaborador.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/tabelaColaborador.css">
 </head>
 <body>
 <header class="topbar">
-    <div class="logo"><img src="img/rhease-ease 1.png" alt="Logo RH Ease" class="logo"></div>
+    <div class="logo"><img src="<?php echo BASE_URL; ?>/img/rhease-ease 1.png" alt="Logo RH Ease" class="logo"></div>
 </header>
 
 <main class="container mt-4">
@@ -119,7 +79,7 @@ die("Erro ao buscar os dados dos colaboradores: " . $e->getMessage());
 
         <div class="d-flex justify-content-between align-items-center mt-3">
             <div>
-                <a href="adicionar_colaborador.php" class="btn btn-success">
+                <a href="<?php echo BASE_URL; ?>/colaboradores/adicionar" class="btn btn-success">
                     <i class="bi bi-plus-circle-fill"></i> Adicionar Colaborador
                 </a>
             </div>
