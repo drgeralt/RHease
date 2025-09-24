@@ -1,20 +1,19 @@
-<?php include("conexao.php"); ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Adicionar Colaborador</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/cadastroColaboradores.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/cadastroColaboradores.css">
 </head>
 <body>
     <header class="topbar">
-        <div class="logo"><img src="img/rhease-ease 1.png" alt="Logo RH Ease" class="logo"></div>
+        <div class="logo"><img src="<?php echo BASE_URL; ?>/img/rhease-ease 1.png" alt="Logo RH Ease" class="logo"></div>
     </header>
 
     <main class="form-container">
         <h2 style="color: #25621C; font-weight: 600;">Adicionar Colaborador</h2>
-        <form action="processa.php" method="POST">
+        <form action="<?php echo BASE_URL; ?>/colaboradores/criar" method="POST">
 
             <!--dados pessoais-->
             <section>
@@ -43,7 +42,7 @@
             <section>
                 <h3>2. Endereço</h3>
                 <div class="grid">
-                    <div><label>CEP</label><input type="text" name="cep" placeholder="99999-999" oninput="mascaraCEP(this)" onblur="buscaCEP(this.value)"></div>
+                    <div><label>CEP</label><input type="text" name="CEP" placeholder="99999-999" oninput="mascaraCEP(this)" onblur="buscaCEP(this.value)"></div>
                     <div class="col-2"><label>Logradouro</label><input type="text" name="logradouro" placeholder="Rua, Avenida, Travessa etc."></div>
                     <div><label>Número</label><input type="text" name="numero" placeholder="Ex.: 123"></div>
                     <div><label>Complemento</label><input type="text" name="complemento" placeholder="Ex.: Apt 202, Bloco B"></div>
