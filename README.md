@@ -26,6 +26,16 @@ O sistema abrange todo o ciclo de vida do colaborador, desde a entrada até a sa
 - **Aumentar a eficiência operacional:** Otimizar tempo e recursos da equipe de RH
 - **Facilitar tomadas de decisão:** Fornecer relatórios e métricas para gestão estratégica
 
+- ## ✅ Sprints
+
+### 🔍 01 - CRUD Inicial
+- [X] **Funções** - Cadastro, atualização, deleção (safe-delete), e visualização de colaboradores
+- [X] **Valor** - Permite ao Gerente de RH iniciar a integração dos colaboradores no RHease
+
+### 🔍 02 - Funções iniciais
+- [X] **Funções** - Login, Painel de vagas, inscrição, registro de pontos, remuneração, benefícios
+- [X] **Valor** - Permite o funcionamento básico do RH, valida a arquitetura do projeto.
+
 ## ✅ Funcionalidades Implementadas
 
 ### 🔍 Recrutamento e Seleção
