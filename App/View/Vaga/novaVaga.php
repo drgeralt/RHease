@@ -6,7 +6,7 @@
     <title>Criar Nova Vaga</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="../public/css/novaVaga.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/public/css/novaVaga.css">
 </head>
 <body>
     <div class="app-container">
@@ -16,7 +16,7 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo">
-                    <img src="../public/img/rhease-ease 1.png" alt="RH ease" class="logo-img">
+                    <img src="<?php echo BASE_URL; ?>/img/rhease-ease 1.png" alt="RH ease" class="logo-img">
                 </div>
             </div>
             <div class="header-right">

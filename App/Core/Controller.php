@@ -2,6 +2,8 @@
 
 namespace App\Core;
 
+use PDO;
+
 class Controller
 {
     public function view($view, $data = [])
@@ -23,4 +25,6 @@ class Controller
         require_once BASE_PATH . '/App/View/common/error.php';
         exit;
     }
+
+    
 }

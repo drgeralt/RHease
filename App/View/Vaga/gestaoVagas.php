@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Gestão de Vagas</title>
-    <link rel="stylesheet" href="../public/css/gestaoVagas.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/public/css/gestaoVagas.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo">
-                    <img src="../public/img/rhease-ease 1.png" alt="RH ease" class="logo-img">
+                    <img src="<?php echo BASE_URL; ?>/img/rhease-ease 1.png" alt="RH ease" class="logo-img">
                 </div>
             </div>
            <div class="header-right">
@@ -101,28 +101,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- <?php foreach ($jobs as $job): ?> 
+                                <?php foreach ($vagas as $vaga): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($job['titulo']); ?></td>
-                                    <td><?php echo htmlspecialchars($job['departamento']); ?></td>
+                                    <td><?php echo htmlspecialchars($vaga['titulo']); ?></td>
+                                    <td><?php echo htmlspecialchars($vaga['departamento']); ?></td>
                                     <td>
-                                        <span class="status-badge status-<?php echo strtolower($job['status']); ?>">
-                                            <?php echo $job['status']; ?>
+                                        <span class="status-badge <?php echo $vaga['situacao'] === 'aberta' ? 'status-open' : 'status-draft'; ?>">
+                                            <?php echo htmlspecialchars(ucfirst($vaga['situacao'])); ?>
                                         </span>
                                     </td>
                                     <td class="actions">
-                                        <button class="btn-action btn-edit" title="Editar">
-                                            <i class="fas fa-edit"></i>
+                                        <button class="btn btn-edit">
+                                            <i class="fas fa-edit"></i> Editar
                                         </button>
-                                        <button class="btn-action btn-delete" title="Excluir">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        <button class="btn-action btn-view" title="Visualizar">
-                                            <i class="fas fa-search"></i>
+                                        <button class="btn btn-delete">
+                                            <i class="fas fa-trash-alt"></i> Excluir
                                         </button>
                                     </td>
                                 </tr>
-                                <?php endforeach; ?> -->
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
@@ -143,17 +140,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- <?php foreach ($rules as $rule): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($rule['tipo_contrato']); ?></td>
-                                    <td><?php echo htmlspecialchars($rule['beneficios_padrao']); ?></td>
+                                    <td>CLT</td>
+                                    <td>Vale Transporte, Vale Refeição</td>
                                     <td class="actions">
-                                        <button class="btn-action btn-edit" title="Editar">
-                                            <i class="fas fa-edit"></i>
+                                        <button class="btn btn-edit">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </button>
+                                        <button class="btn btn-delete">
+                                            <i class="fas fa-trash-alt"></i> Excluir
                                         </button>
                                     </td>
                                 </tr>
-                                <?php endforeach; ?> -->
                             </tbody>
                         </table>
                     </div>
