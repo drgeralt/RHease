@@ -1,45 +1,56 @@
-<?php
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RH ease</title>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
 
-use App\Controller\ColaboradorController;
-use App\Controller\HomeController;
-use App\Core\Router;
+    <div class="login-container">
+        <header class="login-header">
+            <img src="img/rhease-ease%201.png" alt="Logo RH ease" class="logo">
+            <h1>Acesse a sua conta</h1>
+        </header>
 
-require_once __DIR__ .'/../vendor/autoload.php';
+        <form class="login-form">
+            <div class="input-group">
+                <label for="email">Login</label>
+                <div class="input-wrapper icon-email">
+                    <input type="email" id="email" placeholder="Seu e-mail" required>
+                </div>
+            </div>
 
-// Código para forçar a exibição de todos os erros do PHP
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 0);
-error_reporting(E_ALL);
+            <div class="input-group">
+                <label for="password">Senha</label>
+                <div class="input-wrapper icon-password">
+                    <input type="password" id="password" placeholder="Insira sua senha aqui" required>
+                </div>
+            </div>
 
-// Inicia a sessão para usar as mensagens de feedback
-session_start();
+            <div class="options">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Lembre-me</label>
+                </div>
+                <a href="#" class="forgot-password">Esqueceu sua senha?</a>
+            </div>
 
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Entrar como Colaborador</button>
+                <button type="button" class="btn btn-secondary">Entrar como Gestor</button>
+            </div>
+        </form>
 
-// Define o caminho base do projeto
-define('BASE_PATH', dirname(__DIR__));
+        <footer class="login-footer">
+            <p>Não tem uma conta?</p>
+            <a href="../App/View/Login/paginaCadastroPlataforma.php">Cadastre-se aqui.</a>
+        </footer>
+    </div>
 
-
-// Carrega as configurações principais (DB_HOST, BASE_URL, etc.)
-require_once BASE_PATH . '/config.php';
-
-
-// Instancia o roteador
-$router = new Router();
-
-// ----------------------
-// Registro de rotas
-// ----------------------
-$router->addRoute('GET', '/', HomeController::class, 'show_index');
-
-//ColaboradorController
-$router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
-$router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
-
-// Rotas Comuns
-$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
-$router->addRoute('GET', '/error', Controller::class, 'show_error');
-
-// ----------------------
-// Inicia o roteamento
-// ----------------------
-$router->getRoutes();
+</body>
+</html>
