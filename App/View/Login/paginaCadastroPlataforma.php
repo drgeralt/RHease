@@ -53,10 +53,10 @@
     <footer class="login-footer">
         <p>Já tem uma conta?</p>
         <a href="../../../public/index.php">Faça login</a> </footer>
-</div>
+<!--</div>
 </footer>
 </div>
 
-<script src="cadastro.js"></script>
+<script src="cadastro.js"></script>-->
 </body>
 </html>
