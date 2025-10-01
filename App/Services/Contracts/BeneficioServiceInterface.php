@@ -1,5 +1,5 @@
 <?php
-// de vitoria milhomen para gabba
+// de vitoria milhomem para gabba
 
 /**
  * Contrato para o serviço de gerenciamento de benefícios.
