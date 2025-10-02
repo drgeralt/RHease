@@ -6,7 +6,7 @@
     <title>Criar Nova Vaga</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/public/css/novaVaga.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/novaVaga.css">
 </head>
 <body>
     <div class="app-container">
@@ -30,7 +30,7 @@
         <main class="main-container">
             <h1>Criar Nova Vaga</h1>
 
-            <form action="#" method="POST">
+            <form action="<?php echo BASE_URL; ?>/gestaoVagas/salvar" method="POST">
                 
                 <section>
                     <h3>1. Dados da Vaga</h3>

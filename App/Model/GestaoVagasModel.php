@@ -8,13 +8,8 @@ use App\Core\Model;
 
 class GestaoVagasModel extends Model{
 
-    protected string $table = 'vaga';
-    protected PDO $db_connection;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->db_connection = $pdo;
-    }
+    protected string $table = 'vaga'; // Nome da tabela no banco de dados
+    //construtor tem na classe model
 
     //listar todas as vagas para serem exibindas na gestao de vagas
     public function listarVagas(): array{
