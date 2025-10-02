@@ -11,19 +11,22 @@ class GestaoVagasModel extends Model{
     protected string $table = 'vaga';
     protected PDO $db_connection;
 
-    public function __construct(PDO $pdo){
+    public function __construct(PDO $pdo)
+    {
         $this->db_connection = $pdo;
     }
 
     //listar todas as vagas para serem exibindas na gestao de vagas
     public function listarVagas(): array{
-        
+
         $query = "SELECT 
         v.titulo_vaga AS titulo,
-        v.nome_setor AS departamento,
+        s.nome_setor AS departamento,
         v.situacao
         FROM 
             vaga AS v
+        LEFT JOIN 
+            setor AS s ON v.id_setor = s.id_setor
          ORDER BY
             v.titulo_vaga ASC";
         $stmt = $this->db_connection->prepare($query);

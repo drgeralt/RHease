@@ -8,7 +8,7 @@ require_once __DIR__ .'/../vendor/autoload.php';
 
 // Código para forçar a exibição de todos os erros do PHP
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
 // Inicia a sessão para usar as mensagens de feedback
@@ -34,6 +34,9 @@ $router->addRoute('GET', '/', HomeController::class, 'show_index');
 //ColaboradorController
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
 $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
+
+// Rotas de Gestão de Vagas
+$router->addRoute('GET', '/vagas/listar', \App\Controller\GestaoVagasController::class, 'listarVagas');
 
 // Rotas Comuns
 //$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');

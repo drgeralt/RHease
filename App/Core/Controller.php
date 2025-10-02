@@ -2,21 +2,25 @@
 
 namespace App\Core;
 
+use App\Core\Database;
 use PDO;
+
 
 class Controller
 {
-
-       /** @var PDO */
+    /** @var PDO A conexão com o banco de dados */
     protected PDO $db_connection;
 
-    /**
-     * Construtor recebe a conexão PDO
-     */
-    public function __construct(PDO $pdo)
+    // ==========================================================
+    // SEÇÃO ADICIONADA PARA CORRIGIR O ERRO
+    // ==========================================================
+    public function __construct()
     {
-        $this->db_connection = $pdo;
+        // Inicializamos a propriedade AQUI, assim que o Controller é criado.
+        // Usamos nossa classe Singleton para pegar a conexão.
+        $this->db_connection = Database::getInstance();
     }
+    // ==========================================================
 
 
     public function view($view, $data = [])
