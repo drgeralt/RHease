@@ -26,7 +26,13 @@
         </div>
 
         <div class="input-group">
-            <label for="email">Login</label>
+            <label for="cpf">CPF</label>
+            <div class="input-wrapper icon-cpf"> <input type="text" id="cpf" placeholder="000.000.000-00" required>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="email">Login (E-mail Profissional)</label>
             <div class="input-wrapper icon-email">
                 <input type="email" id="email" placeholder="Seu e-mail" required>
             </div>
@@ -56,5 +62,7 @@
     </footer>
 </div>
 
+
+<script src="/RHease/public/js/auth.js"></script>
 </body>
 </html>

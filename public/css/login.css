@@ -65,7 +65,7 @@ body {
 
 .input-wrapper input {
     width: 100%;
-    padding: 12px 15px 12px 45px; /* Espaço para o ícone */
+    padding: 12px 15px 12px 40px; /* Espaço para o ícone */
     border: 1px solid var(--border-color);
     border-radius: 8px;
     background-color: var(--white);
@@ -109,10 +109,9 @@ body {
 .input-wrapper.icon-password::before {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
 }
-
-/* Adiciona um padding esquerdo nos inputs para o ícone não ficar sobre o texto */
-.input-wrapper input {
-    padding-left: 40px;
+/* Ícone de Cartão/Documento para o campo "CPF" */
+.input-wrapper.icon-cpf::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='16' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3Cline x1='7' y1='15' x2='9' y2='15'%3E%3C/line%3E%3C/svg%3E");
 }
 
 /* --- Opções 'Lembre-me' e 'Esqueceu a senha' --- */
@@ -249,4 +248,20 @@ a.forgot-password:hover {
     line-height: 1.6;
     color: var(--dark-text);
     text-align: center;
+}
+.content-box {
+    padding: 20px;
+}
+.content-box .logo {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+.content-box p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #333333;
+    margin-bottom: 30px;
+}
+.content-box .btn {
+    width: 100%;
 }
