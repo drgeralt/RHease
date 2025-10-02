@@ -39,6 +39,7 @@ $router->addRoute('GET', '/cadastro', UserController::class, 'show_cadastro');
 //ColaboradorController
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
 $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
+$router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar');
 
 
 // ----------------------

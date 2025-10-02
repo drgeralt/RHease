@@ -42,7 +42,7 @@
 
         <div class="button-group">
             <button type="submit" class="btn btn-primary">Entrar como Colaborador</button>
-            <button type="button" class="btn btn-secondary">Entrar como Gestor</button>
+            <a href="/RHease/public/colaboradores" class="btn btn-secondary" role="button">Entrar como Gestor</a>
         </div>
     </form>
 
