@@ -9,33 +9,28 @@ class NovaVagaModel extends Model
 {
     protected string $table = 'vaga'; // Nome da tabela no banco de dados
 
-     public function criarVaga(array $dados)
+      public function criarVaga(array $dados): string
     {
-        // A instrução SQL INSERT com placeholders para segurança
+        // Esta query agora reflete os campos do seu novo formulário
         $query = "INSERT INTO {$this->table} 
-                    (titulo_vaga, id_setor, situacao, requisitos) -- Adicione outras colunas conforme necessário
+                    (titulo_vaga, id_setor, situacao, descricao, requisitos, skills_recomendadas, skills_desejadas)
                   VALUES 
-                    (:titulo_vaga, :id_setor, :situacao, :requisitos)";
+                    (:titulo_vaga, :id_setor, :situacao, :descricao, :requisitos, :skills_recomendadas, :skills_desejadas)";
         
-        try {
-            $stmt = $this->db_connection->prepare($query);
+        $stmt = $this->db_connection->prepare($query);
 
-            // Vincula os valores do array aos placeholders da query
-            $stmt->bindValue(':titulo_vaga', $dados['titulo_vaga']);
-            $stmt->bindValue(':id_setor', $dados['id_setor']);
-            $stmt->bindValue(':situacao', $dados['situacao']);
-            $stmt->bindValue(':requisitos', $dados['requisitos']);
-            // ... vincule outros campos aqui ...
+        // Passa o array de dados diretamente para o execute()
+        // As chaves do array devem corresponder aos placeholders na query
+        $stmt->execute([
+            ':titulo_vaga' => $dados['titulo_vaga'],
+            ':id_setor' => $dados['id_setor'],
+            ':situacao' => $dados['status_vaga'], // O campo 'situacao' no banco recebe o valor de 'status_vaga' do form
+            ':descricao' => $dados['descricao'],
+            ':requisitos' => $dados['skills_necessarias'], // O campo 'requisitos' no banco recebe as skills necessárias
+            ':skills_recomendadas' => $dados['skills_recomendadas'],
+            ':skills_desejadas' => $dados['skills_desejadas']
+        ]);
 
-            $stmt->execute();
-            
-            // Retorna o ID da última linha inserida, muito útil para redirecionamentos
-            return $this->db_connection->lastInsertId();
-
-        } catch (PDOException $e) {
-            // Em um sistema real, você logaria o erro em vez de exibi-lo
-            error_log($e->getMessage());
-            return false;
-        }
+        return $this->db_connection->lastInsertId();
     }
 }

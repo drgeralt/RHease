@@ -18,4 +18,10 @@ class GestaoVagasController extends Controller{
         //renderizar a view passando as vagas
         $this->view('vaga/gestaoVagas', ['vagas' => $vagas]);
     }
+
+     public function criar(): void
+    {
+        // A única responsabilidade deste método é carregar a view do formulário.
+        $this->view('vaga/novaVaga');
+    }
 }

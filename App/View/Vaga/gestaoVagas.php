@@ -84,7 +84,7 @@
                 <section class="content-section">
                     <div class="section-header">
                         <h2 class="section-title">Gestão de Vagas</h2>
-                        <a href = "<?php echo BASE_URL;?>/View/Vaga/NovaVaga.php"class="btn btn-primary">
+                        <a href = "<?php echo BASE_URL;?>/vagas/criar" class="btn btn-primary">
                             <i class="fas fa-plus"></i>
                             Criar Nova Vaga
                         </a>

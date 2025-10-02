@@ -43,12 +43,9 @@
                             <label for="departamento">Departamento</label>
                             <input id="departamento" type="text" name="departamento" placeholder="Ex.: Marketing" required>
                         </div>
+                        
                         <div>
-                            <label for="localizacao">Localização</label>
-                            <input id="localizacao" type="text" name="localizacao" placeholder="Ex.: São Paulo, SP" required>
-                        </div>
-                        <div>
-                            <label for="tipo_contrato">Tipo de Contrato</label>
+                        <!--    <label for="tipo_contrato">Tipo de Contrato</label>
                             <select id="tipo_contrato" name="tipo_contrato" required>
                                 <option value="" disabled selected>Selecione</option>
                                 <option value="CLT">CLT</option>
@@ -60,7 +57,13 @@
                         <div>
                             <label for="salario">Salário (Opcional)</label>
                             <input id="salario" type="text" name="salario" placeholder="Ex.: R$ 3.000,00">
+                        </div>-->
+
+                        <div style="grid-column: span 2;">
+                            <label for="descricao">Descrição da Vaga</label>
+                            <textarea id="descricao" name="descricao" placeholder="Descreva as responsabilidades e requisitos da vaga..." required></textarea>
                         </div>
+
                         <div>
                             <label for="status">Status da Vaga</label>
                             <select id="status" name="status" class="status-select" required>
@@ -69,10 +72,7 @@
                                 <option value="fechada">Fechada</option>
                             </select>
                         </div>
-                        <div style="grid-column: span 2;">
-                            <label for="descricao">Descrição da Vaga</label>
-                            <textarea id="descricao" name="descricao" placeholder="Descreva as responsabilidades e requisitos da vaga..." required></textarea>
-                        </div>
+                        
                     </div>
                 </section>
 

@@ -35,8 +35,12 @@ $router->addRoute('GET', '/', HomeController::class, 'show_index');
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
 $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
 
-// Rotas de Gestão de Vagas
+// Rota de Gestão de Vagas
 $router->addRoute('GET', '/vagas/listar', \App\Controller\GestaoVagasController::class, 'listarVagas');
+
+//rotas para criar nova vaga
+$router->addRoute('GET', '/vagas/criar', \App\Controller\GestaoVagasController::class, 'criar');
+$router->addRoute('POST', '/vagas/salvar', \App\Controller\GestaoVagasController::class, 'salvar');
 
 // Rotas Comuns
 //$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');

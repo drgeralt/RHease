@@ -3,58 +3,69 @@
 namespace App\Controller;
 
 use App\Core\Controller;
+use App\Core\Database;
+use App\Model\SetorModel;
+use App\Model\NovaVagaModel;
+use PDOException;
 
 class NovaVagaController extends Controller
 {
-    public function criar()
+    public function criar(): void
     {
-        $this->view('vaga/novaVaga', [/*'setores' => $setores*/]);
-    }
-    public function showForm()
-    {
-        // Renderiza a view do formulário de nova vaga
-        $this->view('vaga/novaVaga');
+        // Apenas renderiza a view que contém o seu novo formulário HTML.
+        // O nome do arquivo pode ser, por exemplo, 'criarVagaForm.php'
+        $this->view('vaga/criarVagaForm');
     }
 
-    public function salvar()
+    /**
+     * Ação para PROCESSAR os dados do formulário e salvar a vaga.
+     * Acessível via POST: /public/gestaoVagas/salvar
+     */
+    public function salvar(): void
     {
-        // 1. Verificar se os dados foram enviados via POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            
-            // 2. Coletar e filtrar os dados do formulário
-            $dados = [
-                'titulo_vaga' => filter_input(INPUT_POST, 'titulo', FILTER_SANITIZE_STRING),
-                'id_setor' => 1, // PONTO IMPORTANTE: Veja a nota abaixo
-                'situacao' => filter_input(INPUT_POST, 'status', FILTER_SANITIZE_STRING),
-                'requisitos' => filter_input(INPUT_POST, 'skills_necessarias', FILTER_SANITIZE_STRING)
-                // Adicione os outros campos do seu formulário aqui...
-            ];
-
-            // 3. (Opcional, mas recomendado) Validar os dados.
-            // Se houver erros de validação, renderize o formulário novamente com as mensagens de erro.
-
-            // 4. Instanciar o Model
-            $vagaModel = $this->model('GestaoVagas');
-
-            // 5. Chamar o método do Model para criar a vaga
-            $novaVagaId = $vagaModel->criarVaga($dados);
-
-            // 6. Redirecionar o usuário (Padrão Post-Redirect-Get)
-            if ($novaVagaId) {
-                // Sucesso: redireciona para a lista de vagas
-                header('Location: /RHease/public/gestaoVagas/listarVagas');
-                exit;
-            } else {
-                // Erro: redireciona de volta para o formulário com uma mensagem de erro
-                // (Em um sistema mais avançado, você usaria sessões para passar a mensagem)
-                header('Location: /RHease/public/gestaoVagas/criar');
-                exit;
-            }
-
-        } else {
-            // Se não for POST, redireciona para a página inicial ou de criação
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /RHease/public/gestaoVagas/criar');
             exit;
+        }
+
+        $post = $_POST;
+        $pdo = Database::getInstance();
+
+        $pdo->beginTransaction();
+
+        try {
+            // 1. Encontra ou cria o Setor (Departamento) e pega o ID
+            $setorModel = new SetorModel($pdo);
+            $idSetor = $setorModel->findOrCreateByName($post['departamento']);
+
+            // 2. Prepara o array de dados para a vaga com os campos do novo formulário
+            $dadosVaga = [
+                'titulo_vaga' => $post['titulo_vaga'],
+                'departamento' => $post['departamento'],
+                'descricao' => $post['descricao'],
+                'status_vaga' => $post['status_vaga'],
+                'skills_necessarias' => $post['skills_necessarias'],
+                'skills_recomendadas' => $post['skills_recomendadas'],
+                'skills_desejadas' => $post['skills_desejadas'],
+                'id_setor' => $idSetor // Adiciona o ID do setor que encontramos/criamos
+            ];
+
+            // 3. Cria a Vaga usando o model apropriado
+            $vagaModel = new NovaVagaModel($pdo);
+            $vagaModel->criarVaga($dadosVaga);
+
+            // 4. Se tudo deu certo, confirma as operações no banco
+            $pdo->commit();
+
+            // 5. Redireciona para a página de gestão de vagas (ou outra página de sucesso)
+            header('Location: /RHease/public/gestaoVagas/listarVagas'); // Mude se o nome do método for outro
+            exit;
+
+        } catch (PDOException $e) {
+            // 6. Se qualquer passo deu erro, desfaz todas as operações
+            $pdo->rollBack();
+            // Para produção, logue o erro. Para desenvolvimento, pode exibir a mensagem.
+            die("Erro ao salvar a vaga: " . $e->getMessage());
         }
     }
 }
