@@ -2,8 +2,8 @@
 
 // Configurações do Banco de Dados
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_USER', 'usuario_app'); // Use um usuário com permissões limitadas 
+define('DB_PASS', 'rhease');
 define('DB_NAME', 'rhease');
 
 // Configuração da URL base

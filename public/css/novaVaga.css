@@ -1,0 +1,252 @@
+/* Importações de Fontes e Ícones */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+/* --- Estilos Globais e Reset Básico --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f4f7f6; /* Cor de fundo suave */
+    color: #333;
+    line-height: 1.6;
+    display: flex; /* Para centralizar o main-container, se necessário */
+    justify-content: center;
+    min-height: 100vh; /* Ocupar toda a altura da viewport */
+}
+
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1400px; /* Ou ajuste conforme o layout geral do seu app */
+}
+
+.header {
+    background-color: #ffffff;
+    padding: 15px 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: #555;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.logo-img {
+    height: 30px; /* Ajuste conforme o tamanho do seu logo */
+    vertical-align: middle;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-info img { /* Para o user.png */
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #eee; /* Placeholder para o user avatar */
+}
+
+.user-name {
+    font-weight: 500;
+    color: #333;
+}
+
+/* --- Estilos do Conteúdo Principal (Formulário) --- */
+.main-container {
+    width: 100%;
+    max-width: 900px; /* Largura do formulário na imagem */
+    margin: 40px auto; /* Centraliza e dá espaço */
+    padding: 20px;
+}
+
+h1 { /* Título principal 'Criar Nova Vaga' */
+    font-size: 2em;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #28a745; /* Linha verde */
+    width: fit-content; /* Para a linha verde acompanhar o texto */
+    margin-left: 20px; /* Alinhamento com o card */
+}
+
+/* Estilo do Card/Seção do Formulário */
+form section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+form h3 { /* Títulos das seções, ex: "1. Dados da Vaga" */
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Duas colunas por padrão */
+    gap: 25px; /* Espaço entre os itens do grid */
+}
+
+.grid > div {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Responsividade básica para o grid */
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr; /* Uma coluna em telas menores */
+    }
+}
+
+/* Estilos para Labels */
+label {
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+/* Estilos para Input, Textarea, Select */
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1em;
+    color: #333;
+    background-color: #fcfcfc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="text"]::placeholder,
+textarea::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #28a745; /* Borda verde ao focar */
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2); /* Sombra suave ao focar */
+    outline: none;
+}
+
+textarea {
+    resize: vertical; /* Permite redimensionar apenas verticalmente */
+    min-height: 100px; /* Altura mínima para textarea */
+    grid-column: span 2; /* Faz o textarea ocupar as duas colunas no grid */
+}
+
+
+/* --- Estilos para os Campos de Skills (Tags) --- */
+/* Cada div que contém skills no seu HTML precisará de uma estrutura interna similar à imagem */
+.skills-container { /* Ex: um div que engloba as tags de skills */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* Espaço entre as tags */
+    background-color: #fcfcfc; /* Fundo igual aos inputs */
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 15px;
+    min-height: 45px; /* Altura mínima similar aos inputs */
+    align-items: center;
+    grid-column: span 1; /* Ocupa 1 coluna */
+}
+
+/* Estilo para as tags individuais (Ex: PHP, Laravel, Docker) */
+.skill-tag {
+    background-color: #e4f8e4; /* Fundo verde claro */
+    color: #28a745; /* Texto verde escuro */
+    padding: 5px 10px;
+    border-radius: 15px; /* Formato de "pílula" */
+    font-size: 0.85em;
+    font-weight: 600;
+    display: inline-flex; /* Para alinhar bem com texto/ícones */
+    align-items: center;
+    gap: 5px; /* Espaço entre o texto da skill e um possível 'x' para remover */
+}
+
+/* A seta para baixo dos selects/dropdowns */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2328a745%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.8c-5%200-9.3%201.8-12.9%205.4s-5.6%208.6-5.6%2014.1l128%20127.9c4.2%204.2%209.6%206.4%2015.4%206.4s11.1-2.2%2015.4-6.4L287%2097.6c3.6-3.6%205.4-7.8%205.4-12.9%200-5.1-1.8-9.3-5.4-12.9z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+    padding-right: 40px;
+}
+
+/* Estilo do Botão de Status (se for um select) */
+.status-select {
+    background-color: #e4f8e4; /* Fundo verde claro para 'Aberta' */
+    color: #28a745; /* Texto verde escuro */
+    border-color: #28a745; /* Borda verde */
+    font-weight: 600;
+}
+
+.status-select option {
+    background-color: white; /* Cor de fundo das opções */
+    color: #333;
+}
+/* Se houver outros status no select, você pode usar JS para mudar a cor da option selecionada */
+
+
+/* --- Botão "Salvar Mudanças" --- */
+.submit-button {
+    background-color: #28a745; /* Cor verde vibrante */
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    margin-top: 30px;
+    display: block; /* Para ocupar a largura total do container */
+    margin-left: auto; /* Alinhar à direita no container */
+    margin-right: 20px; /* Espaçamento da borda */
+    width: fit-content; /* Para o botão não esticar demais */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.submit-button:hover {
+    background-color: #218838;
+    transform: translateY(-1px); /* Efeito de elevação sutil */
+}
