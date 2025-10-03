@@ -36,5 +36,17 @@ $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::clas
 $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
 $router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar');
 
+use App\Controller\BeneficioController;
+
+// Benefícios
+$router->addRoute('GET', '/beneficios', BeneficioController::class, 'index');
+$router->addRoute('POST', '/beneficios/criar', BeneficioController::class, 'criar');
+$router->addRoute('POST', '/beneficios/editar', BeneficioController::class, 'editar');
+$router->addRoute('GET', '/beneficios/desativar/{id}', BeneficioController::class, 'desativar');
+
+
+// Rotas Comuns
+$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
+$router->addRoute('GET', '/error', Controller::class, 'show_error');
 
 $router->getRoutes();
