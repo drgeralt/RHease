@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Controller;
 
@@ -12,9 +12,7 @@ class NovaVagaController extends Controller
 {
     public function criar(): void
     {
-        // Apenas renderiza a view que contém o seu novo formulário HTML.
-        // O nome do arquivo pode ser, por exemplo, 'criarVagaForm.php'
-        $this->view('vaga/criarVagaForm');
+        $this->view('vaga/NovaVaga');
     }
 
     /**
@@ -24,7 +22,7 @@ class NovaVagaController extends Controller
     public function salvar(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /RHease/public/gestaoVagas/criar');
+            header('Location: ' . BASE_URL . '/NovaVagas/criar');
             exit;
         }
 
@@ -40,10 +38,10 @@ class NovaVagaController extends Controller
 
             // 2. Prepara o array de dados para a vaga com os campos do novo formulário
             $dadosVaga = [
-                'titulo_vaga' => $post['titulo_vaga'],
+                'titulo' => $post['titulo'],
                 'departamento' => $post['departamento'],
                 'descricao' => $post['descricao'],
-                'status_vaga' => $post['status_vaga'],
+                'status' => $post['status'],
                 'skills_necessarias' => $post['skills_necessarias'],
                 'skills_recomendadas' => $post['skills_recomendadas'],
                 'skills_desejadas' => $post['skills_desejadas'],
@@ -58,7 +56,7 @@ class NovaVagaController extends Controller
             $pdo->commit();
 
             // 5. Redireciona para a página de gestão de vagas (ou outra página de sucesso)
-            header('Location: /RHease/public/gestaoVagas/listarVagas'); // Mude se o nome do método for outro
+            header('Location: ' . BASE_URL . '/vagas/listar');
             exit;
 
         } catch (PDOException $e) {

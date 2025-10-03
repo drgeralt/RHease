@@ -30,7 +30,7 @@
         <main class="main-container">
             <h1>Criar Nova Vaga</h1>
 
-            <form action="<?php echo BASE_URL; ?>/gestaoVagas/salvar" method="POST">
+            <form action="<?php echo BASE_URL; ?>/vagas/salvar" method="POST">
                 
                 <section>
                     <h3>1. Dados da Vaga</h3>

@@ -1,3 +1,3 @@
-select * from vaga;
 
-show tables;
+
+SHOW CREATE TABLE vaga;

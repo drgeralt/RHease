@@ -11,24 +11,24 @@ class NovaVagaModel extends Model
 
       public function criarVaga(array $dados): string
     {
-        // Esta query agora reflete os campos do seu novo formulário
+        // query referente aos campos da tabela vaga e do forms
         $query = "INSERT INTO {$this->table} 
-                    (titulo_vaga, id_setor, situacao, descricao, requisitos, skills_recomendadas, skills_desejadas)
+                    (titulo_vaga, requisitos, situacao, id_setor, id_cargo)
                   VALUES 
-                    (:titulo_vaga, :id_setor, :situacao, :descricao, :requisitos, :skills_recomendadas, :skills_desejadas)";
-        
+                    (:titulo_vaga, :requisitos, :situacao, :id_setor, :id_cargo)";
+
         $stmt = $this->db_connection->prepare($query);
 
-        // Passa o array de dados diretamente para o execute()
         // As chaves do array devem corresponder aos placeholders na query
         $stmt->execute([
-            ':titulo_vaga' => $dados['titulo_vaga'],
-            ':id_setor' => $dados['id_setor'],
-            ':situacao' => $dados['status_vaga'], // O campo 'situacao' no banco recebe o valor de 'status_vaga' do form
-            ':descricao' => $dados['descricao'],
-            ':requisitos' => $dados['skills_necessarias'], // O campo 'requisitos' no banco recebe as skills necessárias
-            ':skills_recomendadas' => $dados['skills_recomendadas'],
-            ':skills_desejadas' => $dados['skills_desejadas']
+            ':titulo' => $dados['titulo_vaga'],
+            ':id_setor' => $dados['id_setor'], // O campo 'id_setor' no banco recebe o ID do setor 
+            ':id_cargo' => $dados['id_cargo'], 
+            ':situacao' => $dados['situacao'], // O campo 'situacao' no banco recebe o valor de 'status do forms
+            ':requisitos' => $dados['requisitos'], // O campo 'requisitos' no banco recebe as skills necessárias
+            //':skills_recomendadas' => $dados['skills_recomendadas'],
+            //':skills_desejadas' => $dados['skills_desejadas'], 
+            //':descricao' => $dados['descricao']
         ]);
 
         return $this->db_connection->lastInsertId();
