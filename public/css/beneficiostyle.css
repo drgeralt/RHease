@@ -134,12 +134,11 @@ header{
     margin-bottom: 40px; 
 }
 .secao-colaborador {
-    margin-top: 50px;
+    margin-top: 5px;
     margin-bottom: 40px;
 }
 .secao-regras {
     margin-top: 40px;
-    margin-bottom: 60px;
     color: #25621C;
 }
 
@@ -178,28 +177,32 @@ tbody td {
     vertical-align: middle; 
 }
 
-/* CORREÇÃO APLICADA AQUI: Aumentamos a largura para garantir espaço e ajustamos o padding */
+.regras-tabela tbody tr td:nth-child(3) {
+    text-align: center;
+    padding-right: 100px;
+}
 
-/* DEFINIÇÃO DE LARGURA PARA A TABELA DE CATÁLOGO (RH) */
+#acoes_style{
+    padding-left: 130px;
+}
+.regras-tabela 
 /* 5 Colunas: Benefício, Categoria, Valor, Status, Ações */
 .tabela-container table:not(.regras-tabela) thead th:nth-child(1),
 .tabela-container table:not(.regras-tabela) tbody td:nth-child(1) { width: 25%; } /* Benefício */
 .tabela-container table:not(.regras-tabela) thead th:nth-child(2),
-.tabela-container table:not(.regras-tabela) tbody td:nth-child(2) { width: 13%; } /* Categoria (Ajustado) */
+.tabela-container table:not(.regras-tabela) tbody td:nth-child(2) { width: 13%; } /* Categoria */
 .tabela-container table:not(.regras-tabela) thead th:nth-child(3),
-.tabela-container table:not(.regras-tabela) tbody td:nth-child(3) { width: 11%; } /* Valor (Ajustado) */
-
+.tabela-container table:not(.regras-tabela) tbody td:nth-child(3) { width: 11%; } /* Valor */
 .tabela-container table:not(.regras-tabela) thead th:nth-child(4),
 .tabela-container table:not(.regras-tabela) tbody td:nth-child(4) { 
     width: 12%; 
     text-align: center;
 } /* Status */
-
 .tabela-container table:not(.regras-tabela) thead th:nth-child(5) {padding-left: 15px;}
 .tabela-container table:not(.regras-tabela) tbody td:nth-child(5) { 
-    width: 29%; /* Aumentado para 29% */
+    width: 29%; 
     text-align: center;
-    padding: 10px 5px; /* Padding ajustado para não empurrar demais */
+    padding: 10px 5px;
 } 
 
 /* Estilo para as ações (ícones e switch) */
@@ -485,15 +488,10 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 /* Estiliza o próprio CHECKBOX (INPUT) */
 #listaBeneficiosRegra input[type="checkbox"] {
-    /* TAMANHO LIMPO */
     width: 15px; 
     height: 15px;
-    
-    /* ALINHAMENTO E ESPAÇAMENTO */
     margin: 0; 
-    margin-right: 8px; /* Espaço entre o checkbox e o texto */
-    
-    /* GARANTE QUE O ESTILO FIQUE PADRÃO E LIMPO */
-    flex-shrink: 0; /* Impede que o checkbox diminua */
+    margin-right: 8px;
+    flex-shrink: 0;
     cursor: pointer;
 }
