@@ -21,27 +21,28 @@
         <div class="input-group">
             <label for="fullname">Nome Completo</label>
             <div class="input-wrapper icon-user">
-                <input type="text" id="fullname" placeholder="Seu nome" required>
+                <input type="text" id="fullname" name="nome_completo" placeholder="Seu nome" required>
             </div>
         </div>
 
         <div class="input-group">
             <label for="cpf">CPF</label>
-            <div class="input-wrapper icon-cpf"> <input type="text" id="cpf" placeholder="000.000.000-00" required>
+            <div class="input-wrapper icon-cpf">
+                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required>
             </div>
         </div>
 
         <div class="input-group">
             <label for="email">Login (E-mail Profissional)</label>
             <div class="input-wrapper icon-email">
-                <input type="email" id="email" placeholder="Seu e-mail" required>
+                <input type="email" id="email" name="email_profissional" placeholder="Seu e-mail" required>
             </div>
         </div>
 
         <div class="input-group">
             <label for="password">Senha</label>
             <div class="input-wrapper icon-password">
-                <input type="password" id="password" placeholder="Insira sua senha aqui" required>
+                <input type="password" id="password" name="senha" placeholder="Insira sua senha aqui" required>
             </div>
         </div>
 

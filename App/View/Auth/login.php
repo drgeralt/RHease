@@ -17,18 +17,22 @@
         <h1>Acesse a sua conta</h1>
     </header>
 
-    <form class="login-form">
+    <?php if (isset($data['error'])): ?>
+        <div class="error-message"><?php echo htmlspecialchars($data['error']); ?></div>
+    <?php endif; ?>
+
+    <form class="login-form" method="POST" action="<?= BASE_URL ?>/login">
         <div class="input-group">
             <label for="email">Login</label>
             <div class="input-wrapper icon-email">
-                <input type="email" id="email" placeholder="Seu e-mail" required>
+                <input type="email" id="email" name="email_profissional" placeholder="Seu e-mail" required>
             </div>
         </div>
 
         <div class="input-group">
             <label for="password">Senha</label>
             <div class="input-wrapper icon-password">
-                <input type="password" id="password" placeholder="Insira sua senha aqui" required>
+                <input type="password" id="password" name="senha" placeholder="Insira sua senha aqui" required>
             </div>
         </div>
 

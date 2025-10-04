@@ -3,33 +3,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (formCadastro) {
         formCadastro.addEventListener('submit', function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Impede o envio padrão
 
-            const data = {
-                nome_completo: document.getElementById('fullname').value,
-                cpf: document.getElementById('cpf').value,
-                email_profissional: document.getElementById('email').value,
-                senha: document.getElementById('password').value
-            };
+            const button = formCadastro.querySelector('button[type="submit"]');
+            button.disabled = true;
+            button.textContent = 'Aguarde...';
 
+            // FormData pega todos os campos do formulário com o atributo "name"
+            const formData = new FormData(formCadastro);
+
+            // Usamos fetch para enviar os dados para a nossa rota da API
             fetch('/RHease/public/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: formData // Enviando como FormData
             })
-                .then(response => response.json())
+                .then(response => response.json()) // Esperamos uma resposta JSON
                 .then(result => {
                     if (result.status === 'success') {
-                        // Redireciona para a nova página de sucesso
+                        // Se o PHP retornar sucesso, redirecionamos
                         window.location.href = '/RHease/public/registro-sucesso';
                     } else {
-                        // Se der erro, mostra o alerta
-                        alert(result.message);
+                        // Se der erro, mostramos a mensagem do PHP
+                        alert('Erro no cadastro: ' + result.message);
                     }
                 })
                 .catch(error => {
-                    console.error('Erro:', error);
-                    alert('Ocorreu um erro de comunicação.');
+                    console.error('Erro na comunicação:', error);
+                    alert('Ocorreu um erro de comunicação. Tente novamente.');
+                })
+                .finally(() => {
+                    button.disabled = false;
+                    button.textContent = 'Cadastrar';
                 });
         });
     }
