@@ -2,6 +2,7 @@
 
 use App\Controller\ColaboradorController;
 use App\Controller\HomeController;
+use App\Controller\PontoController;
 use App\Core\Router;
 
 require_once __DIR__ .'/../vendor/autoload.php';
@@ -34,6 +35,7 @@ $router->addRoute('GET', '/', HomeController::class, 'show_index');
 //ColaboradorController
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
 $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
+$router->addRoute('GET', '/registrarponto', PontoController::class, 'index');
 
 // Rotas Comuns
 $router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
