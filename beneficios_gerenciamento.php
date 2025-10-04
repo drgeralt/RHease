@@ -1,11 +1,8 @@
 <?php
-// beneficios_gerenciamento.php
 session_start();
 
-// Inclui as configs do projeto para BASE_URL, se existir
 require_once __DIR__ . '/config.php';
 
-// Configurações do banco
 $host = 'localhost';
 $user = 'root';
 $password = '';
@@ -21,8 +18,6 @@ function formatarValor($valor) {
     }
     return '';
 }
-
-// FUNÇÃO CORRIGIDA: A coluna 'descricao' foi removida da query.
 // Lista todos os benefícios para o catálogo (exibição)
 function listarBeneficios($conn) {
     $sql = "SELECT 
@@ -47,7 +42,7 @@ function listarBeneficios($conn) {
     return $beneficios;
 }
 
-// NOVA FUNÇÃO: Lista benefícios com ID e Nome para usar no modal de regras
+// Lista benefícios com ID e Nome para usar no modal de regras
 function listarBeneficiosParaSelecao($conn) {
     $sql = "SELECT id_beneficio, nome FROM beneficios_catalogo WHERE status = 'Ativo' ORDER BY nome";
     $res = $conn->query($sql);
@@ -60,7 +55,6 @@ function listarBeneficiosParaSelecao($conn) {
     return $lista;
 }
 
-
 // Função para listar regras (Mantida, mas busca o ID do benefício)
 function listarRegras($conn) {
     // Buscar o ID e o Nome do benefício
@@ -70,12 +64,13 @@ function listarRegras($conn) {
                 GROUP_CONCAT(bc.id_beneficio SEPARATOR ',') as ids_beneficios
             FROM regras_beneficios rb
             JOIN beneficios_catalogo bc ON rb.id_beneficio = bc.id_beneficio
+            WHERE bc.status = 'Ativo' 
             GROUP BY rb.tipo_contrato";
+            
     $res = $conn->query($sql);
     $regras = [];
     if($res && $res->num_rows > 0) {
         while($row = $res->fetch_assoc()) {
-            // Armazena a lista de IDs para o JavaScript usar na edição
             $regras[$row['tipo_contrato']] = [
                 'nomes' => explode(', ', $row['nomes_beneficios']),
                 'ids' => explode(',', $row['ids_beneficios'])
@@ -85,7 +80,6 @@ function listarRegras($conn) {
     return $regras;
 }
 
-// Carrega dados
 $beneficios = listarBeneficios($conn);
 $beneficios_selecao = listarBeneficiosParaSelecao($conn); // Novo array de benefícios ativos
 $regras = listarRegras($conn);
@@ -179,7 +173,7 @@ $tiposContrato = ["CLT", "PJ", "Estágio", "Temporário"];
                     <div class="form-group">
                         <label>Categoria</label>
                         <select id="categoriaBeneficio" required>
-                            <option value="">Selecione</option>
+                            <option value="" disabled hidden>Selecione</option>
                             <option value="Saúde">Saúde</option>
                             <option value="Alimentação">Alimentação</option>
                             <option value="Mobilidade">Mobilidade</option>
@@ -189,7 +183,7 @@ $tiposContrato = ["CLT", "PJ", "Estágio", "Temporário"];
                     <div class="form-group">
                         <label>Tipo de Valor</label>
                         <select id="tipoValorBeneficio" required>
-                            <option value="">Selecione</option>
+                            <option value="" disabled hidden>Selecione</option>
                             <option value="Fixo">Fixo</option>
                             <option value="Variável">Variável</option>
                             <option value="Descritivo">Descritivo</option>
@@ -219,7 +213,7 @@ $tiposContrato = ["CLT", "PJ", "Estágio", "Temporário"];
                         <tr>
                             <th>Tipo de Contrato</th>
                             <th>Benefícios Padrão</th>
-                            <th>Ações</th>
+                            <th id="acoes_style">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -237,6 +231,64 @@ $tiposContrato = ["CLT", "PJ", "Estágio", "Temporário"];
                 </table>
             </div>
         </div>
+
+        <div class="secao-colaborador">
+        <div class="header-tabela">
+            <h2>Gerenciar Benefícios do Colaborador (Exceções)</h2>
+        </div>
+
+        <div class="tabela-container" style="padding: 20px;">
+            <div class="form-group">
+                <label for="inputPesquisarColaborador"><i class="bi bi-search"></i> Pesquisar colaborador:</label>
+                <input type="text" id="inputPesquisarColaborador" placeholder="Digite o nome ou a matrícula do colaborador" style="margin-bottom: 10px;">
+                <div id="resultadoPesquisa" style="border: 1px solid #ddd; max-height: 150px; overflow-y: auto; border-radius: 6px; display: none;">
+                    </div>
+            </div>
+        </div>
+
+        <div id="painelEdicaoColaborador" class="tabela-container" style="padding: 20px; margin-top: 30px; display: none;">
+            
+            <div class="modal-header" style="border-bottom: none; margin-bottom: 10px;">
+                <h3 id="nomeColaboradorEdicao" style="font-size: 1.5em; color: #489D3B; margin: 0;"></h3>
+            </div>
+            
+            <p class="text-info">
+                Matrícula: <strong id="matriculaColaborador"></strong> | 
+                Contrato Padrão: <strong id="contratoColaborador"></strong>
+            </p>
+            
+            <hr>
+
+            <form id="formBeneficiosColaborador">
+                <input type="hidden" id="colaboradorIdAtual">
+                
+                <div class="form-group">
+                    <label>Benefícios Atribuídos Manualmente (Marque/Desmarque para alterar):</label>
+                    <div id="listaBeneficiosColaborador" style="border: 1px solid #ccc; padding: 15px; height: 300px; overflow-y: auto; background-color: #fcfcfc; border-radius: 8px;">
+                        <?php 
+                        $sql_catalogo = "SELECT id_beneficio, nome FROM beneficios_catalogo WHERE status = 'ativo'";
+                        $result_catalogo = $conn->query($sql_catalogo);
+                        
+                        if ($result_catalogo && $result_catalogo->num_rows > 0):
+                            while($b = $result_catalogo->fetch_assoc()): ?>
+                                <label style="display: flex; align-items: center; margin-bottom: 5px; cursor: pointer;">
+                                    <input type="checkbox" name="beneficios_selecionados_colaborador[]" value="<?= $b['id_beneficio'] ?>" style="margin-right: 8px;">
+                                    <?= htmlspecialchars($b['nome']) ?>
+                                </label>
+                            <?php endwhile;
+                        else: ?>
+                            <p>Nenhum benefício ativo no catálogo.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="justify-content: flex-start;">
+                    <button type="button" class="btn-salvar" id="btnSalvarBeneficiosColaborador">Salvar Atribuição Manual</button>
+                    <button type="button" class="btn-cancelar" id="btnCancelarEdicao">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
         <div id="modalRegras" class="modal">
             <div class="modal-content">
@@ -264,8 +316,6 @@ $tiposContrato = ["CLT", "PJ", "Estágio", "Temporário"];
                 </form>
             </div>
         </div>
-
-
     </div>
 </div>
 
@@ -349,12 +399,32 @@ tipoValorSelect.onchange = () => {
 // Salvar Benefício via AJAX
 $('#btnSalvarBeneficio').click(function() {
     const id = $('#beneficioId').val();
+    
+    // >> CAPTURA OS VALORES ANTES DA VALIDAÇÃO
+    const nome = $('#nomeBeneficio').val();
+    const categoria = $('#categoriaBeneficio').val();
+    const tipoValor = tipoValorSelect.value;
+    
+    // VALIDAÇÃO
+    if (!nome.trim()) {
+        alert("O nome do benefício é obrigatório.");
+        return;
+    }
+    if (!categoria) {
+        alert("Por favor, selecione uma Categoria.");
+        return;
+    }
+    if (!tipoValor) {
+        alert("Por favor, selecione um Tipo de Valor.");
+        return;
+    }
+    
     const data = {
         acao: id ? 'editar' : 'criar',
         id: id,
-        nome: $('#nomeBeneficio').val(),
-        categoria: $('#categoriaBeneficio').val(),
-        tipo_valor: tipoValorSelect.value, 
+        nome: nome, 
+        categoria: categoria, 
+        tipo_valor: tipoValor, 
         valor_fixo: valorFixoInput.value, 
         descricao: descricaoTextarea.value 
     };
@@ -414,6 +484,7 @@ $('.switch input[type="checkbox"]').change(function() {
     $.post('acoes_beneficio.php', data, function(res) {
         if(res.success) {
             row.find('td:eq(3)').text(isChecked ? 'Ativo' : 'Inativo');
+            location.reload(); 
         } else {
             alert(res.mensagem);
             $(this).prop('checked', !isChecked);
@@ -424,6 +495,33 @@ $('.switch input[type="checkbox"]').change(function() {
     }.bind(this));
 });
 
+// --- LÓGICA DE DELEÇÃO PERMANENTE ---
+$('.deletar').click(function() {
+    const row = $(this).closest('tr');
+    const id = row.data('id');
+    const nome = row.find('td:eq(0)').text(); // Pega o nome para a mensagem
+
+    // Mensagem de confirmação
+    const confirmacao = confirm(`ATENÇÃO: Você tem certeza que deseja DELETAR PERMANENTEMENTE o benefício "${nome}"? Esta ação não pode ser desfeita.`);
+
+    if (confirmacao) {
+        const data = {
+            acao: 'deletar', // Chama o novo case no PHP
+            id: id
+        };
+
+        $.post('acoes_beneficio.php', data, function(res) {
+            alert(res.mensagem);
+            if(res.success) {
+                // Remove a linha da tabela se for bem-sucedido
+                row.remove();
+                location.reload(); // Recarrega para garantir que as regras também atualizem
+            }
+        }, 'json').fail(function() {
+            alert('Erro na comunicação com o servidor ao deletar.');
+        });
+    }
+});
 
 // --- LÓGICA DO NOVO MODAL DE REGRAS ---
 
@@ -448,7 +546,7 @@ $('.editar-regra').click(function() {
 });
 
 
-// Salvar Regras via AJAX (AGORA APONTA PARA acoes_beneficio.php)
+// Salvar Regras
 $('#btnSalvarRegras').click(function() {
     const tipoContrato = contratoRegraAtual.value;
     const idsSelecionados = [];
@@ -474,6 +572,125 @@ $('#btnSalvarRegras').click(function() {
     });
 });
 
+const inputPesquisar = $('#inputPesquisarColaborador');
+const resultadoPesquisa = $('#resultadoPesquisa');
+const painelEdicao = $('#painelEdicaoColaborador');
+const colaboradorIdAtual = $('#colaboradorIdAtual');
+const nomeColaboradorEdicao = $('#nomeColaboradorEdicao');
+const matriculaColaborador = $('#matriculaColaborador');
+const contratoColaborador = $('#contratoColaborador');
+const listaBeneficiosColaborador = $('#listaBeneficiosColaborador');
+const btnSalvar = $('#btnSalvarBeneficiosColaborador');
+const btnCancelar = $('#btnCancelarEdicao');
+
+
+// Função para abrir o painel de edição
+function abrirPainelEdicao(id) {
+    // 1. Limpa os checks antes de carregar
+    listaBeneficiosColaborador.find('input[type="checkbox"]').prop('checked', false);
+    
+    // 2. Chama o AJAX para carregar dados e exceções
+    $.post('acoes_beneficio.php', { 
+        acao: 'carregar_beneficios_colaborador', 
+        id_colaborador: id 
+    }, function(res) {
+        if (res.success) {
+            const dados = res.dados_colaborador;
+            const idsAtuais = res.beneficios_ids;
+
+            // Preenche o cabeçalho
+            colaboradorIdAtual.val(id);
+            nomeColaboradorEdicao.text(dados.nome_completo);
+            matriculaColaborador.text(dados.matricula);
+            contratoColaborador.text(dados.tipo_contrato);
+
+            // Marca os checkboxes dos benefícios ATRIBUÍDOS MANUALMENTE (exceções)
+            idsAtuais.forEach(id_beneficio => {
+                listaBeneficiosColaborador.find(`input[value="${id_beneficio}"]`).prop('checked', true);
+            });
+
+            // Exibe o painel e limpa os resultados da pesquisa
+            resultadoPesquisa.hide().empty();
+            inputPesquisar.val('');
+            painelEdicao.show();
+
+        } else {
+            alert("Erro ao carregar dados: " + res.mensagem);
+        }
+    }, 'json').fail(function() {
+        alert('Erro de comunicação ao carregar o colaborador.');
+    });
+}
+
+
+// Evento: Pesquisa Dinâmica
+inputPesquisar.on('keyup', function() {
+    const termo = $(this).val().trim();
+    resultadoPesquisa.empty();
+
+    if (termo.length < 3) {
+        resultadoPesquisa.hide();
+        return;
+    }
+
+    $.post('acoes_beneficio.php', { acao: 'buscar_colaborador', termo: termo }, function(res) {
+        if (res.success && res.colaboradores.length > 0) {
+            res.colaboradores.forEach(col => {
+                const item = $('<div>')
+                    .addClass('checkbox-item')
+                    .css({ 'padding': '10px 15px', 'cursor': 'pointer' })
+                    .text(`${col.nome_completo} (Matrícula: ${col.matricula})`)
+                    .click(() => abrirPainelEdicao(col.id_colaborador));
+                resultadoPesquisa.append(item);
+            });
+            resultadoPesquisa.show();
+        } else {
+            resultadoPesquisa.html('<div style="padding: 10px 15px; color: #777;">Nenhum colaborador encontrado.</div>').show();
+        }
+    }, 'json').fail(function() {
+        resultadoPesquisa.html('<div style="padding: 10px 15px; color: #dc3545;">Erro ao buscar.</div>').show();
+    });
+});
+
+
+// Evento: Salvar Exceções Manuais
+btnSalvar.click(function() {
+    const id_colaborador = colaboradorIdAtual.val();
+    const idsSelecionados = [];
+
+    // Coleta IDs dos benefícios marcados (o que será salvo como exceção)
+    listaBeneficiosColaborador.find('input[type="checkbox"]:checked').each(function() {
+        idsSelecionados.push($(this).val());
+    });
+
+    const data = {
+        acao: 'salvar_beneficios_colaborador', 
+        id_colaborador: id_colaborador,
+        beneficios_ids: idsSelecionados 
+    };
+    
+    $.post('acoes_beneficio.php', data, function(res) {
+        alert(res.mensagem);
+        if(res.success) {
+            painelEdicao.hide(); // Oculta após salvar
+        }
+    }, 'json').fail(function() {
+        alert('Erro na comunicação ao salvar os benefícios.');
+    });
+});
+
+
+// Evento: Cancelar e Ocultar o Painel
+btnCancelar.click(function() {
+    painelEdicao.hide();
+});
+
+// Ocultar resultados da pesquisa ao clicar fora (opcional, mas bom para UX)
+$(document).click(function(e) {
+    if (!inputPesquisar.is(e.target) && !resultadoPesquisa.is(e.target) && resultadoPesquisa.has(e.target).length === 0) {
+        resultadoPesquisa.hide();
+    }
+});
 </script>
 </body>
 </html>
