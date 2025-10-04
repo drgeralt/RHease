@@ -23,6 +23,8 @@ class UserController extends Controller
     }
     public function register(): void
     {
+        //var_dump($_POST);
+        //die();
         $data = $_POST;
 
         $authModel = new AuthModel();

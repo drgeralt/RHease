@@ -7,9 +7,7 @@ use PDO;
 use PDOException;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\SMTP; // Adicionado para usar o SMTP::DEBUG_SERVER
-
-// A linha 'require mailer/PHPMailerAutoload.php' foi removida. O Composer já faz isso.
+use PHPMailer\PHPMailer\SMTP;
 
 class AuthModel
 {
@@ -32,16 +30,11 @@ class AuthModel
 
     private function sendVerificationEmail(string $email, string $token): void
     {
-        // A flag 'true' no construtor já ativa as exceções.
         $mail = new PHPMailer(true);
 
-        // A linha "$mail->exceptions = true;" que causava o erro foi REMOVIDA.
-
         try {
-            // Ativa o debug detalhado para vermos a conversa com o Gmail
-            //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
+            // $mail->SMTPDebug = SMTP::DEBUG_SERVER; // Descomente apenas se precisar de depurar e-mails
 
-            // Configurações do servidor a partir do .env
             $mail->isSMTP();
             $mail->Host       = $_ENV['MAIL_HOST'];
             $mail->SMTPAuth   = true;
@@ -51,20 +44,16 @@ class AuthModel
             $mail->Port       = 465;
             $mail->CharSet    = 'UTF-8';
 
-            // Destinatários
             $mail->setFrom($_ENV['MAIL_USERNAME'], $_ENV['MAIL_FROM_NAME']);
             $mail->addAddress($email);
 
-            // Conteúdo
             $mail->isHTML(true);
             $mail->Subject = 'Ative sua conta no RHEase';
             $verificationLink = BASE_URL . "/verify?token=" . $token;
             $mail->Body    = "Olá! <br><br>Obrigado por se registrar. Clique no link para ativar sua conta: <a href='{$verificationLink}'>Ativar Conta</a>.";
 
             $mail->send();
-
         } catch (Exception $e) {
-            // Se houver um erro, ele será "relançado" para ser capturado no método registerUser
             throw new Exception("PHPMailer Error: {$mail->ErrorInfo}");
         }
     }
@@ -87,40 +76,47 @@ class AuthModel
         $token = bin2hex(random_bytes(32));
         $expiracao = (new \DateTime())->add(new \DateInterval('PT1H'))->format('Y-m-d H:i:s');
 
-        $sql = "INSERT INTO colaborador (nome_completo, cpf, email_profissional, senha, status_conta, token_verificacao, token_expiracao)
-                VALUES (:nome, :cpf, :email, :senha, 'pendente_verificacao', :token, :expiracao)";
+        $matricula = 'C' . time();
+
+        $sql = "INSERT INTO colaborador (
+                    matricula, nome_completo, cpf, email_pessoal, email_profissional, senha,
+                    status_conta, token_verificacao, token_expiracao
+                ) VALUES (
+                    :matricula, :nome, :cpf, :email_pessoal, :email_profissional, :senha,
+                    'pendente_verificacao', :token, :expiracao
+                )";
 
         try {
             $this->db->beginTransaction();
 
             $stmt = $this->db->prepare($sql);
+
             $stmt->execute([
+                ':matricula' => $matricula,
                 ':nome' => $nome,
                 ':cpf' => $cpf,
-                ':email' => $email,
+                ':email_pessoal' => $email,
+                ':email_profissional' => $email,
                 ':senha' => password_hash($senha, PASSWORD_DEFAULT),
                 ':token' => $token,
                 ':expiracao' => $expiracao
             ]);
 
-            // Tenta enviar o e-mail
             $this->sendVerificationEmail($email, $token);
 
             $this->db->commit();
             return ['status' => 'success', 'message' => 'Cadastro realizado! Verifique seu e-mail.'];
 
         } catch (PDOException $e) {
-            $this->db->rollBack();
+            if ($this->db->inTransaction()) { $this->db->rollBack(); }
             if ($e->getCode() === '23000') {
                 return ['status' => 'error', 'message' => 'Este CPF ou e-mail já está cadastrado.'];
             }
             error_log("DB Error: " . $e->getMessage());
-            return ['status' => 'error', 'message' => 'Erro ao salvar os dados.'];
-
-        } catch (Exception $e) { // Captura erros do PHPMailer vindos de sendVerificationEmail
-            $this->db->rollBack();
+            return ['status' => 'error', 'message' => 'Erro interno ao salvar os dados.'];
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) { $this->db->rollBack(); }
             error_log("Mailer Error: " . $e->getMessage());
-            // Mostra o erro real do PHPMailer no alerta para depuração
             return ['status' => 'error', 'message' => 'Não foi possível enviar o e-mail: ' . $e->getMessage()];
         }
     }
@@ -139,38 +135,28 @@ class AuthModel
             return ['success' => false, 'message' => 'Link de verificação inválido, expirado ou já utilizado.'];
         }
     }
+
     public function loginUser(string $email, string $senha): array
     {
-        // 1. Encontrar o utilizador pelo e-mail
         $sql = "SELECT id_colaborador, senha, status_conta FROM colaborador WHERE email_profissional = :email";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':email' => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // 2. Se o utilizador não existe, a senha está incorreta (mensagem genérica por segurança)
         if (!$user) {
             return ['status' => 'error', 'message' => 'E-mail ou senha inválidos.'];
         }
 
-        // 3. Verificar se a senha corresponde E se a conta está ativa
         if (password_verify($senha, $user['senha'])) {
-            // Senha correta! Agora verificamos o status da conta.
-
             if ($user['status_conta'] === 'ativo') {
-                // Login bem-sucedido!
                 return ['status' => 'success', 'user_id' => $user['id_colaborador']];
             }
-
             if ($user['status_conta'] === 'pendente_verificacao') {
-                // A conta existe, mas não foi ativada
                 return ['status' => 'error', 'message' => 'Sua conta ainda não foi ativada. Verifique seu e-mail.'];
             }
-
-            // Outros status como 'inativo' ou 'bloqueado'
             return ['status' => 'error', 'message' => 'Esta conta está inativa ou bloqueada.'];
         }
 
-        // 4. Se a senha estiver incorreta (mensagem genérica)
         return ['status' => 'error', 'message' => 'E-mail ou senha inválidos.'];
     }
 }
