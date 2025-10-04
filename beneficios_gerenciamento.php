@@ -18,6 +18,8 @@ function formatarValor($valor) {
     }
     return '';
 }
+
+
 // Lista todos os benefícios para o catálogo (exibição)
 function listarBeneficios($conn) {
     $sql = "SELECT 
