@@ -17,7 +17,11 @@ class GestaoVagasController extends Controller
 
     public function criar(): void
     {
-        $this->view('vaga/NovaVaga');
+        $cargoModel = $this->model('Cargo');
+        $cargosDisponiveis = $cargoModel->findAll();
+        $this->view('vaga/NovaVaga', ['cargos' => $cargosDisponiveis]);
+
+        
     }
     //método para salvar a nova vaga no banco
     public function salvar(): void
