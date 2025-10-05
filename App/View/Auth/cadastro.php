@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - RH ease</title>
-    <link rel="stylesheet" href="/RHease/public/css/login.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/login.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
 
 <div class="login-container">
     <header class="login-header">
-        <img src="/RHease/public/img/rhease-ease 1.png" alt="Logo RH ease" class="logo">
+        <img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo RH ease" class="logo">
         <h1>Cadastre-se na plataforma</h1>
     </header>
 
@@ -59,11 +59,11 @@
 
     <footer class="login-footer">
         <p>Já tem uma conta?</p>
-        <a href="/RHease/public/login">Faça login</a>
+        <a href="<?= BASE_URL ?>/login">Faça login</a>
     </footer>
 </div>
 
 
-<script src="/RHease/public/js/auth.js"></script>
+<script src="<?= BASE_URL ?>/js/auth.js"></script>
 </body>
 </html>
