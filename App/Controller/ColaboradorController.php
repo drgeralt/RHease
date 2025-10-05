@@ -64,8 +64,4 @@ class ColaboradorController extends Controller
     {
         $this->view('Colaborador/cadastroColaborador');
     }
-    public function listar(): void
-    {
-        $this->view('Colaborador/tabelaColaborador');
-    }
 }
