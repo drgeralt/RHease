@@ -2,33 +2,83 @@
 
 namespace App\Model;
 
-// No futuro, esta classe terá a lógica para interagir com o banco de dados.
-// Ex: salvar, buscar e validar os registros da tabela 'folha_ponto'.
+use App\Core\Database;
+use PDO;
 
-class RegistroPonto
+class PontoModel
 {
-    // Atributos que espelham as colunas da tabela 'folha_ponto'
-    public $id_registro;
-    public $id_colaborador;
-    public $timestamp_batida;
-    public $geolocalizacao;
-    public $caminho_foto;
-    public $ip_address;
-
-    public function __construct()
+    /**
+     * NOVO MÉTODO: Procura pelo último registo de ponto em aberto
+     * para um colaborador no dia atual.
+     *
+     * @param int $idColaborador O ID do colaborador.
+     * @return array|false Retorna os dados do ponto se encontrado, ou false caso contrário.
+     */
+    public function getUltimoPontoAberto(int $idColaborador, string $dataAtual)
     {
-        // Construtor da classe.
-        // Aqui poderá entrar a conexão com o banco de dados no futuro.
+        $pdo = Database::getInstance();
+
+        // --- MODIFICADO AQUI: Usamos um placeholder para a data atual ---
+        $sql = "SELECT data_hora_entrada FROM folha_ponto 
+                WHERE id_colaborador = :id_colaborador 
+                AND DATE(data_hora_entrada) = :data_atual 
+                AND data_hora_saida IS NULL 
+                ORDER BY data_hora_entrada DESC LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':id_colaborador' => $idColaborador,
+            ':data_atual' => $dataAtual
+        ]);
+        return $stmt->fetch();
     }
 
     /**
-     * Método de exemplo para salvar um registro no banco de dados.
-     * (Ainda não funcional, apenas para estrutura)
+     * Lógica para registar a entrada ou saída.
+     * (Este método permanece exatamente igual ao que já temos)
      */
-    public function salvar()
+    public function registrarPonto(int $idColaborador, string $dataHoraAtual): string
     {
-        // Lógica para executar um INSERT na tabela 'folha_ponto' virá aqui.
-        // Por enquanto, apenas retorna true.
-        return true;
+        $pdo = Database::getInstance();
+        $dataAtual = date('Y-m-d', strtotime($dataHoraAtual));
+
+        // --- MODIFICADO AQUI: A query de busca também usa o placeholder ---
+        $sqlBusca = "SELECT id_registro_ponto FROM folha_ponto 
+                     WHERE id_colaborador = :id_colaborador 
+                     AND DATE(data_hora_entrada) = :data_atual 
+                     AND data_hora_saida IS NULL 
+                     ORDER BY data_hora_entrada DESC LIMIT 1";
+
+        $stmtBusca = $pdo->prepare($sqlBusca);
+        $stmtBusca->execute([
+            ':id_colaborador' => $idColaborador,
+            ':data_atual' => $dataAtual
+        ]);
+        $registroAberto = $stmtBusca->fetch();
+
+        // Se encontrou um registo, é uma SAÍDA.
+        if ($registroAberto) {
+            $sql = "UPDATE folha_ponto SET data_hora_saida = :data_hora
+                    WHERE id_registro_ponto = :id_registro";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':data_hora' => $dataHoraAtual,
+                ':id_registro' => $registroAberto['id_registro_ponto']
+            ]);
+            return 'saida';
+        }
+        // Se não, é uma ENTRADA.
+        else {
+            $sql = "INSERT INTO folha_ponto (id_colaborador, data_hora_entrada) 
+                    VALUES (:id_colaborador, :data_hora)";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':id_colaborador' => $idColaborador,
+                ':data_hora' => $dataHoraAtual
+            ]);
+            return 'entrada';
+        }
     }
 }

@@ -36,6 +36,7 @@ $router->addRoute('GET', '/', HomeController::class, 'show_index');
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
 $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
 $router->addRoute('GET', '/registrarponto', PontoController::class, 'index');
+$router->addRoute('POST', '/registrarponto/salvar', PontoController::class, 'registrar');
 
 // Rotas Comuns
 $router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');

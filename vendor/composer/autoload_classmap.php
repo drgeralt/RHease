@@ -16,6 +16,7 @@ return array(
     'App\\Model\\CargoModel' => $baseDir . '/App/Model/CargoModel.php',
     'App\\Model\\ColaboradorModel' => $baseDir . '/App/Model/ColaboradorModel.php',
     'App\\Model\\EnderecoModel' => $baseDir . '/App/Model/EnderecoModel.php',
+    'App\\Model\\PontoModel' => $baseDir . '/App/Model/PontoModel.php',
     'App\\Model\\SetorModel' => $baseDir . '/App/Model/SetorModel.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
 );

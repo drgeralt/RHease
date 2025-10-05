@@ -1,5 +1,5 @@
 <?php
-// de rick para gabba
+
 
 /**
  * Contrato para o serviço de processamento de ponto.

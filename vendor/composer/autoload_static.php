@@ -31,6 +31,7 @@ class ComposerStaticInit2ea4c920c1bec7c337f4d3c75155d9b1
         'App\\Model\\CargoModel' => __DIR__ . '/../..' . '/App/Model/CargoModel.php',
         'App\\Model\\ColaboradorModel' => __DIR__ . '/../..' . '/App/Model/ColaboradorModel.php',
         'App\\Model\\EnderecoModel' => __DIR__ . '/../..' . '/App/Model/EnderecoModel.php',
+        'App\\Model\\PontoModel' => __DIR__ . '/../..' . '/App/Model/PontoModel.php',
         'App\\Model\\SetorModel' => __DIR__ . '/../..' . '/App/Model/SetorModel.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );

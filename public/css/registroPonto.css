@@ -96,3 +96,36 @@ body {
     color: #888; /* Cor mais suave para informação secundária */
     margin: 20px 0 0 0; /* Margem superior */
 }
+
+.camera-feed {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    border-radius: 15px;
+    background-color: #1E1E1E; /* Fundo escuro enquanto a câmera carrega */
+    border: 3px solid #ddd;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.feedback-message {
+    font-size: 24px;
+    font-weight: 600;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.feedback-message.success {
+    background-color: #d4edda; /* Verde claro */
+    color: #155724; /* Verde escuro */
+    border: 1px solid #c3e6cb;
+}
+
+.feedback-message.error {
+    background-color: #f8d7da; /* Vermelho claro */
+    color: #721c24; /* Vermelho escuro */
+    border: 1px solid #f5c6cb;
+}
