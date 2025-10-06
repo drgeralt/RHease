@@ -1,5 +1,6 @@
 <?php
-// acoes_beneficio.php (Arquivo Unificado: Benefícios e Regras)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 header('Content-Type: application/json');
 
@@ -235,47 +236,52 @@ switch($acao) {
         
         echo json_encode(['success' => true, 'colaboradores' => $colaboradores]);
         break;
+        case 'carregar_beneficios_colaborador':
+        $id_colaborador = (int)($_POST['id_colaborador'] ?? 0);
 
-
-    case 'carregar_beneficios_colaborador':
-        $id_colaborador = $_POST['id_colaborador'] ?? null;
-        if (!$id_colaborador) {
-            echo json_encode(['success' => false, 'mensagem' => 'ID do colaborador não informado.']);
+        if ($id_colaborador === 0) {
+            echo json_encode(['success' => false, 'mensagem' => 'ID de colaborador inválido.']);
             break;
         }
 
-        // 1. Buscar dados básicos do colaborador
-        $sql_col = "SELECT nome_completo, matricula, tipo_contrato FROM colaborador WHERE id_colaborador = ?";
-        $stmt_col = $conn->prepare($sql_col);
-        $stmt_col->bind_param('i', $id_colaborador);
-        $stmt_col->execute();
-        $dados_col = $stmt_col->get_result()->fetch_assoc();
-        $stmt_col->close();
-
-        if (!$dados_col) {
-             echo json_encode(['success' => false, 'mensagem' => 'Colaborador não encontrado.']);
-             break;
-        }
-
-        // 2. Buscar os benefícios atribuídos manualmente (exceções)
-        $sql_exc = "SELECT id_beneficio FROM colaborador_beneficio WHERE id_colaborador = ?";
-        $stmt_exc = $conn->prepare($sql_exc);
-        $stmt_exc->bind_param('i', $id_colaborador);
-        $stmt_exc->execute();
-        $result_exc = $stmt_exc->get_result();
+        // 1. Buscar os dados básicos do colaborador
+        $sql_colab = "SELECT id_colaborador, nome_completo, matricula, id_setor, id_cargo FROM colaborador WHERE id_colaborador = ?";
+        $stmt_colab = $conn->prepare($sql_colab);
+        $stmt_colab->bind_param('i', $id_colaborador);
+        $stmt_colab->execute();
+        $res_colab = $stmt_colab->get_result();
         
-        $beneficios_ativos = [];
-        while($row = $result_exc->fetch_assoc()) {
-            $beneficios_ativos[] = $row['id_beneficio'];
+        if ($res_colab->num_rows === 0) {
+            echo json_encode(['success' => false, 'mensagem' => 'Colaborador não encontrado.']);
+            $stmt_colab->close();
+            break;
         }
-        $stmt_exc->close();
+        $dados_colaborador = $res_colab->fetch_assoc();
+        $stmt_colab->close();
 
+        // ADICIONANDO UM PLACEHOLDER para o JavaScript não quebrar no campo 'tipo_contrato'
+        $dados_colaborador['tipo_contrato'] = 'VINCULAR TIPO DE CONTRATO';
+
+
+        // 3. Buscar os IDs dos benefícios salvos como EXCEÇÃO
+        $sql_excecoes = "SELECT id_beneficio FROM colaborador_beneficio WHERE id_colaborador = ?";
+        $stmt_excecoes = $conn->prepare($sql_excecoes);
+        $stmt_excecoes->bind_param('i', $id_colaborador);
+        $stmt_excecoes->execute();
+        $res_excecoes = $stmt_excecoes->get_result();
+        
+        $beneficios_ids = [];
+        while($row = $res_excecoes->fetch_assoc()) {
+            $beneficios_ids[] = $row['id_beneficio']; 
+        }
+        $stmt_excecoes->close();
+        
+        // Retorna todos os dados para o JavaScript
         echo json_encode([
             'success' => true, 
-            'beneficios_ids' => $beneficios_ativos,
-            'dados_colaborador' => $dados_col
+            'dados_colaborador' => $dados_colaborador,
+            'beneficios_ids' => $beneficios_ids
         ]);
-
         break;
 
 

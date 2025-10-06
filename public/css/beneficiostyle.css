@@ -486,12 +486,123 @@ input:checked + .slider:before { transform: translateX(20px); }
     background-color: #eaf3e8; 
 }
 
-/* Estiliza o próprio CHECKBOX (INPUT) */
+/* =================== ESTILOS UNIFICADOS PARA CHECKBOXES DE MODAIS =================== */
+
+/* Estiliza o próprio CHECKBOX (INPUT) no Modal de Regras */
 #listaBeneficiosRegra input[type="checkbox"] {
-    width: 15px; 
-    height: 15px;
+    width: 16px; /* Tamanho padrão para checkbox */
+    height: 16px;
     margin: 0; 
     margin-right: 8px;
     flex-shrink: 0;
     cursor: pointer;
+}
+
+/* Estiliza o próprio CHECKBOX (INPUT) no Modal de Exceções do Colaborador */
+/* (Se você usa este ID/Classe para a lista de exceções) */
+#listaBeneficiosColaborador input[type="checkbox"],
+.lista-checkbox-excecoes input[type="checkbox"] { 
+    width: 16px; /* Tamanho padrão para checkbox */
+    height: 16px;
+    margin: 0; 
+    margin-right: 8px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+/* Reduz o checkbox genérico para 16px, se for o caso */
+.checkbox-item input[type="checkbox"] {
+    width: 16px; 
+    height: 16px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+/* =================== MODAL DE EXCEÇÕES DO COLABORADOR =================== */
+
+.modal-excecoes {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); /* Fundo semi-transparente */
+}
+
+.modal-content-excecoes {
+    background-color: #fefefe;
+    margin: 5% auto; /* 5% do topo e centralizado */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%; 
+    max-width: 600px; /* Largura máxima razoável */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.modal-header-excecoes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.modal-header-excecoes h3 {
+    color: #25621C;
+    margin: 0;
+    font-size: 1.3em;
+}
+
+.close-btn-excecoes {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn-excecoes:hover,
+.close-btn-excecoes:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-footer-excecoes {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    margin-top: 15px;
+    text-align: right;
+}
+
+.lista-checkbox-excecoes {
+    border: 1px solid #ccc;
+    padding: 10px;
+    height: 200px; 
+    overflow-y: auto;
+    background-color: #fcfcfc;
+    border-radius: 5px;
+}
+
+.lista-checkbox-excecoes label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Estilo do botão de lápis (opcional) */
+.btn-edit-colaborador {
+    background: none;
+    border: none;
+    color: #489D3B;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin-left: 10px;
+    padding: 0 5px;
+}
+.btn-edit-colaborador:hover {
+    color: #25621C;
 }

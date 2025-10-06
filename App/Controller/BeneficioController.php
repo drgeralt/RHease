@@ -1,5 +1,7 @@
 <?php
-require_once 'Models/BeneficioModel.php';
+namespace App\Controller; 
+
+use App\Model\BeneficioModel;
 
 class BeneficioController {
     private $model;
@@ -12,6 +14,26 @@ class BeneficioController {
     public function index() {
         return $this->model->listarBeneficios();
     }
+
+    public function meusBeneficios() {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+    $id_colaborador_logado = 1;
+
+    require_once dirname(__DIR__, 2) . '/App/View/Beneficios/meus_beneficios.php'; 
+
+    /*
+    $id_colaborador_logado = $_SESSION['id_colaborador'] ?? null;
+    
+    if (!$id_colaborador_logado) {
+        header("Location: /login"); 
+        exit();
+    }
+    */
+    
+    require_once dirname(__DIR__) . '/View/Beneficios/meus_beneficios.php'; 
+}
 
     // Criar benefício
     public function criar($nome, $categoria, $tipo_valor, $valor_fixo = null, $descricao = null) {
