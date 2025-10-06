@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Core;
 
@@ -6,27 +7,36 @@ use PDO;
 use PDOException;
 
 class   Database {
-    private static $instance = null;
-    private $connection;
+    private static ?Database $instance = null;
+    private PDO $connection;
 
-    private function __construct() {
-        $host = 'localhost';
-        $user = 'root';
-        $password = ''; // Default XAMPP password
-        $database = 'rhease';
+    /**
+     * Database constructor.
+     * Cria a conexão PDO usando constantes definidas em `config.php`.
+     */
+
+    private function __construct()
+    {
+        $host = defined('DB_HOST') ? DB_HOST : (getenv('DB_HOST') ?: 'localhost');
+        $user = defined('DB_USER') ? DB_USER : (getenv('DB_USER') ?: 'root');
+        $password = defined('DB_PASS') ? DB_PASS : (getenv('DB_PASS') ?: '');
+        $database = defined('DB_NAME') ? DB_NAME : (getenv('DB_NAME') ?: 'rhease');
 
         try {
-            $this->connection = new PDO("mysql:host=$host;dbname=$database;charset=utf8mb4", $user, $password);
+            $this->connection = new PDO("mysql:host={$host};dbname={$database};charset=utf8mb4", $user, $password);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            // Log the error and re-throw the exception
             error_log("Erro ao conectar ao banco de dados: " . $e->getMessage());
             throw new PDOException($e->getMessage(), (int)$e->getCode());
         }
     }
 
-    public static function getInstance() {
-        if (!self::$instance) {
+   /**
+     * Retorna a instância única da conexão PDO.
+     */
+    public static function getInstance(): PDO
+    {
+        if (self::$instance === null) {
             self::$instance = new Database();
         }
 
