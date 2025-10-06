@@ -6,17 +6,10 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'App\\Controller\\ColaboradorController' => $baseDir . '/App/Controller/ColaboradorController.php',
-    'App\\Controller\\HomeController' => $baseDir . '/App/Controller/HomeController.php',
-    'App\\Controller\\PontoController' => $baseDir . '/App/Controller/PontoController.php',
-    'App\\Core\\Controller' => $baseDir . '/App/Core/Controller.php',
-    'App\\Core\\Database' => $baseDir . '/App/Core/Database.php',
-    'App\\Core\\Model' => $baseDir . '/App/Core/Model.php',
-    'App\\Core\\Router' => $baseDir . '/App/Core/Router.php',
-    'App\\Model\\CargoModel' => $baseDir . '/App/Model/CargoModel.php',
-    'App\\Model\\ColaboradorModel' => $baseDir . '/App/Model/ColaboradorModel.php',
-    'App\\Model\\EnderecoModel' => $baseDir . '/App/Model/EnderecoModel.php',
-    'App\\Model\\PontoModel' => $baseDir . '/App/Model/PontoModel.php',
-    'App\\Model\\SetorModel' => $baseDir . '/App/Model/SetorModel.php',
+    'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'PhpToken' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
+    'Stringable' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
+    'UnhandledMatchError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+    'ValueError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
 );

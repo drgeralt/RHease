@@ -4,6 +4,8 @@ use App\Controller\ColaboradorController;
 use App\Controller\HomeController;
 use App\Controller\PontoController;
 use App\Controller\UserController;
+use App\Controller\CandidaturaController;
+use App\Controller\GestaoVagasController;
 use App\Core\Router;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -42,10 +44,21 @@ $router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar
 // Rota de Gestão de Vagas
 $router->addRoute('GET', '/vagas/listar', \App\Controller\GestaoVagasController::class, 'listarVagas');
 
+
 //rotas para criar nova vaga
 $router->addRoute('GET', '/vagas/criar', \App\Controller\GestaoVagasController::class, 'criar');
 $router->addRoute('POST', '/vagas/salvar', \App\Controller\GestaoVagasController::class, 'salvar');
 
+
+//Candidatura
+$router->addRoute('GET', '/vagas', CandidaturaController::class, 'listar');
+$router->addRoute('POST', '/candidatura/formulario', CandidaturaController::class, 'exibirFormulario');
+$router->addRoute('POST', '/candidatura/aplicar', CandidaturaController::class, 'aplicar');
+$router->addRoute('GET', '/candidatura/formulario', CandidaturaController::class, 'redirecionarParaVagas');
+$router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redirecionarParaVagas');
+$router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos');
+$router->addRoute('POST', 'candidatura/analisar', CandidaturaController::class, 'analisarCurriculo');
+$router->addRoute('GET', '/candidatura/analise-ia', CandidaturaController::class, 'exibirAnaliseIA');
 // Rotas Comuns
 //$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
 //$router->addRoute('GET', '/error', Controller::class, 'show_error');
@@ -54,4 +67,3 @@ $router->addRoute('POST', '/vagas/salvar', \App\Controller\GestaoVagasController
 // Inicia o roteamento
 // ----------------------
 $router->getRoutes();
-

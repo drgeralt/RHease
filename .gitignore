@@ -74,6 +74,8 @@ composer.phar
 # Built Visual Studio Code Extensions
 *.vsix
 
+.env
+
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
