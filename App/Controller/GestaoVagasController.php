@@ -1,4 +1,5 @@
 <?php 
+declare(strict_types=1);
 
 namespace App\Controller;
 
@@ -7,57 +8,61 @@ use PDOException;
 
 class GestaoVagasController extends Controller
 {
-    //criando método para listar vagas
-    public function listarVagas()
+    // lista as vagas e exibe a view
+    public function listarVagas(): void 
     {
         $vagaModel = $this->model('GestaoVagas');
         $vagas = $vagaModel->listarVagas();
         $this->view('vaga/GestaoVagas', ['vagas' => $vagas]);
     }
 
+    // exibe o formulário de criação
     public function criar(): void
     {
         $cargoModel = $this->model('Cargo');
         $cargosDisponiveis = $cargoModel->findAll();
         $this->view('vaga/NovaVaga', ['cargos' => $cargosDisponiveis]);
-
-        
     }
-    //método para salvar a nova vaga no banco
+
+    //método para salvar uma nova vaga enviada via POST
     public function salvar(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . '/GestaoVagas/criar');
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            header('Location: ' . BASE_URL . '/vagas/criar');
+            exit;
+        }
+
+         // Validação mínima
+        $titulo = trim($_POST['titulo'] ?? '');
+        $departamento = trim($_POST['departamento'] ?? '');
+        $status = trim($_POST['status'] ?? 'aberta');
+
+        if ($titulo === '' || $departamento === '') {
+            header('Location: ' . BASE_URL . '/vagas/criar');
             exit;
         }
 
         try {
-
             $setorModel = $this->model('Setor');
-            $idSetor = $setorModel->findOrCreateByName($_POST['departamento']);
+            $idSetor = $setorModel->findOrCreateByName($departamento);
 
-            // Os dados do forms
             $dadosVaga = [
-                'titulo_vaga' => $_POST['titulo'],
+                'titulo_vaga' => $titulo,
                 'id_setor' => $idSetor,
-                'situacao' => $_POST['status'],
-                'requisitos' => $_POST['skills_necessarias'],
-                'id_cargo' => null, // tem q mudar isso depois
-                //'descricao' => $_POST['descricao'],
-                //'skills_recomendadas' => $_POST['skills_recomendadas'],
-                //'skills_desejadas' => $_POST['skills_desejadas'],
-                
+                'situacao' => $status,
+                'requisitos' => $_POST['skills_necessarias'] ?? null,
+                'id_cargo' => null,
             ];
-            // Salva a vaga
+
             $vagaModel = $this->model('NovaVaga');
             $vagaModel->criarVaga($dadosVaga);
 
-            // Redireciona para a listagem
-            header('Location: ' . BASE_URL . '/GestaoVagas/listarVagas');
+            header('Location: ' . BASE_URL . '/vagas/listar');
             exit;
-
         } catch (PDOException $e) {
-            die("Erro ao salvar a vaga: " . $e->getMessage());
+            // Log e redireciona para página de erro
+            error_log('Erro ao salvar vaga: ' . $e->getMessage());
+            $this->view('Common/error', ['message' => 'Erro ao salvar a vaga.']);
         }
     }
 }

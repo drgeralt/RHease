@@ -1,11 +1,23 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Core;
 
 class Router {
-    protected $routes = [];
+    
+    /** @var array<string, mixed>[] Lista de rotas registradas */
+    protected array $routes = [];
 
-    public function addRoute($method, $path, $controller, $action) {
+    /**
+     * Registra uma rota.
+     *
+     * @param string $method GET|POST
+     * @param string $path caminho da rota (ex: /vagas/listar)
+     * @param string $controller Classe do controller
+     * @param string $action Método a chamar
+     */
+    public function addRoute(string $method, string $path, string $controller, string $action): void
+    {
         $this->routes[] = [
             'path' => $path,
             'controller' => $controller,
@@ -14,26 +26,35 @@ class Router {
         ];
     }
 
-    public function getRoutes() {
-        $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $request_method = $_SERVER['REQUEST_METHOD'];
+    /**
+     * Percorre as rotas registradas e executa a que casar com a requisição.
+     */
+    public function getRoutes(): void
+    {
+        $request_method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-        $base_path = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
-        if ($base_path !== '/') {
-            $request_uri = substr($request_uri, strlen($base_path));
-        }
+        if (isset($_GET['url']) && !empty($_GET['url'])) {
+            $request_uri = '/' . ltrim((string) $_GET['url'], '/');
+        } else {
+            $request_uri = (string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
-        if (empty($request_uri)) {
-            $request_uri = '/';
+            $base_path = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/'));
+            if ($base_path !== '/' && strpos($request_uri, $base_path) === 0) {
+                $request_uri = substr($request_uri, strlen($base_path));
+            }
+
+            if (empty($request_uri)) {
+                $request_uri = '/';
+            }
         }
 
         foreach ($this->routes as $route) {
-
             $route_pattern = preg_replace('/\{([a-zA-Z0-9_]+)}/', '(?P<$1>[a-zA-Z0-9_]+)', $route['path']);
             $route_pattern = '#^' . $route_pattern . '$#';
 
-            
-            if(preg_match($route_pattern, $request_uri, $matches) && $request_method === $route['method']){
+            $comp_uri = '/' . ltrim($request_uri, '/');
+
+            if (preg_match($route_pattern, $comp_uri, $matches) && $request_method === $route['method']) {
                 $controller_name = $route['controller'];
                 $action = $route['action'];
                 $controller = new $controller_name();
@@ -41,7 +62,6 @@ class Router {
                 $controller->$action(...array_values($matches));
                 return;
             }
-
         }
 
         http_response_code(404);

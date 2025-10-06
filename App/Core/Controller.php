@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Core;
 
 use App\Core\Database;
@@ -11,46 +13,53 @@ class Controller
     /** @var PDO A conexão com o banco de dados */
     protected PDO $db_connection;
 
-    // ==========================================================
-    // SEÇÃO ADICIONADA PARA CORRIGIR O ERRO
-    // ==========================================================
     public function __construct()
     {
-        // Inicializamos a propriedade AQUI, assim que o Controller é criado.
-        // Usamos nossa classe Singleton para pegar a conexão.
         $this->db_connection = Database::getInstance();
     }
-    // ==========================================================
 
+    /**
+     * Renderiza uma view.
+     *
+     * @param string $view Caminho relativo da view (ex: 'Vaga/gestaoVagas')
+     * @param array $data Dados a disponibilizar na view
+     */
 
-    public function view($view, $data = [])
+    public function view($view, $data = []): void
     {
         extract($data);
 
         $viewPath = BASE_PATH . "/App/View/{$view}.php";
 
-        if (file_exists($viewPath)) {
+       if (file_exists($viewPath)) {
             require_once $viewPath;
-        } else {
-            self::handleError("View not found: {$viewPath}");
+            return;
         }
+
+        // Se o arquivo da view não existir, logamos e exibimos a página de erro.
+        self::handleError("View not found: {$viewPath}");
     }
 
-    public static function handleError($message)
+    public static function handleError($message): void
     {
         error_log($message);
-        require_once BASE_PATH . '/App/View/common/error.php';
+        require_once BASE_PATH . '/App/View/Common/error.php';
         exit;
     }
 
-    public function model(string $modelName)
+    /**
+     * Retorna uma instância do Model pedido.
+     *
+     * @param string $modelName
+     * @return object
+     */
+    public function model(string $modelName): object
     {
         $modelClass = "App\\Model\\{$modelName}Model";
         if (class_exists($modelClass)) {
             return new $modelClass($this->db_connection);
         }
+
         throw new \Exception("Model {$modelClass} não encontrado.");
     }
-
-    
 }

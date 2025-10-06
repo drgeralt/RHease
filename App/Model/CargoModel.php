@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Model;
 
@@ -21,6 +22,20 @@ class CargoModel extends Model
         $stmt->execute([':nome' => $nomeCargo]);
 
         return $this->db_connection->lastInsertId();
+    }
+
+    /**
+     * Retorna todos os cargos existentes.
+     * @return array
+     */
+    /** Retorna todos os cargos existentes. */
+    public function findAll(): array
+    {
+        $stmt = $this->db_connection->prepare("SELECT id_cargo, nome_cargo, salario_base FROM cargo");
+        $stmt->execute();
+        return $stmt->fetchAll(
+            \PDO::FETCH_ASSOC
+        );
     }
 
 }
