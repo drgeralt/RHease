@@ -4,6 +4,7 @@ use App\Controller\ColaboradorController;
 use App\Controller\HomeController;
 use App\Controller\UserController;
 use App\Core\Router;
+use App\Controller\BeneficioController;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -36,7 +37,6 @@ $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::clas
 $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
 $router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar');
 
-use App\Controller\BeneficioController;
 
 // Benefícios
 $router->addRoute('GET', '/beneficios', BeneficioController::class, 'index');
@@ -46,8 +46,19 @@ $router->addRoute('GET', '/beneficios/desativar/{id}', BeneficioController::clas
 
 $router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios'); 
 
+// Rota de Gestão de Vagas
+$router->addRoute('GET', '/vagas/listar', \App\Controller\GestaoVagasController::class, 'listarVagas');
+
+//rotas para criar nova vaga
+$router->addRoute('GET', '/vagas/criar', \App\Controller\GestaoVagasController::class, 'criar');
+$router->addRoute('POST', '/vagas/salvar', \App\Controller\GestaoVagasController::class, 'salvar');
+
 // Rotas Comuns
 $router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
 $router->addRoute('GET', '/error', Controller::class, 'show_error');
 
+// ----------------------
+// Inicia o roteamento
+// ----------------------
 $router->getRoutes();
+
