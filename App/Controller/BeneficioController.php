@@ -2,8 +2,8 @@
 namespace App\Controller; 
 
 use App\Model\BeneficioModel;
-
-class BeneficioController {
+use App\Core\Controller;
+class BeneficioController extends Controller{
     private $model;
 
     public function __construct() {
@@ -12,7 +12,7 @@ class BeneficioController {
 
     // Retorna todos os benefícios
     public function index() {
-        return $this->model->listarBeneficios();
+        return $this->view('Beneficios/meus_beneficios');
     }
 
     public function meusBeneficios() {

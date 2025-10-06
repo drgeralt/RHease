@@ -3,7 +3,7 @@
         'name' => 'your-vendor/rhease',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => '5a5a607124283cfca76e4016cead172df6b57a17',
+        'reference' => '772e6fdc641021b30d23bfa8fbd5ac2dce47f384',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -76,7 +76,7 @@
         'your-vendor/rhease' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => '5a5a607124283cfca76e4016cead172df6b57a17',
+            'reference' => '772e6fdc641021b30d23bfa8fbd5ac2dce47f384',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

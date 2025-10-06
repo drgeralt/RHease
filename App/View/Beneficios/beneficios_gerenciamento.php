@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../../../config.php';
 
 $host = 'localhost';
 $user = 'root';
@@ -31,7 +31,7 @@ function listarBeneficios($conn) {
             FROM 
                 beneficios_catalogo bc
             LEFT JOIN 
-                beneficio b ON bc.id_beneficio = b.id_beneficio";
+                beneficios_catalogo b ON bc.id_beneficio = b.id_beneficio";
     
     $res = $conn->query($sql);
     $beneficios = [];

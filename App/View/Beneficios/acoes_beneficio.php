@@ -53,7 +53,7 @@ switch($acao) {
 
             // 2. INSERIR/ATUALIZAR em beneficio (se for Fixo)
             if ($tipo_valor_puro === 'Fixo') {
-                $stmt_beneficio = $conn->prepare("INSERT INTO beneficio (id_beneficio, nome_beneficio, custo_padrao_empresa) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nome_beneficio=?, custo_padrao_empresa=?");
+                $stmt_beneficio = $conn->prepare("INSERT INTO beneficios_catalogo (id_beneficio, nome, custo_padrao_empresa) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nome=?, custo_padrao_empresa=?");
                 $stmt_beneficio->bind_param('issss', $novo_id, $nome, $valor_fixo, $nome, $valor_fixo);
                 
                 if(!$stmt_beneficio->execute()) {
@@ -85,7 +85,7 @@ switch($acao) {
 
             // 2. INSERIR/ATUALIZAR em beneficio (se for Fixo)
             if ($tipo_valor_puro === 'Fixo') {
-                $stmt_beneficio = $conn->prepare("INSERT INTO beneficio (id_beneficio, nome_beneficio, custo_padrao_empresa) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nome_beneficio=?, custo_padrao_empresa=?");
+                $stmt_beneficio = $conn->prepare("INSERT INTO beneficios_catalogo (id_beneficio, nome, custo_padrao_empresa) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nome=?, custo_padrao_empresa=?");
                 $stmt_beneficio->bind_param('issss', $id, $nome, $valor_fixo, $nome, $valor_fixo);
                 
                 if(!$stmt_beneficio->execute()) {
@@ -194,7 +194,7 @@ switch($acao) {
             $stmt_regras->close();
 
             // 2. Deletar de beneficio (custo)
-            $stmt_beneficio = $conn->prepare("DELETE FROM beneficio WHERE id_beneficio = ?");
+            $stmt_beneficio = $conn->prepare("DELETE FROM beneficios_catalogo WHERE id_beneficio = ?");
             $stmt_beneficio->bind_param('i', $id);
             $stmt_beneficio->execute();
             $stmt_beneficio->close();

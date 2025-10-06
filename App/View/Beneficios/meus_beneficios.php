@@ -30,7 +30,7 @@ function buscarBeneficiosColaborador($conn, $id_colaborador) {
     // 1. Buscar os benefícios e o nome do colaborador em uma única consulta
     $sql = "SELECT 
                 c.nome_completo,
-                bc.nome AS nome_beneficio, 
+                bc.nome AS nome, 
                 bc.categoria, 
                 bc.tipo_valor, 
                 cb.valor_especifico, 
@@ -40,7 +40,7 @@ function buscarBeneficiosColaborador($conn, $id_colaborador) {
             JOIN 
                 beneficios_catalogo bc ON cb.id_beneficio = bc.id_beneficio
             LEFT JOIN 
-                beneficio b ON bc.id_beneficio = b.id_beneficio
+                beneficios_catalogo b ON bc.id_beneficio = b.id_beneficio
             JOIN
                 colaborador c ON cb.id_colaborador = c.id_colaborador
             WHERE 
