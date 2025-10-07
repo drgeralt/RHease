@@ -91,6 +91,73 @@ function buscarTiposDeContrato($conn) {
     }
     return $tipos;
 }
+function aplicarRegrasPadrao($conn, $idColaborador) {
+    if (empty($idColaborador)) {
+        return false;
+    }
+
+    // --- 1. BUSCAR O TIPO DE CONTRATO (Consulta direta à tabela 'colaborador') ---
+    $sqlTipo = "SELECT tipo_contrato FROM colaborador WHERE id_colaborador = ?";
+    $stmtTipo = $conn->prepare($sqlTipo);
+    $stmtTipo->bind_param('i', $idColaborador);
+    $stmtTipo->execute();
+    $resultTipo = $stmtTipo->get_result();
+    
+    if ($resultTipo->num_rows === 0) {
+        // Se o colaborador não existe, lança um erro, pois o cadastro deveria ter ocorrido.
+        throw new Exception("Colaborador ID {$idColaborador} não encontrado após cadastro.");
+    }
+
+    $tipoContrato = $resultTipo->fetch_assoc()['tipo_contrato'];
+    $stmtTipo->close();
+    
+    if (empty($tipoContrato)) {
+        // Se o tipo de contrato não estiver preenchido, não há regras para aplicar.
+        return true; 
+    }
+
+    // --- 2. BUSCAR AS REGRAS PADRÃO NA TABELA 'regras_beneficios' ---
+    $sqlRegras = "
+        SELECT id_beneficio
+        FROM regras_beneficios
+        WHERE tipo_contrato = ?
+    ";
+
+    $stmtRegras = $conn->prepare($sqlRegras);
+    $stmtRegras->bind_param('s', $tipoContrato);
+    $stmtRegras->execute();
+    $resultRegras = $stmtRegras->get_result();
+    $regras = [];
+    while($row = $resultRegras->fetch_assoc()) {
+        $regras[] = $row['id_beneficio'];
+    }
+    $stmtRegras->close();
+
+    // Se não houver regras para esse tipo de contrato no catálogo, encerra.
+    if (empty($regras)) {
+        return true; 
+    }
+    
+    // --- 3. INSERIR OS BENEFÍCIOS NA TABELA 'colaborador_beneficio' ---
+    $sqlInsert = "
+        INSERT INTO colaborador_beneficio (id_colaborador, id_beneficio, valor_especifico)
+        VALUES (?, ?, 0.0) 
+    ";
+    $stmtInsert = $conn->prepare($sqlInsert);
+
+    foreach ($regras as $idBeneficio) {
+        $idBeneficio = (int)$idBeneficio;
+        // valor_especifico é inicializado como 0.0, pois é o valor inicial de desconto.
+        $stmtInsert->bind_param('ii', $idColaborador, $idBeneficio);
+        
+        if (!$stmtInsert->execute()) {
+            throw new Exception("Erro ao inserir benefício padrão: " . $stmtInsert->error);
+        }
+    }
+    $stmtInsert->close();
+    
+    return true;
+}
 
 $beneficios = listarBeneficios($conn);
 $beneficios_selecao = listarBeneficiosParaSelecao($conn);

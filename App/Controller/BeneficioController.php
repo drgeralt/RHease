@@ -19,18 +19,15 @@ class BeneficioController extends Controller{
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
     }
-    $id_colaborador_logado = 1;
 
     require_once dirname(__DIR__, 2) . '/App/View/Beneficios/meus_beneficios.php'; 
 
-    /*
     $id_colaborador_logado = $_SESSION['id_colaborador'] ?? null;
     
     if (!$id_colaborador_logado) {
         header("Location: /login"); 
         exit();
     }
-    */
     
     require_once dirname(__DIR__) . '/View/Beneficios/meus_beneficios.php'; 
 }

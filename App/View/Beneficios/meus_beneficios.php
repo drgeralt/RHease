@@ -1,11 +1,11 @@
 <?php
 
-// session_start(); 
-// $id_colaborador_logado = $_SESSION['id_colaborador'] ?? null;
-// if (!$id_colaborador_logado) {
-//     header("Location: /login");
-//     exit();
-// }
+//session_start(); 
+//$id_colaborador_logado = $_SESSION['id_colaborador'] ?? null;
+//if (!$id_colaborador_logado) {
+     //header("Location: /login");
+    //exit();
+//}
 $id_colaborador_logado = 1; 
 
 $host = 'localhost';
