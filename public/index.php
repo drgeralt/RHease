@@ -2,6 +2,7 @@
 
 use App\Controller\ColaboradorController;
 use App\Controller\HomeController;
+use App\Controller\PontoController;
 use App\Controller\UserController;
 use App\Core\Router;
 use App\Controller\BeneficioController;
@@ -35,6 +36,8 @@ $router->addRoute('GET', '/verify', UserController::class, 'verify_account');
 //Colaboradores
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
 $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
+$router->addRoute('GET', '/registrarponto', PontoController::class, 'index');
+$router->addRoute('POST', '/registrarponto/salvar', PontoController::class, 'registrar');
 $router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar');
 
 
