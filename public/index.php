@@ -6,7 +6,7 @@ use App\Controller\PontoController;
 use App\Controller\UserController;
 use App\Core\Router;
 use App\Controller\BeneficioController;
-
+use App\Controller\HoleriteController;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 ini_set('display_errors', 1);
@@ -47,7 +47,7 @@ $router->addRoute('POST', '/beneficios/criar', BeneficioController::class, 'cria
 $router->addRoute('POST', '/beneficios/editar', BeneficioController::class, 'editar');
 $router->addRoute('GET', '/beneficios/desativar/{id}', BeneficioController::class, 'desativar');
 
-$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios'); 
+$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios');
 
 // Rota de Gestão de Vagas
 $router->addRoute('GET', '/vagas/listar', \App\Controller\GestaoVagasController::class, 'listarVagas');
@@ -55,6 +55,16 @@ $router->addRoute('GET', '/vagas/listar', \App\Controller\GestaoVagasController:
 //rotas para criar nova vaga
 $router->addRoute('GET', '/vagas/criar', \App\Controller\GestaoVagasController::class, 'criar');
 $router->addRoute('POST', '/vagas/salvar', \App\Controller\GestaoVagasController::class, 'salvar');
+
+// ----------------------
+// Holerites
+// ----------------------
+// Rota para a página de listagem de holerites do colaborador
+$router->addRoute('GET', '/meus-holerites', HoleriteController::class, 'index');
+
+// Rota para gerar o PDF de um holerite específico
+$router->addRoute('GET', '/holerite/pdf/{id}', HoleriteController::class, 'gerarPDF');
+
 
 // Rotas Comuns
 $router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
@@ -64,4 +74,3 @@ $router->addRoute('GET', '/error', Controller::class, 'show_error');
 // Inicia o roteamento
 // ----------------------
 $router->getRoutes();
-

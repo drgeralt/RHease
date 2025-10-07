@@ -1,0 +1,101 @@
+/* public/css/holerites.css */
+
+/* =============================================== */
+/* ESTILOS BASE (Reutilizados de cadastroColaboradores.css) */
+/* =============================================== */
+* {
+    font-family: 'Montserrat', sans-serif;
+}
+body {
+    background: #f2f2f2;
+    margin: 0;
+}
+.topbar {
+    background: #d9d9d9;
+    padding: 15px 30px;
+    border-bottom: 2px solid #ddd;
+}
+.logo {
+    width: 130px;
+}
+/* Usaremos 'content-container' para ser mais genérico */
+.content-container {
+    background: #fff;
+    width: 90%;
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
+}
+.content-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 26px;
+}
+section {
+    margin-bottom: 25px;
+}
+section h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #489D3B;
+    display: inline-block;
+    padding-bottom: 3px;
+    color: #489D3B;
+}
+
+/* =============================================== */
+/* NOVOS ESTILOS (para a tabela de holerites)      */
+/* =============================================== */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto; /* Garante responsividade em telas pequenas */
+}
+.holerite-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+.holerite-table th,
+.holerite-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.holerite-table thead tr {
+    background-color: #f0f0f0; /* Um cinza um pouco mais claro */
+    color: #333;
+    font-weight: 600;
+    font-size: 14px;
+}
+.holerite-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+.btn-action {
+    background: #2a7c4b;
+    color: #fff;
+    font-size: 14px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-action:hover {
+    background: #489D3B;
+}
+.empty-message {
+    text-align: center;
+    color: #96989A;
+    font-style: italic;
+    padding: 20px;
+}
+.info-text {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
