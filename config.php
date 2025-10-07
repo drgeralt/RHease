@@ -22,8 +22,6 @@ if (!defined('DB_NAME')) {
 	define('DB_NAME', getenv('DB_NAME') ?: 'rhease');
 }
 
-
-
 // Configurações do Banco de Dados
 /**define('DB_HOST', 'localhost');
 define('DB_USER', 'root');

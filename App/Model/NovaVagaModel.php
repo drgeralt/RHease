@@ -15,9 +15,9 @@ class NovaVagaModel extends Model
   {
     // query referente aos campos da tabela vaga e do forms
     $query = "INSERT INTO {$this->table} 
-                    (titulo_vaga, requisitos, situacao, id_setor, id_cargo)
+                    (titulo_vaga, descricao_vaga, id_setor, situacao, requisitos_necessarios, requisitos_recomendados, requisitos_desejados, id_cargo)
                   VALUES 
-                    (:titulo_vaga, :requisitos, :situacao, :id_setor, :id_cargo)";
+                    (:titulo_vaga, :descricao_vaga, :id_setor, :situacao, :requisitos_necessarios, :requisitos_recomendados, :requisitos_desejados, :id_cargo)";
 
     $stmt = $this->db_connection->prepare($query);
 
@@ -26,11 +26,14 @@ class NovaVagaModel extends Model
 
     // As chaves do array devem corresponder aos placeholders na query
     $stmt->execute([
-      ':titulo_vaga' => $dados['titulo_vaga'],
-      ':id_setor' => $dados['id_setor'],
-      ':id_cargo' => $idCargo,
-      ':situacao' => $dados['situacao'],
-      ':requisitos' => $dados['requisitos'],
+        ':titulo_vaga' => $dados['titulo_vaga'],
+        ':descricao_vaga' => $dados['descricao_vaga'],
+        ':id_setor' => $dados['id_setor'],
+        ':situacao' => $dados['situacao'],
+        ':requisitos_necessarios' => $dados['requisitos_necessarios'],
+        ':requisitos_recomendados' => $dados['requisitos_recomendados'],
+        ':requisitos_desejados' => $dados['requisitos_desejados'],
+        ':id_cargo' => $dados['id_cargo'],
     ]);
 
     return $this->db_connection->lastInsertId();
