@@ -18,7 +18,6 @@ class PontoModel
     {
         $pdo = Database::getInstance();
 
-        // --- MODIFICADO AQUI: Usamos um placeholder para a data atual ---
         $sql = "SELECT data_hora_entrada FROM folha_ponto 
                 WHERE id_colaborador = :id_colaborador 
                 AND DATE(data_hora_entrada) = :data_atual 
@@ -42,7 +41,6 @@ class PontoModel
         $pdo = Database::getInstance();
         $dataAtual = date('Y-m-d', strtotime($dataHoraAtual));
 
-        // --- MODIFICADO AQUI: A query de busca também usa o placeholder ---
         $sqlBusca = "SELECT id_registro_ponto FROM folha_ponto 
                      WHERE id_colaborador = :id_colaborador 
                      AND DATE(data_hora_entrada) = :data_atual 
@@ -56,7 +54,6 @@ class PontoModel
         ]);
         $registroAberto = $stmtBusca->fetch();
 
-        // Se encontrou um registo, é uma SAÍDA.
         if ($registroAberto) {
             $sql = "UPDATE folha_ponto SET data_hora_saida = :data_hora
                     WHERE id_registro_ponto = :id_registro";
@@ -68,7 +65,6 @@ class PontoModel
             ]);
             return 'saida';
         }
-        // Se não, é uma ENTRADA.
         else {
             $sql = "INSERT INTO folha_ponto (id_colaborador, data_hora_entrada) 
                     VALUES (:id_colaborador, :data_hora)";
