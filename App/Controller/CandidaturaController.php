@@ -98,25 +98,30 @@ class CandidaturaController extends Controller
     }
     public function exibirAnaliseIA()
     {
-        $idCandidatura = (int)($_GET['id'] ?? 0);
+        $idCandidatura = 0;
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Vem do clique no botão "Ver Análise" (olho)
+            $idCandidatura = (int)($_POST['id_candidatura'] ?? 0);
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            // Vem do redirecionamento após o processamento da IA
+            $idCandidatura = (int)($_GET['id'] ?? 0);
+        }
+
         if ($idCandidatura === 0) {
-            // Se o ID for inválido, redireciona para a lista de vagas
-            header('Location: ' . BASE_URL . '/vagas');
+            header('Location: ' . BASE_URL . '/vagas/listar');
             exit;
         }
 
         $db = Database::getInstance();
         $candidaturaModel = new CandidaturaModel($db);
-
         $analise = $candidaturaModel->buscarAnaliseCompleta($idCandidatura);
 
-        // Se a análise não for encontrada ou a pontuação for nula, redireciona
         if (!$analise || $analise['pontuacao_aderencia'] === null) {
-            header('Location: ' . BASE_URL . '/vagas?error=analise_nao_encontrada');
+            header('Location: ' . BASE_URL . '/vagas/listar?error=analise_nao_encontrada');
             exit;
         }
 
-        // Se tudo estiver correto, exibe a view com os dados
         return $this->view('Candidatura/resultado_ia', ['candidatura' => $analise]);
     }
     /**

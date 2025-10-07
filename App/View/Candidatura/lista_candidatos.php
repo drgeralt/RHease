@@ -77,7 +77,7 @@
                                             </form>
                                         <?php else: ?>
                                             <!-- Se JÁ HOUVER score, mostra o botão para ver a análise -->
-                                            <form action="<?php echo BASE_URL; ?>/candidatos/analise-ia" method="POST" style="display: inline;">
+                                            <form action="<?php echo BASE_URL; ?>/candidatura/ver-analise" method="POST" style="display: inline;">
                                                 <input type="hidden" name="id_candidatura" value="<?php echo $candidato['id_candidatura']; ?>">
                                                 <button type="submit" class="btn btn-info" title="Ver Análise da IA">
                                                     <i class="fas fa-eye"></i>

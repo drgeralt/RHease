@@ -22,43 +22,39 @@ require_once BASE_PATH . '/config.php';
 
 $router = new Router();
 
-// ----------------------
-// Rotas de Autenticação
-// ----------------------
-$router->addRoute('GET', '/', UserController::class, 'show_login'); // Página inicial é o login
+// --- Rotas de Autenticação ---
+$router->addRoute('GET', '/', UserController::class, 'show_login');
 $router->addRoute('GET', '/login', UserController::class, 'show_login');
 $router->addRoute('POST', '/login', UserController::class, 'process_login');
 $router->addRoute('GET', '/cadastro', UserController::class, 'show_cadastro');
-$router->addRoute('POST', '/register', UserController::class, 'register'); // API para o JavaScript
+$router->addRoute('POST', '/register', UserController::class, 'register');
 $router->addRoute('GET', '/registro-sucesso', UserController::class, 'show_registro_sucesso');
 $router->addRoute('GET', '/verify', UserController::class, 'verify_account');
 
-
-//Colaboradores
+// --- Rotas de Colaboradores ---
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
 $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
 $router->addRoute('GET', '/registrarponto', PontoController::class, 'index');
 $router->addRoute('POST', '/registrarponto/salvar', PontoController::class, 'registrar');
 $router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar');
 
-// Rota de Gestão de Vagas
-$router->addRoute('GET', '/vagas/listar', \App\Controller\GestaoVagasController::class, 'listarVagas');
+// --- Rotas de Gestão de Vagas ---
+$router->addRoute('GET', '/vagas/listar', GestaoVagasController::class, 'listarVagas');
+$router->addRoute('GET', '/vagas/criar', GestaoVagasController::class, 'criar');
+$router->addRoute('POST', '/vagas/salvar', GestaoVagasController::class, 'salvar');
+$router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos');
 
-
-//rotas para criar nova vaga
-$router->addRoute('GET', '/vagas/criar', \App\Controller\GestaoVagasController::class, 'criar');
-$router->addRoute('POST', '/vagas/salvar', \App\Controller\GestaoVagasController::class, 'salvar');
-
-
-//Candidatura
+// --- Rotas de Candidatura e IA ---
 $router->addRoute('GET', '/vagas', CandidaturaController::class, 'listar');
 $router->addRoute('POST', '/candidatura/formulario', CandidaturaController::class, 'exibirFormulario');
 $router->addRoute('POST', '/candidatura/aplicar', CandidaturaController::class, 'aplicar');
+$router->addRoute('POST', '/candidatura/analisar', CandidaturaController::class, 'analisarCurriculo');
+$router->addRoute('POST', '/candidatura/ver-analise', CandidaturaController::class, 'exibirAnaliseIA');
+$router->addRoute('GET', '/candidatura/ver-analise', CandidaturaController::class, 'exibirAnaliseIA');
+
+// --- Rotas de Redirecionamento ---
 $router->addRoute('GET', '/candidatura/formulario', CandidaturaController::class, 'redirecionarParaVagas');
 $router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redirecionarParaVagas');
-$router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos');
-$router->addRoute('POST', '/candidatura/analisar', CandidaturaController::class, 'analisarCurriculo');
-$router->addRoute('GET', '/candidatura/analise-ia', CandidaturaController::class, 'exibirAnaliseIA');
 
 // Rotas Comuns
 //$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
