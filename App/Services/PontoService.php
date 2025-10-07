@@ -32,8 +32,6 @@ class PontoService implements PontoServiceInterface
         $totais = $this->calcularTotaisDoMes($idColaborador, $mes, $ano);
 
         $horasExtras = $totais['trabalhadas'] - $totais['esperadas'];
-
-        // Garante que o resultado nunca seja negativo.
         return max(0, $horasExtras);
     }
 
@@ -70,18 +68,13 @@ class PontoService implements PontoServiceInterface
             $entrada = new DateTime($registro['data_hora_entrada']);
             $saida = new DateTime($registro['data_hora_saida']);
 
-            // Calcula a diferença entre a saída e a entrada
             $intervalo = $saida->diff($entrada);
 
-            // Converte o intervalo para um valor decimal de horas
             $horasDoDia = $intervalo->h + ($intervalo->i / 60) + ($intervalo->s / 3600);
             $totalHorasTrabalhadas += $horasDoDia;
-
-            // Regista o dia como trabalhado (para não contar dias de folga)
             $diasTrabalhados[$entrada->format('Y-m-d')] = true;
         }
 
-        // Calcula o total de horas que o colaborador deveria ter trabalhado
         $numeroDeDiasTrabalhados = count($diasTrabalhados);
         $totalHorasEsperadas = $numeroDeDiasTrabalhados * self::$JORNADA_DIARIA_PADRAO_EM_HORAS;
 
