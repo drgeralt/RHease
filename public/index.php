@@ -7,6 +7,7 @@ use App\Controller\UserController;
 use App\Controller\CandidaturaController;
 use App\Controller\GestaoVagasController;
 use App\Core\Router;
+use App\Controller\BeneficioController;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -38,11 +39,21 @@ $router->addRoute('GET', '/registrarponto', PontoController::class, 'index');
 $router->addRoute('POST', '/registrarponto/salvar', PontoController::class, 'registrar');
 $router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar');
 
+
 // --- Rotas de Gestão de Vagas ---
 $router->addRoute('GET', '/vagas/listar', GestaoVagasController::class, 'listarVagas');
 $router->addRoute('GET', '/vagas/criar', GestaoVagasController::class, 'criar');
 $router->addRoute('POST', '/vagas/salvar', GestaoVagasController::class, 'salvar');
 $router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos');
+
+// Benefícios
+$router->addRoute('GET', '/beneficios', BeneficioController::class, 'index');
+$router->addRoute('POST', '/beneficios/criar', BeneficioController::class, 'criar');
+$router->addRoute('POST', '/beneficios/editar', BeneficioController::class, 'editar');
+$router->addRoute('GET', '/beneficios/desativar/{id}', BeneficioController::class, 'desativar');
+
+$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios'); 
+
 
 // --- Rotas de Candidatura e IA ---
 $router->addRoute('GET', '/vagas', CandidaturaController::class, 'listar');
@@ -57,8 +68,8 @@ $router->addRoute('GET', '/candidatura/formulario', CandidaturaController::class
 $router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redirecionarParaVagas');
 
 // Rotas Comuns
-//$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
-//$router->addRoute('GET', '/error', Controller::class, 'show_error');
+$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
+$router->addRoute('GET', '/error', Controller::class, 'show_error');
 
 // ----------------------
 // Inicia o roteamento
