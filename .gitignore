@@ -74,8 +74,6 @@ composer.phar
 # Built Visual Studio Code Extensions
 *.vsix
 
-.env
-
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
@@ -106,5 +104,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+/vendor/
+/.idea/
+/composer.lock
 
 # End of https://www.toptal.com/developers/gitignore/api/phpunit,composer,visualstudiocode,windows,jboss-6-x
