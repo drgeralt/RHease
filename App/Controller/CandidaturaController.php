@@ -1,13 +1,19 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controller;
+
 use App\Core\Controller;
 use App\Core\Database;
+use App\Model\CandidaturaModel;
 use App\Model\GestaoVagasModel;
 use App\Model\CandidatoModel;
-use App\Model\CandidaturaModel;
-use Smalot\PdfParser\Parser;
 use App\Service\AnalisadorCurriculoService;
+use Smalot\PdfParser\Parser;
+// Adicionado para a nova função
+use GeminiAPI\Client;
+
+
 class CandidaturaController extends Controller
 {
     public function analisarCurriculo()
@@ -69,7 +75,7 @@ class CandidaturaController extends Controller
             // ATENÇÃO: Substitua a chave
             $analisadorService = new AnalisadorCurriculoService('AIzaSyAXXpXRYl5mEOw8SnPLxYbTLa1moERQcNk');
 
-            $resultadoAnalise = $analisadorService->analisar($textoDoCurriculo, $descricaoVaga);
+            $resultadoAnalise = $analisadorService->analisar($textoDoCurriculo, $candidatura);
 
             if ($resultadoAnalise['sucesso']) {
                 $sumario = $resultadoAnalise['resultado']['sumario'] ?? 'Sumário não retornado.';
@@ -92,27 +98,26 @@ class CandidaturaController extends Controller
     }
     public function exibirAnaliseIA()
     {
-        // O ID é passado via GET, como parte do redirecionamento
         $idCandidatura = (int)($_GET['id'] ?? 0);
         if ($idCandidatura === 0) {
-            die("Erro: ID da candidatura não fornecido.");
+            // Se o ID for inválido, redireciona para a lista de vagas
+            header('Location: ' . BASE_URL . '/vagas');
+            exit;
         }
 
         $db = Database::getInstance();
         $candidaturaModel = new CandidaturaModel($db);
 
-        // Busca os dados já processados (pontuação e sumário)
         $analise = $candidaturaModel->buscarAnaliseCompleta($idCandidatura);
 
+        // Se a análise não for encontrada ou a pontuação for nula, redireciona
         if (!$analise || $analise['pontuacao_aderencia'] === null) {
-            // Se a rota foi acessada diretamente antes do processamento, ou houve erro
-            die("Análise da IA não encontrada ou ainda não processada.");
+            header('Location: ' . BASE_URL . '/vagas?error=analise_nao_encontrada');
+            exit;
         }
 
-        // Exibe a view com os dados completos
-        return $this->view('Candidatura/resultado_ia', [
-            'candidatura' => $analise
-        ]);
+        // Se tudo estiver correto, exibe a view com os dados
+        return $this->view('Candidatura/resultado_ia', ['candidatura' => $analise]);
     }
     /**
      * Exibe a lista de vagas abertas para os candidatos.

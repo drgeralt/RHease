@@ -57,8 +57,9 @@ $router->addRoute('POST', '/candidatura/aplicar', CandidaturaController::class, 
 $router->addRoute('GET', '/candidatura/formulario', CandidaturaController::class, 'redirecionarParaVagas');
 $router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redirecionarParaVagas');
 $router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos');
-$router->addRoute('POST', 'candidatura/analisar', CandidaturaController::class, 'analisarCurriculo');
+$router->addRoute('POST', '/candidatura/analisar', CandidaturaController::class, 'analisarCurriculo');
 $router->addRoute('GET', '/candidatura/analise-ia', CandidaturaController::class, 'exibirAnaliseIA');
+
 // Rotas Comuns
 //$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
 //$router->addRoute('GET', '/error', Controller::class, 'show_error');

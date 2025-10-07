@@ -35,7 +35,7 @@ class GestaoVagasModel extends Model{
                     v.id_vaga,
                     v.titulo_vaga AS titulo,
                     v.descricao_vaga,
-                    v.requisitos,
+                    v.requisitos_necessarios AS requisitos,
                     v.data_criacao,
                     v.situacao,
                     s.nome_setor AS departamento

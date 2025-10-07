@@ -69,7 +69,7 @@
                                         <!-- LÓGICA DO BOTÃO DE IA -->
                                         <?php if (is_null($candidato['pontuacao_aderencia'])): ?>
                                             <!-- Se NÃO HOUVER score, mostra o botão para processar -->
-                                            <form action="<?php echo BASE_URL; ?>/candidatura/processar-ia" method="POST" style="display: inline;">
+                                            <form action="<?php echo BASE_URL; ?>/candidatura/analisar" method="POST" style="display: inline;">
                                                 <input type="hidden" name="id_candidatura" value="<?php echo $candidato['id_candidatura']; ?>">
                                                 <button type="submit" class="btn btn-secondary" title="Processar com IA">
                                                     <i class="fas fa-robot"></i>
@@ -77,7 +77,7 @@
                                             </form>
                                         <?php else: ?>
                                             <!-- Se JÁ HOUVER score, mostra o botão para ver a análise -->
-                                            <form action="<?php echo BASE_URL; ?>/candidatos/ver-analise" method="POST" style="display: inline;">
+                                            <form action="<?php echo BASE_URL; ?>/candidatos/analise-ia" method="POST" style="display: inline;">
                                                 <input type="hidden" name="id_candidatura" value="<?php echo $candidato['id_candidatura']; ?>">
                                                 <button type="submit" class="btn btn-info" title="Ver Análise da IA">
                                                     <i class="fas fa-eye"></i>

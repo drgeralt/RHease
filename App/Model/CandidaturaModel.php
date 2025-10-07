@@ -12,17 +12,14 @@ class CandidaturaModel extends Model
     public function buscarAnaliseCompleta(int $idCandidatura): array|false
     {
         $sql = "SELECT 
-                    c.id_candidatura,
-                    c.data_candidatura,
-                    c.status_triagem,
-                    c.pontuacao_aderencia,  -- Novo campo!
-                    c.justificativa_ia,     -- Novo campo!
-                    cand.nome_completo AS nome_candidato,
+                    c.pontuacao_aderencia,
+                    c.justificativa_ia,
+                    cand.nome_completo,
                     v.titulo_vaga,
-                    v.requisitos AS descricao_vaga
+                    v.descricao_vaga
                 FROM 
                     candidaturas AS c
-                JOIN
+                JOIN 
                     candidato AS cand ON c.id_candidato = cand.id_candidato
                 JOIN
                     vaga AS v ON c.id_vaga = v.id_vaga
@@ -35,17 +32,19 @@ class CandidaturaModel extends Model
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    public function buscarComVaga(int $idCandidatura): array|false
+    public function buscarComVaga(int $idCandidatura)
     {
         $sql = "SELECT 
                     c.id_candidatura,
-                    c.id_vaga,
                     cand.curriculo,
-                    v.requisitos AS descricao_vaga,
-                    v.titulo_vaga
+                    v.titulo_vaga,
+                    v.descricao_vaga,
+                    v.requisitos_necessarios,
+                    v.requisitos_recomendados,
+                    v.requisitos_desejados
                 FROM 
                     candidaturas AS c
-                JOIN
+                JOIN 
                     candidato AS cand ON c.id_candidato = cand.id_candidato
                 JOIN
                     vaga AS v ON c.id_vaga = v.id_vaga
@@ -58,32 +57,20 @@ class CandidaturaModel extends Model
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
     public function atualizarResultadoIA(int $idCandidatura, int $nota, string $sumario): bool
     {
-        $sql = "
-            UPDATE 
-                candidaturas
-            SET
-                pontuacao_aderencia = :nota,
-                justificativa_ia = :sumario,
-                status_triagem = 'Em Análise' 
-            WHERE
-                id_candidatura = :id_candidatura
-        ";
+        $sql = "UPDATE candidaturas 
+                SET pontuacao_aderencia = :nota, justificativa_ia = :sumario 
+                WHERE id_candidatura = :id_candidatura";
 
-        try {
-            $stmt = $this->db_connection->prepare($sql);
+        $stmt = $this->db_connection->prepare($sql);
 
-            return $stmt->execute([
-                ':nota' => $nota,
-                ':sumario' => $sumario,
-                ':id_candidatura' => $idCandidatura
-            ]);
-        } catch (\PDOException $e) {
-            // Em ambiente de desenvolvimento, você pode logar o erro
-            error_log("Erro ao atualizar resultado IA: " . $e->getMessage());
-            return false;
-        }
+        return $stmt->execute([
+            ':nota' => $nota,
+            ':sumario' => $sumario,
+            ':id_candidatura' => $idCandidatura
+        ]);
     }
     /**
      * Cria um novo registro de candidatura na tabela 'candidaturas'.
@@ -124,23 +111,24 @@ class CandidaturaModel extends Model
     }
     public function buscarPorVaga(int $idVaga): array
     {
-        // CORREÇÃO: Adicionados os campos 'id_candidatura' e 'pontuacao_aderencia' à consulta.
+        // CORREÇÃO: A consulta agora junta 'candidaturas' (alias c) com 'candidato' (alias cand)
+        // e seleciona as colunas corretas de cada tabela.
         $sql = "SELECT 
-                    cand.id_candidatura,
-                    cand.pontuacao_aderencia,
-                    cand.justificativa_ia,
-                    cand.data_candidatura,
-                    cand.status_triagem,
-                    c.nome_completo,
-                    c.curriculo
-                FROM 
-                    candidaturas AS cand
-                JOIN 
-                    candidato AS c ON cand.id_candidato = c.id_candidato
-                WHERE 
-                    cand.id_vaga = :id_vaga
-                ORDER BY 
-                    cand.pontuacao_aderencia ASC";
+                c.id_candidatura,
+                c.pontuacao_aderencia,
+                c.justificativa_ia,
+                c.data_candidatura,
+                c.status_triagem,
+                cand.nome_completo,
+                cand.curriculo
+            FROM 
+                candidaturas AS c
+            JOIN 
+                candidato AS cand ON c.id_candidato = cand.id_candidato
+            WHERE 
+                c.id_vaga = :id_vaga
+            ORDER BY 
+                c.pontuacao_aderencia DESC, c.data_candidatura DESC";
 
         $stmt = $this->db_connection->prepare($sql);
         $stmt->execute([':id_vaga' => $idVaga]);
@@ -150,13 +138,17 @@ class CandidaturaModel extends Model
     public function buscarPorId(int $idCandidatura)
     {
         $sql = "SELECT 
-                    c.id_candidatura,
-                    c.id_vaga,
-                    cand.curriculo
+                    c.pontuacao_aderencia,
+                    c.justificativa_ia,
+                    cand.nome_completo,
+                    v.titulo_vaga,
+                    v.descricao_vaga
                 FROM 
                     candidaturas AS c
-                JOIN
+                JOIN 
                     candidato AS cand ON c.id_candidato = cand.id_candidato
+                JOIN
+                    vaga AS v ON c.id_vaga = v.id_vaga
                 WHERE 
                     c.id_candidatura = :id_candidatura
                 LIMIT 1";

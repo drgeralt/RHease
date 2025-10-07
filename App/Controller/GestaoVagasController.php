@@ -14,6 +14,7 @@ class GestaoVagasController extends Controller
     // lista as vagas e exibe a view
     public function listarVagas(): void 
     {
+        $db = Database::getInstance();
         $vagaModel = $this->model('GestaoVagas');
         $vagas = $vagaModel->listarVagas();
         $this->view('vaga/GestaoVagas', ['vagas' => $vagas]);
@@ -80,8 +81,11 @@ class GestaoVagasController extends Controller
             $dadosVaga = [
                 'titulo_vaga' => $titulo,
                 'id_setor' => $idSetor,
-                'situacao' => $status,
-                'requisitos' => $_POST['skills_necessarias'] ?? null,
+                'situacao' => $_POST['status'] ?? 'rascunho',
+                'descricao_vaga' => $_POST['descricao'] ?? null,
+                'requisitos_necessarios' => $_POST['skills_necessarias'] ?? null,
+                'requisitos_recomendados' => $_POST['skills_recomendadas'] ?? null,
+                'requisitos_desejados' => $_POST['skills_desejadas'] ?? null,
                 'id_cargo' => null,
             ];
 
