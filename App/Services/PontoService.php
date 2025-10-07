@@ -6,15 +6,9 @@ use App\Services\Contracts\PontoServiceInterface;
 use App\Model\PontoModel;
 use DateTime;
 
-/**
- * Implementação concreta do serviço de processamento de ponto.
- */
+
 class PontoService implements PontoServiceInterface
 {
-    /**
-     * Define a jornada de trabalho diária padrão em horas.
-     * Este valor pode ser movido para um ficheiro de configuração no futuro.
-     */
     private static $JORNADA_DIARIA_PADRAO_EM_HORAS = 8.0;
 
     private $pontoModel;
@@ -48,9 +42,6 @@ class PontoService implements PontoServiceInterface
     }
 
     /**
-     * Método auxiliar privado para calcular os totais de horas trabalhadas e esperadas.
-     * Evita a duplicação de código entre os métodos públicos.
-     *
      * @return array ['trabalhadas' => float, 'esperadas' => float]
      */
     private function calcularTotaisDoMes(int $idColaborador, int $mes, int $ano): array
