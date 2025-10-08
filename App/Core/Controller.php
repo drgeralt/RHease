@@ -39,10 +39,7 @@ class Controller
         // Se o arquivo da view não existir, logamos e exibimos a página de erro.
         self::handleError("View not found: {$viewPath}");
     }
-    protected function getDB(): PDO
-    {
-        return Database::getInstance();
-    }
+
     public static function handleError($message): void
     {
         error_log($message);

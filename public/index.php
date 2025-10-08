@@ -12,7 +12,7 @@ use App\Controller\BeneficioController;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
 session_start();
@@ -38,10 +38,6 @@ $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 
 $router->addRoute('GET', '/registrarponto', PontoController::class, 'index');
 $router->addRoute('POST', '/registrarponto/salvar', PontoController::class, 'registrar');
 $router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar');
-$router->addRoute('POST', '/colaboradores/editar', ColaboradorController::class, 'editar');
-$router->addRoute('POST', '/colaboradores/atualizar', ColaboradorController::class, 'atualizar');
-$router->addRoute('POST', '/colaboradores/atualizar', ColaboradorController::class, 'atualizar');
-$router->addRoute('POST', '/colaboradores/toggle-status', ColaboradorController::class, 'toggleStatus');
 
 
 // --- Rotas de Gestão de Vagas ---
@@ -52,13 +48,11 @@ $router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 've
 
 // Benefícios
 $router->addRoute('GET', '/beneficios', BeneficioController::class, 'index');
-$router->addRoute('POST', '/beneficios/api', BeneficioController::class, 'api');
 $router->addRoute('POST', '/beneficios/criar', BeneficioController::class, 'criar');
 $router->addRoute('POST', '/beneficios/editar', BeneficioController::class, 'editar');
 $router->addRoute('GET', '/beneficios/desativar/{id}', BeneficioController::class, 'desativar');
-$router->addRoute('GET', '/beneficios/gerenciamento', \App\Controller\BeneficioController::class, 'gerenciamento');
 
-$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios');
+$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios'); 
 
 
 // --- Rotas de Candidatura e IA ---

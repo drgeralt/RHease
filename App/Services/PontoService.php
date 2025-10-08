@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Service;
+namespace App\Services;
 
-use App\Model\PontoModel;
 use App\Services\Contracts\PontoServiceInterface;
+use App\Model\PontoModel;
 use DateTime;
 
 /**

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Service\Implementations;
+namespace App\Services\Implementations;
 
-use App\Core\Database;
+use App\Core\Database; 
 use App\Services\Contracts\BeneficioServiceInterface;
 use PDO;
 use PDOException;
