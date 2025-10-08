@@ -48,13 +48,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <!-- Link de Dados Cadastrais atualizado -->
+                            <a href="<?php echo BASE_URL; ?>/colaboradores" class="nav-link">
                                 <i class="fas fa-database"></i>
                                 <span>Dados cadastrais</span>
                             </a>
                         </li>
                         <li class="nav-item active">
-                            <a href="#" class="nav-link">
+                            <!-- Link de Recrutamento atualizado -->
+                            <a href="<?php echo BASE_URL; ?>/vagas/listar" class="nav-link">
                                 <i class="fas fa-users"></i>
                                 <span>Recrutamento</span>
                             </a>
@@ -66,13 +68,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <!-- Link de Benefícios atualizado -->
+                            <a href="<?php echo BASE_URL; ?>/beneficios" class="nav-link">
                                 <i class="fas fa-gift"></i>
                                 <span>Benefícios</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <!-- Link de Frequência atualizado -->
+                            <a href="<?php echo BASE_URL; ?>/registrarponto" class="nav-link">
                                 <i class="fas fa-clock"></i>
                                 <span>Frequência</span>
                             </a>
