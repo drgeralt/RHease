@@ -7,6 +7,8 @@ use App\Controller\UserController;
 use App\Core\Router;
 use App\Controller\BeneficioController;
 use App\Controller\HoleriteController;
+use App\Controller\FolhaPagamentoController;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 ini_set('display_errors', 1);
@@ -64,6 +66,9 @@ $router->addRoute('GET', '/meus-holerites', HoleriteController::class, 'index');
 
 // Rota para gerar o PDF de um holerite específico
 $router->addRoute('GET', '/holerite/pdf/{id}', HoleriteController::class, 'gerarPDF');
+
+$router->addRoute('GET', '/folha/processar', FolhaPagamentoController::class, 'index');
+$router->addRoute('POST', '/folha/processar', FolhaPagamentoController::class, 'processar');
 
 
 // Rotas Comuns
