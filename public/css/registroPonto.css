@@ -1,0 +1,131 @@
+/* Importando a fonte para garantir que esteja disponível */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap');
+
+/* Estilos Iniciais */
+* {
+    font-family: 'Montserrat', sans-serif;
+    box-sizing: border-box; /* Boa prática para controle de layout */
+}
+
+body {
+    background: #f2f2f2;
+    margin: 0;
+    color: #1E1E1E; /* Cor de texto padrão */
+}
+
+.topbar {
+    background: #d9d9d9;
+    padding: 15px 30px;
+    border-bottom: 2px solid #ddd;
+}
+
+.logo {
+    width: 130px;
+    height: auto; /* Mantém a proporção da imagem */
+}
+
+/* --- ESTILOS PARA O WIDGET DE REGISTRO --- */
+
+/* Container principal para centralizar o widget na tela */
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Faz o container ocupar a altura da tela menos a altura aproximada da topbar */
+    min-height: calc(100vh - 80px);
+    padding: 20px;
+}
+
+/* O widget principal, baseado no Figma */
+.clock-widget {
+    background: #F4F4F4;
+    border-radius: 25px;
+    padding: 50px;
+    width: 100%;
+    max-width: 1160px; /* Largura máxima do Figma */
+
+    /* Usamos flexbox para alinhar o conteúdo interno verticalmente */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px; /* Espaçamento entre os elementos internos */
+    box-shadow: 0 4px Apx rgba(0, 0, 0, 0.08); /* Sombra suave para destacar */
+    text-align: center;
+}
+
+.greeting {
+    font-size: 40px;
+    font-weight: 600;
+    margin: 0; /* Remove margem padrão do h1 */
+}
+
+.time-display {
+    font-size: 96px;
+    font-weight: 700;
+    line-height: 1.2; /* Ajuste de espaçamento vertical */
+    color: #1E1E1E;
+}
+
+.register-btn {
+    background: #489D3B;
+    color: #F4F4F4;
+    font-size: 40px;
+    font-weight: 600;
+
+    width: 100%;
+    max-width: 598px; /* Largura do botão do Figma */
+    padding: 30px 20px; /* Padding para altura flexível */
+
+    border: none;
+    border-radius: 28px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.register-btn:hover {
+    background-color: #3e8632; /* Um pouco mais escuro ao passar o mouse */
+}
+
+.register-btn:active {
+    transform: scale(0.98); /* Efeito de clique */
+}
+
+.punch-type {
+    font-size: 40px;
+    font-weight: 600;
+    color: #888; /* Cor mais suave para informação secundária */
+    margin: 20px 0 0 0; /* Margem superior */
+}
+
+.camera-feed {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    border-radius: 15px;
+    background-color: #1E1E1E; /* Fundo escuro enquanto a câmera carrega */
+    border: 3px solid #ddd;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.feedback-message {
+    font-size: 24px;
+    font-weight: 600;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.feedback-message.success {
+    background-color: #d4edda; /* Verde claro */
+    color: #155724; /* Verde escuro */
+    border: 1px solid #c3e6cb;
+}
+
+.feedback-message.error {
+    background-color: #f8d7da; /* Vermelho claro */
+    color: #721c24; /* Vermelho escuro */
+    border: 1px solid #f5c6cb;
+}
