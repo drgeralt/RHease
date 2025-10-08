@@ -1,96 +1,166 @@
 <?php
+declare(strict_types=1);
+
 namespace App\Model;
+
+use App\Core\Model;
 use PDO;
 
-class BeneficioModel {
-    private $pdo;
-
-    public function __construct() {
-        $host = 'localhost';
-        $user = 'root';
-        $password = '';
-        $database = 'rhease';
-
-        try {
-            $this->pdo = new PDO("mysql:host=$host;dbname=$database;charset=utf8", $user, $password);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die("Erro ao conectar ao banco: " . $e->getMessage());
-        }
+class BeneficioModel extends Model
+{
+    public function __construct(PDO $db)
+    {
+        parent::__construct($db);
     }
+    // --- Funções para o Catálogo de Benefícios ---
 
-    // --- Benefícios ---
-    public function listarBeneficios() {
-        $stmt = $this->pdo->query("SELECT * FROM beneficios_catalogo ORDER BY nome ASC");
+    public function listarBeneficiosCatalogo(): array
+    {
+        // Exemplo de query
+        $stmt = $this->db_connection->query("SELECT * FROM beneficios_catalogo");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getBeneficio($id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM beneficios_catalogo WHERE id_beneficio = :id");
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    public function criarBeneficio(array $dados): string
+    {
+        $sql = "INSERT INTO beneficios_catalogo (nome, categoria, tipo_valor, custo_padrao_empresa, status) 
+                VALUES (:nome, :categoria, :tipo_valor, :custo, 'Ativo')";
+        $stmt = $this->db_connection->prepare($sql);
+        $stmt->execute([
+            'nome' => $dados['nome'],
+            'categoria' => $dados['categoria'],
+            'tipo_valor' => $dados['tipo_valor'],
+            'custo' => ($dados['tipo_valor'] === 'Fixo') ? $dados['valor_fixo'] : null,
+        ]);
+        return $this->db_connection->lastInsertId();
     }
 
-    public function criarBeneficio($nome, $categoria, $tipo_valor) {
-        $stmt = $this->pdo->prepare("INSERT INTO beneficios_catalogo (nome, categoria, tipo_valor, status) VALUES (:nome, :categoria, :tipo_valor, 'Ativo')");
-        $stmt->bindValue(':nome', $nome);
-        $stmt->bindValue(':categoria', $categoria);
-        $stmt->bindValue(':tipo_valor', $tipo_valor);
-        $stmt->execute();
-        return $this->pdo->lastInsertId();
+    public function editarBeneficio(array $dados): bool
+    {
+        $sql = "UPDATE beneficios_catalogo SET nome = :nome, categoria = :categoria, tipo_valor = :tipo_valor, custo_padrao_empresa = :custo 
+                WHERE id_beneficio = :id";
+        $stmt = $this->db_connection->prepare($sql);
+        return $stmt->execute([
+            'id' => $dados['id'],
+            'nome' => $dados['nome'],
+            'categoria' => $dados['categoria'],
+            'tipo_valor' => $dados['tipo_valor'],
+            'custo' => ($dados['tipo_valor'] === 'Fixo') ? $dados['valor_fixo'] : null,
+        ]);
     }
 
-    public function editarBeneficio($id, $nome, $categoria, $tipo_valor, $status) {
-        $stmt = $this->pdo->prepare("UPDATE beneficios_catalogo SET nome = :nome, categoria = :categoria, tipo_valor = :tipo_valor, status = :status WHERE id_beneficio = :id");
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->bindValue(':nome', $nome);
-        $stmt->bindValue(':categoria', $categoria);
-        $stmt->bindValue(':tipo_valor', $tipo_valor);
-        $stmt->bindValue(':status', $status);
-        $stmt->execute();
-        return true;
+    public function atualizarStatus(int $id): bool
+    {
+        $stmt = $this->db_connection->prepare("SELECT status FROM beneficios_catalogo WHERE id_beneficio = :id");
+        $stmt->execute(['id' => $id]);
+        $statusAtual = $stmt->fetchColumn();
+
+        $novoStatus = ($statusAtual === 'Ativo') ? 'Inativo' : 'Ativo';
+
+        $stmtUpdate = $this->db_connection->prepare("UPDATE beneficios_catalogo SET status = :status WHERE id_beneficio = :id");
+        return $stmtUpdate->execute(['status' => $novoStatus, 'id' => $id]);
     }
 
-    public function desativarBeneficio($id) {
-        $stmt = $this->pdo->prepare("UPDATE beneficios_catalogo SET status = 'Inativo' WHERE id_beneficio = :id");
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-        return true;
+    public function deletarBeneficio(int $id): bool
+    {
+        $this->db_connection->beginTransaction();
+        try {
+            $this->db_connection->prepare("DELETE FROM regras_beneficios WHERE id_beneficio = :id")->execute(['id' => $id]);
+            $this->db_connection->prepare("DELETE FROM colaborador_beneficio WHERE id_beneficio = :id")->execute(['id' => $id]);
+            $this->db_connection->prepare("DELETE FROM beneficios_catalogo WHERE id_beneficio = :id")->execute(['id' => $id]);
+            $this->db_connection->commit();
+            return true;
+        } catch (\PDOException $e) {
+            $this->db_connection->rollBack();
+            return false;
+        }
     }
 
-    // --- Regras Automáticas ---
-    public function listarRegras() {
-        $stmt = $this->pdo->query("
-            SELECT rb.id_regra, rb.tipo_contrato, bc.nome AS beneficio
-            FROM regras_beneficios rb
-            JOIN beneficios_catalogo bc ON rb.id_beneficio = bc.id_beneficio
-        ");
+    // --- Funções para Regras de Atribuição ---
+
+    public function listarRegras(): array
+    {
+        $sql = "SELECT 
+                    rb.tipo_contrato, 
+                    GROUP_CONCAT(bc.nome SEPARATOR ', ') as nomes_beneficios,
+                    GROUP_CONCAT(bc.id_beneficio SEPARATOR ',') as ids_beneficios
+                FROM regras_beneficios rb
+                JOIN beneficios_catalogo bc ON rb.id_beneficio = bc.id_beneficio
+                WHERE bc.status = 'Ativo' 
+                GROUP BY rb.tipo_contrato";
+        $stmt = $this->db_connection->query($sql);
         $regras = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $regras[$row['tipo_contrato']][] = $row['beneficio'];
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $regras[$row['tipo_contrato']] = [
+                'nomes' => explode(', ', $row['nomes_beneficios']),
+                'ids' => explode(',', $row['ids_beneficios'])
+            ];
         }
         return $regras;
     }
 
-    public function salvarRegras($tipoContrato, $beneficios) {
-        // Remove regras antigas
-        $stmt = $this->pdo->prepare("DELETE FROM regras_beneficios WHERE tipo_contrato = :tipo");
-        $stmt->bindValue(':tipo', $tipoContrato);
-        $stmt->execute();
+    public function salvarRegras(string $tipoContrato, array $beneficiosIds): bool
+    {
+        $this->db_connection->beginTransaction();
+        try {
+            $this->db_connection->prepare("DELETE FROM regras_beneficios WHERE tipo_contrato = :tipo")->execute(['tipo' => $tipoContrato]);
 
-        // Insere novas
-        $stmt = $this->pdo->prepare("INSERT INTO regras_beneficios (tipo_contrato, id_beneficio) VALUES (:tipo, :id_beneficio)");
-        foreach ($beneficios as $id_beneficio) {
-            $stmt->bindValue(':tipo', $tipoContrato);
-            $stmt->bindValue(':id_beneficio', $id_beneficio, PDO::PARAM_INT);
-            $stmt->execute();
+            if (!empty($beneficiosIds)) {
+                $stmt = $this->db_connection->prepare("INSERT INTO regras_beneficios (tipo_contrato, id_beneficio) VALUES (:tipo, :id)");
+                foreach ($beneficiosIds as $id) {
+                    $stmt->execute(['tipo' => $tipoContrato, 'id' => (int)$id]);
+                }
+            }
+            $this->db_connection->commit();
+            return true;
+        } catch (\PDOException $e) {
+            $this->db_connection->rollBack();
+            return false;
         }
     }
 
-    public function listarTodosBeneficios() {
-        $stmt = $this->pdo->query("SELECT * FROM beneficios_catalogo WHERE status = 'Ativo' ORDER BY nome ASC");
+    // --- Funções para Gestão de Colaboradores ---
+
+    public function buscarColaborador(string $termo): array
+    {
+        $sql = "SELECT id_colaborador, nome_completo, matricula FROM colaborador WHERE nome_completo LIKE :termo OR matricula LIKE :termo LIMIT 5";
+        $stmt = $this->db_connection->prepare($sql);
+        $stmt->execute(['termo' => "%{$termo}%"]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function carregarBeneficiosColaborador(int $idColaborador): array
+    {
+        $sqlColab = "SELECT id_colaborador, nome_completo, matricula, tipo_contrato FROM colaborador WHERE id_colaborador = :id";
+        $stmtColab = $this->db_connection->prepare($sqlColab);
+        $stmtColab->execute(['id' => $idColaborador]);
+        $dadosColaborador = $stmtColab->fetch(PDO::FETCH_ASSOC);
+
+        $sqlBeneficios = "SELECT id_beneficio FROM colaborador_beneficio WHERE id_colaborador = :id";
+        $stmtBeneficios = $this->db_connection->prepare($sqlBeneficios);
+        $stmtBeneficios->execute(['id' => $idColaborador]);
+        $beneficiosIds = $stmtBeneficios->fetchAll(PDO::FETCH_COLUMN);
+
+        return ['dados_colaborador' => $dadosColaborador, 'beneficios_ids' => $beneficiosIds];
+    }
+
+    public function salvarBeneficiosColaborador(int $idColaborador, array $beneficiosIds): bool
+    {
+        $this->db_connection->beginTransaction();
+        try {
+            $this->db_connection->prepare("DELETE FROM colaborador_beneficio WHERE id_colaborador = :id")->execute(['id' => $idColaborador]);
+
+            if (!empty($beneficiosIds)) {
+                $stmt = $this->db_connection->prepare("INSERT INTO colaborador_beneficio (id_colaborador, id_beneficio) VALUES (:id_colaborador, :id_beneficio)");
+                foreach ($beneficiosIds as $id) {
+                    $stmt->execute(['id_colaborador' => $idColaborador, 'id_beneficio' => (int)$id]);
+                }
+            }
+            $this->db_connection->commit();
+            return true;
+        } catch (\PDOException $e) {
+            $this->db_connection->rollBack();
+            return false;
+        }
+    }
 }
-?>

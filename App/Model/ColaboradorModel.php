@@ -14,31 +14,32 @@ class ColaboradorModel extends Model
     {
         $this->db_connection = $pdo;
     }
-    public function getAll(): array
+    public function listarColaboradores(): array
     {
-        $query = "SELECT 
-            c.id_colaborador, 
-            c.nome_completo,
-            c.data_admissao,
-            c.situacao,
-            ca.nome_cargo AS cargo,
-            s.nome_setor AS departamento
-        FROM 
-            colaborador AS c
-        LEFT JOIN 
-            cargo AS ca ON c.id_cargo = ca.id_cargo
-        LEFT JOIN 
-            setor AS s ON c.id_setor = s.id_setor
-        WHERE
-            c.situacao = 'ativo'
-        ORDER BY
-            c.nome_completo ASC";
+        $sql = "SELECT 
+                    c.id_colaborador,
+                    c.nome_completo,
+                    c.email_pessoal AS email,
+                    c.telefone,
+                    c.data_admissao,
+                    c.situacao,
+                    cargo.nome_cargo AS cargo,
+                    setor.nome_setor AS departamento
+                FROM 
+                    colaborador AS c
+                LEFT JOIN 
+                    cargo ON c.id_cargo = cargo.id_cargo
+                LEFT JOIN 
+                    setor ON c.id_setor = setor.id_setor
+                ORDER BY
+                    c.nome_completo ASC";
 
-        $stmt = $this->db_connection->prepare($query);
+        $stmt = $this->db_connection->prepare($sql);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     public function create(array $data): void
     {
@@ -70,30 +71,132 @@ class ColaboradorModel extends Model
         $stmt->execute();
     }
 
-    public function getById($id){
-        $query = "SELECT * FROM colaborador WHERE id = :id";
-        $stmt = $this->db_connection->prepare($query);
-        $stmt->bindValue(':id', $id);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    public function buscarPorId(int $id)
+    {
+        $sql = "SELECT 
+                    col.id_colaborador, col.nome_completo, col.cpf AS CPF, col.rg AS RG, col.data_nascimento, col.genero, col.email_pessoal AS email, col.telefone, col.matricula, col.data_admissao, col.situacao,
+                    end.CEP, end.logradouro, end.numero, end.bairro, end.cidade, end.estado,
+                    car.nome_cargo, car.salario_base,
+                    setr.nome_setor
+                FROM 
+                    colaborador AS col
+                LEFT JOIN endereco AS end ON col.id_endereco = end.id_endereco
+                LEFT JOIN cargo AS car ON col.id_cargo = car.id_cargo
+                LEFT JOIN setor AS setr ON col.id_setor = setr.id_setor
+                WHERE 
+                    col.id_colaborador = :id
+                LIMIT 1";
+
+        $stmt = $this->db_connection->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        $colaborador = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$colaborador) {
+            return false;
+        }
+
+        return [
+            'colaborador' => $colaborador,
+            'endereco' => $colaborador,
+            'cargo' => $colaborador,
+            'setor' => $colaborador,
+        ];
     }
 
-    public function update($id, $data): void
+    public function atualizarColaborador(array $dados): bool
     {
-        $query = "UPDATE colaborador SET nome_completo = :nome_completo, cpf = :cpf, rg = :rg, data_nascimento = :data_nascimento, genero = :genero, email_pessoal = :email_pessoal, telefone_celular = :telefone_celular, logradouro = :logradouro, numero = :numero, complemento = :complemento, bairro = :bairro, cidade = :cidade, estado = :estado, cep = :cep, cargo = :cargo, departamento = :departamento, salario = :salario, data_admissao = :data_admissao, data_desligamento = :data_desligamento, tipo_contrato = :tipo_contrato, email_corporativo = :email_corporativo, status = :status, updated_at = :updated_at WHERE id = :id";
-        $stmt = $this->db_connection->prepare($query);
-        $stmt->bindValue(':id', $id);
-        $this->binds($stmt, $data);
-        $stmt->bindValue(':updated_at', $data['updated_at']);
-        $stmt->execute();
+        // Para uma atualização robusta, o ideal seria ter models para Cargo, Setor e Endereço
+        // com métodos findOrCreateByName(), mas por simplicidade, faremos a lógica aqui.
+
+        try {
+            $this->db_connection->beginTransaction();
+
+            // 1. Obter os IDs das tabelas relacionadas
+            $stmt = $this->db_connection->prepare("SELECT id_cargo, id_setor, id_endereco FROM colaborador WHERE id_colaborador = :id");
+            $stmt->execute([':id' => $dados['id_colaborador']]);
+            $ids = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // 2. Atualizar a tabela 'cargo'
+            $stmt = $this->db_connection->prepare("UPDATE cargo SET nome_cargo = :nome, salario_base = :salario WHERE id_cargo = :id");
+            $stmt->execute([
+                ':nome' => $dados['cargo']['nome_cargo'],
+                ':salario' => $dados['cargo']['salario_base'],
+                ':id' => $ids['id_cargo']
+            ]);
+
+            // 3. Atualizar a tabela 'setor'
+            $stmt = $this->db_connection->prepare("UPDATE setor SET nome_setor = :nome WHERE id_setor = :id");
+            $stmt->execute([':nome' => $dados['setor']['nome_setor'], ':id' => $ids['id_setor']]);
+
+            // 4. Atualizar a tabela 'endereco'
+            $stmt = $this->db_connection->prepare(
+                "UPDATE endereco SET CEP = :cep, logradouro = :log, numero = :num, bairro = :bairro, cidade = :cid, estado = :est WHERE id_endereco = :id"
+            );
+            $stmt->execute([
+                ':cep' => $dados['endereco']['CEP'],
+                ':log' => $dados['endereco']['logradouro'],
+                ':num' => $dados['endereco']['numero'],
+                ':bairro' => $dados['endereco']['bairro'],
+                ':cid' => $dados['endereco']['cidade'],
+                ':est' => $dados['endereco']['estado'],
+                ':id' => $ids['id_endereco']
+            ]);
+
+            // 5. Atualizar a tabela principal 'colaborador'
+            $stmt = $this->db_connection->prepare(
+                "UPDATE colaborador SET nome_completo = :nome, data_nascimento = :dn, genero = :gen, email_pessoal = :email, telefone = :tel, situacao = :sit, data_admissao = :da WHERE id_colaborador = :id"
+            );
+            $stmt->execute([
+                ':nome' => $dados['nome_completo'],
+                ':dn' => $dados['data_nascimento'],
+                ':gen' => $dados['genero'],
+                ':email' => $dados['email_pessoal'],
+                ':tel' => $dados['telefone'],
+                ':sit' => $dados['situacao'],
+                ':da' => $dados['data_admissao'],
+                ':id' => $dados['id_colaborador']
+            ]);
+
+            // Se tudo correu bem, confirma as alterações
+            $this->db_connection->commit();
+            return true;
+
+        } catch (\PDOException $e) {
+            // Se algo falhou, desfaz todas as alterações
+            $this->db_connection->rollBack();
+            error_log("Erro ao atualizar colaborador: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function softDelete($id): void
     {
-        $query = "UPDATE colaborador SET status = 'Inativo' WHERE id = :id";
+        $query = "UPDATE colaborador SET situacao = 'Inativo' WHERE id_colaborador = :id";
         $stmt = $this->db_connection->prepare($query);
         $stmt->bindValue(':id', $id);
         $stmt->execute();
+    }
+    public function toggleStatus(int $id): bool
+    {
+        // 1. Descobre o status atual do colaborador
+        $stmt = $this->db_connection->prepare("SELECT situacao FROM colaborador WHERE id_colaborador = :id");
+        $stmt->execute([':id' => $id]);
+        $statusAtual = $stmt->fetchColumn();
+
+        if (!$statusAtual) {
+            return false; // Retorna falso se o colaborador não for encontrado
+        }
+
+        // 2. Determina qual será o novo status
+        $novoStatus = ($statusAtual === 'ativo') ? 'inativo' : 'ativo';
+
+        // 3. Executa a atualização no banco de dados
+        $stmt = $this->db_connection->prepare("UPDATE colaborador SET situacao = :novoStatus WHERE id_colaborador = :id");
+
+        return $stmt->execute([
+            ':novoStatus' => $novoStatus,
+            ':id' => $id
+        ]);
     }
 
     /**
