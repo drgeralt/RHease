@@ -180,6 +180,12 @@ a.forgot-password:hover {
     color: var(--primary-green);
 }
 
+.btn-third {
+    background-color: var(--white);
+    color: var(--primary-green);
+    margin-top:10px;
+}
+
 .btn-secondary:hover {
     background-color: rgba(103, 167, 97, 0.1);
 }

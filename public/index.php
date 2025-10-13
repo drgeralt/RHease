@@ -80,7 +80,6 @@ $router->addRoute('GET', '/holerite/pdf/{id}', HoleriteController::class, 'gerar
 $router->addRoute('GET', '/folha/processar', FolhaPagamentoController::class, 'index');
 $router->addRoute('POST', '/folha/processar', FolhaPagamentoController::class, 'processar');
 
-
 // Rotas Comuns
 //$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
 //$router->addRoute('GET', '/error', Controller::class, 'show_error');

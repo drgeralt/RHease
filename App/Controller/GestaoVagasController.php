@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Core\Controller;
+use App\Core\Database;
+use App\Model\GestaoVagasModel;
+use App\Model\CandidaturaModel;
 use PDOException;
 
 class GestaoVagasController extends Controller
@@ -11,9 +14,38 @@ class GestaoVagasController extends Controller
     // lista as vagas e exibe a view
     public function listarVagas(): void 
     {
+        $db = Database::getInstance();
         $vagaModel = $this->model('GestaoVagas');
         $vagas = $vagaModel->listarVagas();
         $this->view('vaga/GestaoVagas', ['vagas' => $vagas]);
+    }
+
+    public function verCandidatos()
+    {
+        // CORREÇÃO: Lê o ID da vaga a partir de $_POST, que é enviado pelo formulário.
+        $idVaga = (int)($_POST['id'] ?? 0);
+
+        if ($idVaga === 0) {
+            header('Location: ' . BASE_URL . '/vagas/listar');
+            exit;
+        }
+
+        $db = Database::getInstance();
+        $vagaModel = new GestaoVagasModel($db);
+        $candidaturaModel = new CandidaturaModel($db);
+
+        $vaga = $vagaModel->buscarPorId($idVaga);
+        $candidatos = $candidaturaModel->buscarPorVaga($idVaga);
+
+        if (!$vaga) {
+            header('Location: ' . BASE_URL . '/vagas/listar?error=not_found');
+            exit;
+        }
+
+        return $this->view('Candidatura/lista_candidatos', [
+            'vaga' => $vaga,
+            'candidatos' => $candidatos
+        ]);
     }
 
     // exibe o formulário de criação
@@ -49,8 +81,11 @@ class GestaoVagasController extends Controller
             $dadosVaga = [
                 'titulo_vaga' => $titulo,
                 'id_setor' => $idSetor,
-                'situacao' => $status,
-                'requisitos' => $_POST['skills_necessarias'] ?? null,
+                'situacao' => $_POST['status'] ?? 'rascunho',
+                'descricao_vaga' => $_POST['descricao'] ?? null,
+                'requisitos_necessarios' => $_POST['skills_necessarias'] ?? null,
+                'requisitos_recomendados' => $_POST['skills_recomendadas'] ?? null,
+                'requisitos_desejados' => $_POST['skills_desejadas'] ?? null,
                 'id_cargo' => null,
             ];
 

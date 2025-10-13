@@ -44,12 +44,12 @@ class BeneficioController extends Controller{
 
     // Deletar benefício
     public function deletar($id) {
-        $this->model->desativarBeneficio($id);
+        $this->model->deletarBeneficio($id);
     }
 
     // Alternar status
-    //public function toggleStatus($id, $status) { // VERIFICAR FUNCIONALIDADE NO MODEL
-      // $this->model->atualizarStatus($id, $status);
-    //}
+    public function toggleStatus($id, $status) {
+        $this->model->atualizarStatus($id, $status);
+    }
 }
 ?>

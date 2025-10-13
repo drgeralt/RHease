@@ -1,162 +1,157 @@
 <?php
-declare(strict_types=1);
+// App/Model/FolhaPagamentoModel.php
 
 namespace App\Model;
 
-use App\Core\Model;
 use PDO;
-use App\Core\Database;
+use PDOException;
+use stdClass;
 
-class CandidaturaModel extends Model
+class FolhaPagamentoModel
 {
-    public function buscarAnaliseCompleta(int $idCandidatura): array|false
+    private $pdo;
+    private $parametrosModel;
+    private $colaboradorModel;
+
+    // Tabelas de impostos carregadas uma única vez
+    private $tabelaInss;
+    private $tabelaIrrf;
+    private $deducaoDependenteIrrf;
+    private $valorFgtsAliquota = 0.08; // 8%
+
+    public function __construct()
     {
-        $sql = "SELECT 
-                    c.pontuacao_aderencia,
-                    c.justificativa_ia,
-                    cand.nome_completo,
-                    v.titulo_vaga,
-                    v.descricao_vaga
-                FROM 
-                    candidaturas AS c
-                JOIN 
-                    candidato AS cand ON c.id_candidato = cand.id_candidato
-                JOIN
-                    vaga AS v ON c.id_vaga = v.id_vaga
-                WHERE 
-                    c.id_candidatura = :id_candidatura
-                LIMIT 1";
+        // Conexão principal com o banco
+        $host = 'localhost'; $user = 'root'; $password = ''; $database = 'rhease';
+        try {
+            $this->pdo = new PDO("mysql:host=$host;dbname=$database;charset=utf8", $user, $password);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die("Erro ao conectar: " . $e->getMessage());
+        }
 
-        $stmt = $this->db_connection->prepare($sql);
-        $stmt->execute([':id_candidatura' => $idCandidatura]);
+        // Instancia os outros models que vamos precisar
+        $this->parametrosModel = new ParametrosFolhaModel();
+        $this->colaboradorModel = new ColaboradorModel();
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-    public function buscarComVaga(int $idCandidatura)
-    {
-        $sql = "SELECT 
-                    c.id_candidatura,
-                    cand.curriculo,
-                    v.titulo_vaga,
-                    v.descricao_vaga,
-                    v.requisitos_necessarios,
-                    v.requisitos_recomendados,
-                    v.requisitos_desejados
-                FROM 
-                    candidaturas AS c
-                JOIN 
-                    candidato AS cand ON c.id_candidato = cand.id_candidato
-                JOIN
-                    vaga AS v ON c.id_vaga = v.id_vaga
-                WHERE 
-                    c.id_candidatura = :id_candidatura
-                LIMIT 1";
+        // Carrega os parâmetros da folha no construtor
+        $paramInss = $this->parametrosModel->findParametroPorChave('TABELA_INSS_VIGENTE');
+        $this->tabelaInss = json_decode($paramInss->valor_texto, true);
 
-        $stmt = $this->db_connection->prepare($sql);
-        $stmt->execute([':id_candidatura' => $idCandidatura]);
+        $paramIrrf = $this->parametrosModel->findParametroPorChave('TABELA_IRRF_VIGENTE');
+        $this->tabelaIrrf = json_decode($paramIrrf->valor_texto, true);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function atualizarResultadoIA(int $idCandidatura, int $nota, string $sumario): bool
-    {
-        $sql = "UPDATE candidaturas 
-                SET pontuacao_aderencia = :nota, justificativa_ia = :sumario 
-                WHERE id_candidatura = :id_candidatura";
-
-        $stmt = $this->db_connection->prepare($sql);
-
-        return $stmt->execute([
-            ':nota' => $nota,
-            ':sumario' => $sumario,
-            ':id_candidatura' => $idCandidatura
-        ]);
-    }
-    /**
-     * Cria um novo registro de candidatura na tabela 'candidaturas'.
-     *
-     * @param int $idVaga O ID da vaga.
-     * @param int $idCandidato O ID do candidato.
-     * @return bool Retorna true em caso de sucesso, false em caso de falha.
-     */
-    public function criar(int $idVaga, int $idCandidato): bool
-    {
-        // Usando a tabela 'candidaturas' conforme planejamos
-        $sql = "INSERT INTO candidaturas (id_vaga, id_candidato) VALUES (:id_vaga, :id_candidato)";
-        $stmt = $this->db_connection->prepare($sql);
-
-        return $stmt->execute([
-            ':id_vaga' => $idVaga,
-            ':id_candidato' => $idCandidato
-        ]);
+        $paramDependente = $this->parametrosModel->findParametroPorChave('DEDUCAO_DEPENDENTE_IRRF_VIGENTE');
+        $this->deducaoDependenteIrrf = (float) $paramDependente->valor_decimal;
     }
 
     /**
-     * Verifica se um candidato já se aplicou para uma determinada vaga.
-     *
-     * @param int $idVaga
-     * @param int $idCandidato
-     * @return bool Retorna true se a candidatura já existe, false caso contrário.
+     * Orquestra o processamento completo da folha de pagamento.
+     * Este é o método principal a ser chamado pelo Controller.
      */
-    public function verificarExistente(int $idVaga, int $idCandidato): bool
+    public function processarFolha(int $ano, int $mes): array
     {
-        $sql = "SELECT COUNT(*) FROM candidaturas WHERE id_vaga = :id_vaga AND id_candidato = :id_candidato";
-        $stmt = $this->db_connection->prepare($sql);
-        $stmt->execute([
-            ':id_vaga' => $idVaga,
-            ':id_candidato' => $idCandidato
+        $colaboradores = $this->colaboradorModel->findAllAtivos();
+        $resultados = ['sucesso' => [], 'falha' => []];
+
+        foreach ($colaboradores as $colaborador) {
+            $this->pdo->beginTransaction();
+            try {
+                // Limpa holerite anterior para evitar duplicidade no reprocessamento
+                $this->limparHoleriteAnterior($colaborador->id_colaborador, $ano, $mes);
+
+                // 1. Coleta eventos (salário, bônus, faltas, etc.)
+                $eventos = $this->_coletarEventos($colaborador, $ano, $mes);
+
+                // 2. Calcula os impostos e totais
+                $calculo = $this->_calcularImpostosETotais($eventos, $colaborador->numero_dependentes);
+
+                // 3. Salva o holerite e seus itens no banco
+                $this->_salvarHolerite($colaborador->id_colaborador, $ano, $mes, $colaborador->salario_base, $calculo);
+
+                $this->pdo->commit();
+                $resultados['sucesso'][] = $colaborador->id_colaborador;
+            } catch (\Exception $e) {
+                $this->pdo->rollBack();
+                $resultados['falha'][] = ['id' => $colaborador->id_colaborador, 'erro' => $e->getMessage()];
+            }
+        }
+        return $resultados;
+    }
+
+    // MÉTODOS PRIVADOS DE LÓGICA INTERNA
+
+    private function _coletarEventos(stdClass $colaborador, int $ano, int $mes): array
+    {
+        $proventos = [];
+        $descontos = [];
+        $proventos[] = ['codigo' => '101', 'descricao' => 'Salário Base', 'valor' => $colaborador->salario_base, 'tipo' => 'PROVENTO'];
+
+        // AQUI ENTRA A INTEGRAÇÃO REAL COM OUTROS MODELS
+        // Ex: $descontoVT = (new BeneficioModel())->getDescontoVT(...);
+        // Ex: $horasExtras = (new PontoModel())->getHorasExtras(...);
+
+        return ['proventos' => $proventos, 'descontos' => $descontos];
+    }
+
+    private function _calcularImpostosETotais(array $eventos, int $numDependentes): array
+    {
+        $totalProventos = array_sum(array_column($eventos['proventos'], 'valor'));
+
+        $baseInss = $totalProventos;
+        $valorInss = $this->_calcularINSS($baseInss);
+        if ($valorInss > 0) {
+            $eventos['descontos'][] = ['codigo' => '301', 'descricao' => 'INSS sobre Salário', 'valor' => $valorInss, 'tipo' => 'DESCONTO'];
+        }
+
+        $deducaoTotalDependentes = $numDependentes * $this->deducaoDependenteIrrf;
+        $baseIrrf = $totalProventos - $valorInss - $deducaoTotalDependentes;
+        $valorIrrf = $this->_calcularIRRF($baseIrrf);
+        if ($valorIrrf > 0) {
+            $eventos['descontos'][] = ['codigo' => '302', 'descricao' => 'IRRF', 'valor' => $valorIrrf, 'tipo' => 'DESCONTO'];
+        }
+
+        $totalDescontos = array_sum(array_column($eventos['descontos'], 'valor'));
+        $salarioLiquido = $totalProventos - $totalDescontos;
+        $valorFgts = $totalProventos * $this->valorFgtsAliquota;
+
+        return [
+            'total_proventos' => $totalProventos,
+            'total_descontos' => $totalDescontos,
+            'salario_liquido' => $salarioLiquido,
+            'base_inss' => $baseInss,
+            'base_irrf' => $baseIrrf,
+            'valor_fgts' => $valorFgts,
+            'base_fgts' => $totalProventos,
+            'itens_holerite' => array_merge($eventos['proventos'], $eventos['descontos'])
+        ];
+    }
+
+    private function _salvarHolerite(int $colaboradorId, int $ano, int $mes, float $salarioBase, array $calculo): void
+    {
+        $sqlHolerite = "INSERT INTO holerites (id_colaborador, mes_referencia, ano_referencia, data_processamento, total_proventos, total_descontos, salario_liquido, base_calculo_inss, base_calculo_fgts, valor_fgts, base_calculo_irrf) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?)";
+        $stmtHolerite = $this->pdo->prepare($sqlHolerite);
+        $stmtHolerite->execute([
+            $colaboradorId, $mes, $ano,
+            $calculo['total_proventos'], $calculo['total_descontos'], $calculo['salario_liquido'],
+            $calculo['base_inss'], $calculo['base_fgts'], $calculo['valor_fgts'], $calculo['base_irrf']
         ]);
+        $holeriteId = $this->pdo->lastInsertId();
 
-        return $stmt->fetchColumn() > 0;
+        $sqlItem = "INSERT INTO holerite_itens (id_holerite, codigo_evento, descricao, tipo, valor) VALUES (?, ?, ?, ?, ?)";
+        $stmtItem = $this->pdo->prepare($sqlItem);
+        foreach ($calculo['itens_holerite'] as $item) {
+            $stmtItem->execute([$holeriteId, $item['codigo'], $item['descricao'], $item['tipo'], $item['valor']]);
+        }
     }
-    public function buscarPorVaga(int $idVaga): array
+
+    private function limparHoleriteAnterior(int $colaboradorId, int $ano, int $mes): void
     {
-        // CORREÇÃO: A consulta agora junta 'candidaturas' (alias c) com 'candidato' (alias cand)
-        // e seleciona as colunas corretas de cada tabela.
-        $sql = "SELECT 
-                c.id_candidatura,
-                c.pontuacao_aderencia,
-                c.justificativa_ia,
-                c.data_candidatura,
-                c.status_triagem,
-                cand.nome_completo,
-                cand.curriculo
-            FROM 
-                candidaturas AS c
-            JOIN 
-                candidato AS cand ON c.id_candidato = cand.id_candidato
-            WHERE 
-                c.id_vaga = :id_vaga
-            ORDER BY 
-                c.pontuacao_aderencia DESC, c.data_candidatura DESC";
-
-        $stmt = $this->db_connection->prepare($sql);
-        $stmt->execute([':id_vaga' => $idVaga]);
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    public function buscarPorId(int $idCandidatura)
-    {
-        $sql = "SELECT 
-                    c.pontuacao_aderencia,
-                    c.justificativa_ia,
-                    cand.nome_completo,
-                    v.titulo_vaga,
-                    v.descricao_vaga
-                FROM 
-                    candidaturas AS c
-                JOIN 
-                    candidato AS cand ON c.id_candidato = cand.id_candidato
-                JOIN
-                    vaga AS v ON c.id_vaga = v.id_vaga
-                WHERE 
-                    c.id_candidatura = :id_candidatura
-                LIMIT 1";
-
-        $stmt = $this->db_connection->prepare($sql);
-        $stmt->execute([':id_candidatura' => $idCandidatura]);
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $sql = "DELETE FROM holerites WHERE id_colaborador = ? AND ano_referencia = ? AND mes_referencia = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$colaboradorId, $ano, $mes]);
     }
 
+    private function _calcularINSS(float $base): float { /* ... lógica de cálculo ... */ return round(max(0, $valor), 2); }
+    private function _calcularIRRF(float $base): float { /* ... lógica de cálculo ... */ return round(max(0, $valor), 2); }
 }

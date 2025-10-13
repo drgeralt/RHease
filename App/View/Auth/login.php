@@ -48,6 +48,9 @@
             <button type="submit" class="btn btn-primary">Entrar como Colaborador</button>
             <a href="/RHease/public/colaboradores" class="btn btn-secondary" role="button">Entrar como Gestor</a>
         </div>
+        <div class="button-group">
+            <a href="/RHease/public/candidatura" class="btn btn-third" role="button">Candidatar-se</a>
+        </div>
     </form>
 
     <footer class="login-footer">
