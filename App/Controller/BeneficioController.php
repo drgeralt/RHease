@@ -44,7 +44,7 @@ class BeneficioController extends Controller{
 
     // Deletar benefício
     public function deletar($id) {
-        $this->model->deletarBeneficio($id);
+        $this->model->desativarBeneficio($id);
     }
 
     // Alternar status
