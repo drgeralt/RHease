@@ -17,6 +17,7 @@ error_reporting(E_ALL);
 
 session_start();
 
+
 define('BASE_PATH', dirname(__DIR__));
 
 require_once BASE_PATH . '/config.php';
@@ -47,10 +48,13 @@ $router->addRoute('POST', '/vagas/salvar', GestaoVagasController::class, 'salvar
 $router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos');
 
 // Benefícios
-$router->addRoute('GET', '/beneficios', BeneficioController::class, 'index');
+$router->addRoute('GET', '/beneficios', BeneficioController::class, 'gerenciamento');
 $router->addRoute('POST', '/beneficios/criar', BeneficioController::class, 'criar');
 $router->addRoute('POST', '/beneficios/editar', BeneficioController::class, 'editar');
 $router->addRoute('GET', '/beneficios/desativar/{id}', BeneficioController::class, 'desativar');
+$router->addRoute('POST', '/beneficios/salvar', BeneficioController::class, 'salvarBeneficio'); 
+$router->addRoute('POST', '/colaborador/beneficios/salvar', BeneficioController::class, 'salvarBeneficiosColaborador');
+
 
 $router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios'); 
 
