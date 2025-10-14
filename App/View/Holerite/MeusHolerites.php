@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Meus Holerites</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/holerites.css">
+</head>
+<body>
+<header class="topbar">
+    <div class="logo"><img src="<?php echo BASE_URL; ?>/img/rhease-ease 1.png" alt="Logo RH Ease" class="logo"></div>
+</header>
+
+<main class="content-container">
+    <h2 style="color: #25621C; font-weight: 600;">Meus Holerites</h2>
+
+    <section>
+        <h3>Histórico de Pagamentos</h3>
+        <div class="table-wrapper">
+            <table class="holerite-table">
+                <thead>
+                <tr>
+                    <th>Referência</th>
+                    <th>Data do Pagamento</th>
+                    <th>Salário Líquido (R$)</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+                // A variável $data['holerites'] virá do Controller
+                if (empty($data['holerites'])): ?>
+                    <tr>
+                        <td colspan="4" class="empty-message">Nenhum holerite encontrado.</td>
+                    </tr>
+                <?php else:
+                    foreach ($data['holerites'] as $holerite): ?>
+                        <tr>
+                            <td><?php echo str_pad($holerite->mes_referencia, 2, '0', STR_PAD_LEFT) . '/' . $holerite->ano_referencia; ?></td>
+
+                            <td><?php echo date('d/m/Y', strtotime($holerite->data_processamento)); ?></td>
+
+                            <td><?php echo number_format($holerite->salario_liquido, 2, ',', '.'); ?></td>
+
+                            <td>
+                                <a href="<?php echo BASE_URL; ?>/holerite/pdf/<?php echo $holerite->id_holerite; ?>" class="btn-action" target="_blank">Visualizar</a>
+                            </td>
+                        </tr>
+                    <?php endforeach;
+                endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="info-text">
+        <p>Para dúvidas sobre seus pagamentos, por favor, entre em contato com o RH.</p>
+    </div>
+</main>
+</body>
+</html>
