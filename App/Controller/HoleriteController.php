@@ -10,17 +10,6 @@ class HoleriteController extends Controller
 {
     private $model;
 
-    /**
-     * O construtor cria a instância do nosso Model.
-     */
-    public function __construct()
-    {
-        $this->model = new HoleriteModel();
-    }
-
-    /**
-     * Exibe a página "Meus Holerites".
-     */
     public function index()
     {
         $colaboradorId = 1; // ID fixo para teste
@@ -32,16 +21,40 @@ class HoleriteController extends Controller
         ]);
     }
 
-    public function gerarPDF($id)
-    {
-        $holerite = $this->model->findHoleriteCompletoById($id);
-        $itens = $this->model->findItensByHoleriteId($id);
+    public function gerarPDF()
+{
+    // 1. Pega o ID do colaborador da sessão (segurança)
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+    $idColaborador = $_SESSION['id_colaborador'] ?? null;
 
-        if (!$holerite) {
-            echo "Holerite não encontrado.";
-            return;
-        }
+    // Se não houver usuário logado, redireciona para o login
+    if (!$idColaborador) {
+        header('Location: ' . BASE_URL . '/login');
+        exit();
+    }
 
+    // 2. Pega o mês e o ano enviados pelo formulário (via POST)
+    $mes = filter_input(INPUT_POST, 'mes', FILTER_VALIDATE_INT);
+    $ano = filter_input(INPUT_POST, 'ano', FILTER_VALIDATE_INT);
+
+    if (!$mes || !$ano) {
+        echo "Período (mês/ano) não fornecido ou inválido.";
+        return;
+    }
+
+    // 3. Usa o NOVO método do model para buscar o holerite
+    $holerite = $this->model->findHoleritePorColaboradorEMes($idColaborador, $mes, $ano);
+
+    // Se encontrou o holerite, busca os itens dele
+    if ($holerite) {
+        $itens = $this->model->findItensByHoleriteId((int)$holerite->id_holerite);
+    } else {
+        echo "Holerite não encontrado para este período.";
+        return;
+    }
+    // 4. Gera o PDF usando a biblioteca FPDF
         $proventos = array_filter($itens, function($item) { return $item->tipo == 'PROVENTO'; });
         $descontos = array_filter($itens, function($item) { return $item->tipo == 'DESCONTO'; });
 

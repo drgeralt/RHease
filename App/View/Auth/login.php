@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - RH ease</title>
-    <link rel="stylesheet" href="/RHease/public/css/login.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/login.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
 
 <div class="login-container">
     <header class="login-header">
-        <img src="/RHease/public/img/rhease-ease 1.png" alt="Logo RH ease" class="logo">
+        <img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo RH ease" class="logo">
         <h1>Acesse a sua conta</h1>
     </header>
 
@@ -46,16 +46,16 @@
 
         <div class="button-group">
             <button type="submit" class="btn btn-primary">Entrar como Colaborador</button>
-            <a href="/RHease/public/colaboradores" class="btn btn-secondary" role="button">Entrar como Gestor</a>
+            <a href="<?= BASE_URL ?>/colaboradores" class="btn btn-secondary" role="button">Entrar como Gestor</a>
         </div>
         <div class="button-group">
-            <a href="/RHease/public/candidatura" class="btn btn-third" role="button">Candidatar-se</a>
+            <a href="<?= BASE_URL ?>/candidatura" class="btn btn-third" role="button">Candidatar-se</a>
         </div>
     </form>
 
     <footer class="login-footer">
         <p>Não tem uma conta?</p>
-        <a href="/RHease/public/cadastro">Cadastre-se aqui.</a>
+        <a href="<?= BASE_URL ?>/cadastro">Cadastre-se aqui.</a>
     </footer>
 </div>
 

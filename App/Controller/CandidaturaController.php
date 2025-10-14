@@ -72,9 +72,8 @@ class CandidaturaController extends Controller
             $pdf = $parser->parseFile($caminhoCompleto);
             $textoDoCurriculo = $pdf->getText();
 
-            // ATENÇÃO: Substitua a chave
-            $analisadorService = new AnalisadorCurriculoService('AIzaSyAXXpXRYl5mEOw8SnPLxYbTLa1moERQcNk');
-
+            $apiKey = $_ENV['GEMINI_API_KEY'];
+            $analisadorService = new AnalisadorCurriculoService($apiKey);
             $resultadoAnalise = $analisadorService->analisar($textoDoCurriculo, $candidatura);
 
             if ($resultadoAnalise['sucesso']) {
@@ -113,8 +112,7 @@ class CandidaturaController extends Controller
             exit;
         }
 
-        $db = Database::getInstance();
-        $candidaturaModel = new CandidaturaModel($db);
+        $candidaturaModel = $this->model('Candidatura');
         $analise = $candidaturaModel->buscarAnaliseCompleta($idCandidatura);
 
         if (!$analise || $analise['pontuacao_aderencia'] === null) {
