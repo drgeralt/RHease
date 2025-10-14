@@ -14,8 +14,6 @@ if ($conn->connect_error) {
 $acao = $_POST['acao'] ?? '';
 
 switch($acao) {
-
-    // --- AÇÕES DE GERENCIAMENTO DO CATÁLOGO DE BENEFÍCIOS ---
     
     case 'criar':
     case 'editar':
