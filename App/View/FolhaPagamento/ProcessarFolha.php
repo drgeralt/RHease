@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Processar Folha de Pagamento</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Usaremos o mesmo CSS da página de holerites para manter o padrão -->
+   
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/holerites.css">
 </head>
 <body>

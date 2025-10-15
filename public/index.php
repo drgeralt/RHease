@@ -1,17 +1,5 @@
 <?php
 
-use App\Controller\ColaboradorController;
-use App\Controller\HomeController;
-use App\Controller\PontoController;
-use App\Controller\UserController;
-use App\Controller\CandidaturaController;
-use App\Controller\GestaoVagasController;
-use App\Core\Router;
-use App\Controller\BeneficioController;
-use App\Controller\HoleriteController;
-use App\Controller\FolhaPagamentoController;
-
-
 require_once __DIR__ . '/../vendor/autoload.php';
 
 ini_set('display_errors', 1);
@@ -25,6 +13,21 @@ define('BASE_PATH', dirname(__DIR__));
 
 require_once BASE_PATH . '/config.php';
 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../'); 
+$dotenv->load();
+
+use App\Controller\ColaboradorController;
+use App\Controller\HomeController;
+use App\Controller\PontoController;
+use App\Controller\UserController;
+use App\Controller\CandidaturaController;
+use App\Controller\GestaoVagasController;
+use App\Core\Router;
+use App\Controller\BeneficioController;
+use App\Controller\HoleriteController;
+use App\Controller\FolhaPagamentoController;
+
+// registro de rotas
 $router = new Router();
 
 // --- Rotas de Autenticação ---
@@ -70,6 +73,7 @@ $router->addRoute('POST', '/candidatura/analisar', CandidaturaController::class,
 $router->addRoute('POST', '/candidatura/ver-analise', CandidaturaController::class, 'exibirAnaliseIA');
 $router->addRoute('GET', '/candidatura/ver-analise', CandidaturaController::class, 'exibirAnaliseIA');
 
+
 // --- Rotas de Redirecionamento ---
 $router->addRoute('GET', '/candidatura/formulario', CandidaturaController::class, 'redirecionarParaVagas');
 $router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redirecionarParaVagas');
@@ -79,17 +83,14 @@ $router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redireci
 // ----------------------
 // Rota para a página de listagem de holerites do colaborador
 $router->addRoute('GET', '/meus-holerites', HoleriteController::class, 'index');
-
-// Rota para gerar o PDF de um holerite específico
-$router->addRoute('GET', '/holerite/pdf/{id}', HoleriteController::class, 'gerarPDF');
+$router->addRoute('GET', '/holerite/pdf', HoleriteController::class, 'gerarPDF');
 
 $router->addRoute('GET', '/folha/processar', FolhaPagamentoController::class, 'index');
 $router->addRoute('POST', '/folha/processar', FolhaPagamentoController::class, 'processar');
 
-
 // Rotas Comuns
-$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
-$router->addRoute('GET', '/error', Controller::class, 'show_error');
+//$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
+//$router->addRoute('GET', '/error', Controller::class, 'show_error');
 
 // ----------------------
 // Inicia o roteamento

@@ -4,13 +4,7 @@ ini_set('display_errors', 1);
 session_start();
 header('Content-Type: application/json');
 
-// Configurações do banco
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'rhease';
 
-$conn = new mysqli($host, $user, $password, $database);
 if ($conn->connect_error) {
     echo json_encode(['success' => false, 'mensagem' => 'Erro ao conectar ao banco: '.$conn->connect_error]);
     exit;

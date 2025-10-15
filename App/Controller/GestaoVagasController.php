@@ -30,9 +30,8 @@ class GestaoVagasController extends Controller
             exit;
         }
 
-        $db = Database::getInstance();
-        $vagaModel = new GestaoVagasModel($db);
-        $candidaturaModel = new CandidaturaModel($db);
+        $vagaModel = $this->model('GestaoVagas');
+        $candidaturaModel = $this->model('Candidatura');
 
         $vaga = $vagaModel->buscarPorId($idVaga);
         $candidatos = $candidaturaModel->buscarPorVaga($idVaga);
