@@ -43,7 +43,14 @@
                             <td><?php echo number_format($holerite->salario_liquido, 2, ',', '.'); ?></td>
 
                             <td>
-                                <a href="<?php echo BASE_URL; ?>/holerite/pdf/<?php echo $holerite->id_holerite; ?>" class="btn-action" target="_blank">Visualizar</a>
+                                <form action="<?php echo BASE_URL; ?>/holerite/pdf" method="POST" target="_blank">
+                                    
+                                    <input type="hidden" name="mes" value="<?php echo $holerite->mes_referencia; ?>">
+                                    <input type="hidden" name="ano" value="<?php echo $holerite->ano_referencia; ?>">
+                                    
+                                    <button type="submit" class="btn-action">Visualizar</button>
+                                    
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach;

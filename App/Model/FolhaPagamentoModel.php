@@ -1,13 +1,13 @@
 <?php
-// App/Model/FolhaPagamentoModel.php
 
 namespace App\Model;
 
+use App\Core\Model;
 use PDO;
 use PDOException;
 use stdClass;
 
-class FolhaPagamentoModel
+class FolhaPagamentoModel extends Model
 {
     private $pdo;
     private $parametrosModel;
@@ -21,18 +21,10 @@ class FolhaPagamentoModel
 
     public function __construct()
     {
-        // Conexão principal com o banco
-        $host = 'localhost'; $user = 'root'; $password = ''; $database = 'rhease';
-        try {
-            $this->pdo = new PDO("mysql:host=$host;dbname=$database;charset=utf8", $user, $password);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die("Erro ao conectar: " . $e->getMessage());
-        }
-
+      
         // Instancia os outros models que vamos precisar
         $this->parametrosModel = new ParametrosFolhaModel();
-        $this->colaboradorModel = new ColaboradorModel();
+        $this->colaboradorModel = new ColaboradorModel($pdo);
 
         // Carrega os parâmetros da folha no construtor
         $paramInss = $this->parametrosModel->findParametroPorChave('TABELA_INSS_VIGENTE');

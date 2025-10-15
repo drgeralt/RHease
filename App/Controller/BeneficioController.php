@@ -6,10 +6,6 @@ use App\Core\Controller;
 class BeneficioController extends Controller{
     private $model;
 
-    public function __construct() {
-        $this->model = new BeneficioModel();
-    }
-
     // Retorna todos os benefícios
     public function index() {
         return $this->view('Beneficios/meus_beneficios');
@@ -43,8 +39,11 @@ class BeneficioController extends Controller{
     }
 
     // Deletar benefício
-    public function deletar($id) {
-        $this->model->deletarBeneficio($id);
+    public function desativar() { // Remove o parâmetro $id
+    $id = $_GET['id'] ?? null; // Pega o id da URL
+    if ($id) {
+        $this->model->desativarBeneficio($id);
+    }
     }
 
     // Alternar status

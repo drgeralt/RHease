@@ -5,26 +5,11 @@ namespace App\Model;
 
 use PDO;
 use PDOException;
+use App\Core\Model;
 
-class HoleriteModel
+class HoleriteModel extends Model
 {
     private $pdo;
-
-    public function __construct()
-    {
-        $host = 'localhost';
-        $user = 'root';
-        $password = '';
-        $database = 'rhease';
-
-        try {
-            $this->pdo = new PDO("mysql:host=$host;dbname=$database;charset=utf8", $user, $password);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die("Erro ao conectar ao banco de dados: " . $e->getMessage());
-        }
-    }
-
 
     public function findByColaboradorId(int $colaboradorId): array
     {
@@ -68,4 +53,26 @@ class HoleriteModel
 
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
+    
+    public function findHoleritePorColaboradorEMes(int $idColaborador, int $mes, int $ano)
+{
+    $sql = "SELECT h.*, c.nome_completo, c.CPF, c.matricula, ca.nome_cargo, s.nome_setor
+            FROM holerites h
+            JOIN colaborador c ON h.id_colaborador = c.id_colaborador
+            LEFT JOIN cargo ca ON c.id_cargo = ca.id_cargo
+            LEFT JOIN setor s ON c.id_setor = s.id_setor
+            WHERE h.id_colaborador = :idColaborador 
+              AND h.mes_referencia = :mes
+              AND h.ano_referencia = :ano
+            LIMIT 1";
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([
+        ':idColaborador' => $idColaborador,
+        ':mes' => $mes,
+        ':ano' => $ano
+    ]);
+
+    return $stmt->fetch(PDO::FETCH_OBJ);
+}
 }
