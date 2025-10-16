@@ -5,15 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e4b94f6-4f1b-462d-bbb3-6e67e40f5595" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/public/js/auth.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/App/View/Auth/esqueceuSenha.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/App/View/Auth/redefinirSenha.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/App/View/Auth/cadastro.php" beforeDir="false" afterPath="$PROJECT_DIR$/App/View/Auth/cadastro.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/Controller/AuthController.php" beforeDir="false" afterPath="$PROJECT_DIR$/App/Controller/AuthController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/Model/AuthModel.php" beforeDir="false" afterPath="$PROJECT_DIR$/App/Model/AuthModel.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/Model/UserModel.php" beforeDir="false" afterPath="$PROJECT_DIR$/App/Model/UserModel.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App/View/Auth/login.php" beforeDir="false" afterPath="$PROJECT_DIR$/App/View/Auth/login.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.php" beforeDir="false" afterPath="$PROJECT_DIR$/config.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/login.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/login.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +28,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaScript File" />
+        <option value="PHP File" />
       </list>
     </option>
   </component>
@@ -127,7 +128,7 @@
       <option name="presentableId" value="Default" />
       <updated>1758997218164</updated>
       <workItem from="1758997219611" duration="17000" />
-      <workItem from="1760548428840" duration="5090000" />
+      <workItem from="1760548428840" duration="11376000" />
     </task>
     <servers />
   </component>
