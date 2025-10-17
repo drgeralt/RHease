@@ -57,10 +57,15 @@ class GestaoVagasModel extends Model{
 
     public function buscarPorId(int $id)
     {
+        // ATUALIZADO: A query agora busca TODOS os campos da vaga para preencher o formulário
         $sql = "SELECT 
                     v.id_vaga,
                     v.titulo_vaga,
                     v.descricao_vaga,
+                    v.situacao,
+                    v.requisitos_necessarios,
+                    v.requisitos_recomendados,
+                    v.requisitos_desejados,
                     s.nome_setor
                 FROM 
                     vaga AS v
@@ -75,4 +80,35 @@ class GestaoVagasModel extends Model{
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function atualizarVaga(int $idVaga, array $dados): bool
+    {
+        $sql = "UPDATE vaga SET 
+                    titulo_vaga = :titulo_vaga,
+                    id_setor = :id_setor,
+                    situacao = :situacao,
+                    descricao_vaga = :descricao_vaga,
+                    requisitos_necessarios = :requisitos_necessarios,
+                    requisitos_recomendados = :requisitos_recomendados,
+                    requisitos_desejados = :requisitos_desejados
+                WHERE id_vaga = :id_vaga";
+
+        $stmt = $this->db_connection->prepare($sql);
+
+        // O 'id_vaga' é usado tanto no SET quanto no WHERE
+        $dados['id_vaga'] = $idVaga;
+
+        return $stmt->execute($dados);
+    }
+
+    public function excluirVaga(int $idVaga): bool
+    {
+        // 1. A query é PREPARADA com um placeholder (:id_vaga)
+        $sql = "DELETE FROM vaga WHERE id_vaga = :id_vaga";
+        $stmt = $this->db_connection->prepare($sql);
+        
+        // 2. O dado real ($idVaga) é ENVIADO separadamente no execute()
+        return $stmt->execute([':id_vaga' => $idVaga]);
+    }
+        
 }

@@ -118,20 +118,21 @@
                                         </span>
                                 </td>
                                 <td class="actions">
-                                    <button class="btn btn-edit">
-                                        <i class="fas fa-edit"></i> Editar
-                                    </button>
-                                    <button class="btn btn-delete">
-                                        <i class="fas fa-trash-alt"></i> Excluir
-                                    </button>
+                                    <div class="action-icons">
+                                        <a href="<?php echo BASE_URL; ?>/vagas/editar?id=<?php echo $vaga['id_vaga']; ?>" class="icon-btn icon-edit" title="Editar Vaga">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
 
-                                    <!-- Botão "Ver Candidatos" transformado em formulário POST -->
-                                    <form action="<?php echo BASE_URL; ?>/vagas/candidatos" method="POST">
-                                        <input type="hidden" name="id" value="<?php echo $vaga['id_vaga']; ?>">
-                                        <button type="submit" class="btn btn-info">
-                                            <i class="fa-solid fa-user"></i> Ver Candidatos
-                                        </button>
-                                    </form>
+                                        <a href="<?php echo BASE_URL; ?>/vagas/excluir?id=<?php echo $vaga['id_vaga']; ?>" class="icon-btn icon-delete" title="Excluir Vaga" onclick="return confirm('Tem certeza que deseja excluir esta vaga? Esta ação não pode ser desfeita.');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+
+                                        <form action="<?php echo BASE_URL; ?>/vagas/candidatos" method="POST">
+                                            <input type="hidden" name="id" value="<?php echo $vaga['id_vaga']; ?>">
+                                            <button type="submit" class="icon-btn icon-view" title="Ver Candidatos">
+                                                <i class="fas fa-search"></i> </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -159,13 +160,22 @@
                             <td>CLT</td>
                             <td>Vale Transporte, Vale Refeição</td>
                             <td class="actions">
-                                <button class="btn btn-edit">
-                                    <i class="fas fa-edit"></i> Editar
-                                </button>
-                                <button class="btn btn-delete">
-                                    <i class="fas fa-trash-alt"></i> Excluir
-                                </button>
-                            </td>
+                                    <div class="action-icons">
+                                        <a href="<?php echo BASE_URL; ?>/vagas/editar?id=<?php echo $vaga['id_vaga']; ?>" class="icon-btn icon-edit" title="Editar Vaga">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <a href="<?php echo BASE_URL; ?>/vagas/excluir?id=<?php echo $vaga['id_vaga']; ?>" class="icon-btn icon-delete" title="Excluir Vaga" onclick="return confirm('Tem certeza que deseja excluir esta vaga? Esta ação não pode ser desfeita.');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+
+                                        <form action="<?php echo BASE_URL; ?>/vagas/candidatos" method="POST">
+                                            <input type="hidden" name="id" value="<?php echo $vaga['id_vaga']; ?>">
+                                            <button type="submit" class="icon-btn icon-view" title="Ver Candidatos">
+                                                <i class="fas fa-search"></i> </button>
+                                        </form>
+                                    </div>
+                                </td>
                         </tr>
                         </tbody>
                     </table>
