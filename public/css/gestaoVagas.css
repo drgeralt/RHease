@@ -1,22 +1,22 @@
 /* Reset e configurações básicas */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
-  line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
 }
 
 /* Container principal */
 .app-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .user-info img { /* Para o user.png */
@@ -28,350 +28,352 @@ body {
 
 /* Header */
 .header {
-  background: white;
-  border-bottom: 1px solid #e5e5e5;
-  padding: 0 24px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+    background: white;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .menu-toggle {
-  background: none;
-  border: none;
-  font-size: 18px;
-  color: #666;
-  cursor: pointer;
-  padding: 8px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .logo-img {
-  width: 90px;
-  height: 32px;
+    width: 90px;
+    height: 32px;
 }
 
 .logo-text {
-  font-size: 20px;
-  font-weight: 600;
-  color: #4caf50;
+    font-size: 20px;
+    font-weight: 600;
+    color: #4caf50;
 }
 
 .header-right {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .user-profile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .user-profile:hover {
-  background-color: #f5f5f5;
+    background-color: #f5f5f5;
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .user-name {
-  font-weight: 500;
-  color: #333;
+    font-weight: 500;
+    color: #333;
 }
 
 /* Container principal */
 .main-container {
-  display: flex;
-  flex: 1;
+    display: flex;
+    flex: 1;
 }
 
 /* Sidebar */
 .sidebar {
-  position: initial;
-  width: 240px;
-  background: white;
-  border-right: 1px solid #e5e5e5;
-  padding: 24px 0;
+    position: initial;
+    width: 240px;
+    background: white;
+    border-right: 1px solid #e5e5e5;
+    padding: 24px 0;
 }
 .sidebar-container {
-  position: sticky;
-  top: 64px;
-  max-height: calc(100vh - 64px);
-  overflow-y: auto;
+    position: sticky;
+    top: 64px;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
 }
 
 .sidebar-nav {
-  padding: 0 16px;
+    padding: 0 16px;
 }
 
 .nav-list {
-  list-style: none;
+    list-style: none;
 }
 
 .nav-item {
-  margin-bottom: 4px;
+    margin-bottom: 4px;
 }
 
 .nav-link {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  color: #666;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.2s;
-  font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: #666;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: 500;
 }
 
 .nav-link:hover {
-  background-color: #f5f5f5;
-  color: #333;
+    background-color: #f5f5f5;
+    color: #333;
 }
 
 .nav-item.active .nav-link {
-  background-color: #4caf50;
-  color: white;
+    background-color: #4caf50;
+    color: white;
 }
 
 .nav-link i {
-  width: 20px;
-  text-align: center;
+    width: 20px;
+    text-align: center;
 }
 
 /* Conteúdo principal */
 .main-content {
-  flex: 1;
-  padding: 32px;
-  overflow-y: auto;
+    flex: 1;
+    padding: 32px;
+    overflow-y: auto;
 }
 
 .page-header {
-  margin-bottom: 32px;
+    margin-bottom: 32px;
 }
 
 .page-title {
-  font-size: 32px;
-  font-weight: 600;
-  color: #333;
+    font-size: 32px;
+    font-weight: 600;
+    color: #333;
 }
 
 /* Seções de conteúdo */
 .content-section {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
 }
 
 .section-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
 }
 
 /* Botões */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-}
-
 .btn-primary {
-  background-color: #4caf50;
-  color: white;
+    background-color: #4caf50;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
 }
 
 .btn-primary:hover {
-  background-color: #45a049;
+    background-color: #45a049;
 }
 
 /* Tabelas */
 .table-container {
-  overflow-x: auto;
+    overflow-x: auto;
 }
 
 .data-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
 }
 
 .data-table th {
-  background-color: #4caf50;
-  color: white;
-  padding: 12px 16px;
-  text-align: left;
-  font-weight: 600;
-  border-bottom: 2px solid #45a049;
+    background-color: #4caf50;
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #45a049;
 }
 
 .data-table th i {
-  margin-left: 8px;
-  opacity: 0.7;
+    margin-left: 8px;
+    opacity: 0.7;
 }
 
 .data-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e5e5e5;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e5e5;
+    vertical-align: middle; /* Ajuda a alinhar o conteúdo verticalmente */
 }
 
 .data-table tbody tr:hover {
-  background-color: #f9f9f9;
+    background-color: #f9f9f9;
 }
 
 /* Status badges */
 .status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
-.status-aberta {
-  background-color: #e8f5e8;
-  color: #4caf50;
+.status-open, .status-aberta { /* Adicionado para compatibilidade */
+    background-color: #e8f5e8;
+    color: #4caf50;
 }
 
-.status-rascunho {
-  background-color: #e3f2fd;
-  color: #2196f3;
+.status-draft, .status-rascunho { /* Adicionado para compatibilidade */
+    background-color: #e3f2fd;
+    color: #2196f3;
 }
 
 .status-fechada {
-  background-color: #ffebee;
-  color: #f44336;
+    background-color: #ffebee;
+    color: #f44336;
 }
 
-/* Ações */
-.actions {
-  display: flex;
-  gap: 8px;
+/* --- ESTILOS REFINADOS PARA OS ÍCONES DE AÇÃO --- */
+
+/* Garante que a célula da tabela tenha espaço suficiente */
+.data-table td.actions {
+    width: 150px; /* Define uma largura mínima para a coluna de ações */
+    text-align: center;
 }
 
-.btn-action {
-  background: none;
-  border: none;
-  padding: 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #666;
+/* O contêiner principal que alinha os ícones */
+.action-icons {
+    display: flex;
+    justify-content: center; /* Centraliza os ícones horizontalmente na célula */
+    align-items: center;     /* Alinha verticalmente (MUITO IMPORTANTE!) */
+    gap: 25px;               /* Espaço consistente e generoso entre cada ícone */
+    padding: 5px 0;          /* Adiciona um respiro vertical */
 }
 
-.btn-action:hover {
-  background-color: #f5f5f5;
+/* Remove margens extras do formulário que possam quebrar o alinhamento */
+.action-icons form {
+    margin: 0;
+    padding: 0;
+    display: flex; /* Garante que o botão dentro do form se alinhe com os outros ícones */
 }
 
-.btn-edit:hover {
-  color: #2196f3;
-  background-color: #e3f2fd;
+/* Estilo base para cada ícone (seja <a> ou <button>) */
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin: 0;
+    font-size: 18px; /* Tamanho do ícone (ajuste se preferir maior/menor) */
+    line-height: 1;
+    text-decoration: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.btn-delete:hover {
-  color: #f44336;
-  background-color: #ffebee;
+.icon-btn:hover {
+    transform: scale(1.2); /* Efeito de zoom sutil ao passar o mouse */
+    opacity: 0.8;
 }
 
-.btn-view:hover {
-  color: #4caf50;
-  background-color: #e8f5e8;
+/* Cores específicas para cada ícone, como na sua imagem de referência */
+.icon-btn.icon-edit {
+    color: #0d6efd; /* Azul para Editar */
+}
+
+.icon-btn.icon-delete {
+    color: #dc3545; /* Vermelho para Excluir */
+}
+
+.icon-btn.icon-view {
+    color: #212529; /* Preto para Ver/Pesquisar */
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-  .main-container {
-    flex-direction: column;
-  }
+    .main-container {
+        flex-direction: column;
+    }
 
-  .sidebar {
-    width: 100%;
-    order: 2;
-  }
+    .sidebar {
+        width: 100%;
+        order: 2;
+    }
 
-  .sidebar-container {
-    position: static;
-    top: unset;
-    max-height: unset;
-    height: auto;
-    overflow-y: visible;
-  }
+    .sidebar-container {
+        position: static;
+        top: unset;
+        max-height: unset;
+        height: auto;
+        overflow-y: visible;
+    }
 
-  .main-content {
-    order: 1;
-    padding: 16px;
-  }
+    .main-content {
+        order: 1;
+        padding: 16px;
+    }
 
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .table-container {
-    overflow-x: scroll;
-  }
-
-  .data-table {
-    min-width: 600px;
-  }
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
 }
 
 @media (max-width: 480px) {
-  .header {
-    padding: 0 16px;
-  }
+    .header {
+        padding: 0 16px;
+    }
 
-  .user-name {
-    display: none;
-  }
-
-  .main-content {
-    padding: 12px;
-  }
-
-  .content-section {
-    padding: 16px;
-  }
+    .user-name {
+        display: none;
+    }
 }

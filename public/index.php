@@ -51,6 +51,9 @@ $router->addRoute('GET', '/vagas/listar', GestaoVagasController::class, 'listarV
 $router->addRoute('GET', '/vagas/criar', GestaoVagasController::class, 'criar');
 $router->addRoute('POST', '/vagas/salvar', GestaoVagasController::class, 'salvar');
 $router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos');
+$router->addRoute('GET', '/vagas/editar', GestaoVagasController::class, 'editar');
+$router->addRoute('POST', '/vagas/atualizar', GestaoVagasController::class, 'atualizar');
+$router->addRoute('GET', '/vagas/excluir', GestaoVagasController::class, 'excluir');
 
 // Benefícios
 $router->addRoute('GET', '/beneficios', BeneficioController::class, 'index');
