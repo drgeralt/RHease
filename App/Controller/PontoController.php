@@ -51,6 +51,7 @@ class PontoController
             $idColaborador = $_SESSION['id_colaborador'] ?? 1;
             $timestamp = time();
             $dataHoraAtual = date('Y-m-d H:i:s', $timestamp);
+            $geolocalizacao = $_POST['geolocalizacao'] ?? 'Não informada';
             $nomeArquivo = $idColaborador . '_' . $timestamp . '.jpg';
             $caminhoCompleto = BASE_PATH . '/storage/fotos_ponto/' . $nomeArquivo;
 
@@ -59,7 +60,7 @@ class PontoController
             }
 
             $pontoModel = new PontoModel();
-            $tipoDeRegisto = $pontoModel->registrarPonto($idColaborador, $dataHoraAtual);
+            $tipoDeRegisto = $pontoModel->registrarPonto($idColaborador, $dataHoraAtual, $geolocalizacao);
 
             echo json_encode([
                 'status' => 'success',

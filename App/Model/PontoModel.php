@@ -8,7 +8,7 @@ use PDO;
 class PontoModel
 {
     /**
-     * NOVO MÉTODO: Procura pelo último registo de ponto em aberto
+     * Procura pelo último registo de ponto em aberto
      * para um colaborador no dia atual.
      *
      * @param int $idColaborador O ID do colaborador.
@@ -32,11 +32,7 @@ class PontoModel
         return $stmt->fetch();
     }
 
-    /**
-     * Lógica para registar a entrada ou saída.
-     * (Este método permanece exatamente igual ao que já temos)
-     */
-    public function registrarPonto(int $idColaborador, string $dataHoraAtual): string
+    public function registrarPonto(int $idColaborador, string $dataHoraAtual, string $geolocalizacao): string
     {
         $pdo = Database::getInstance();
         $dataAtual = date('Y-m-d', strtotime($dataHoraAtual));
@@ -55,24 +51,27 @@ class PontoModel
         $registroAberto = $stmtBusca->fetch();
 
         if ($registroAberto) {
-            $sql = "UPDATE folha_ponto SET data_hora_saida = :data_hora
+            $sql = "UPDATE folha_ponto SET data_hora_saida = :data_hora,
+                    geolocalizacao = :geolocalizacao
                     WHERE id_registro_ponto = :id_registro";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 ':data_hora' => $dataHoraAtual,
+                ':geolocalizacao' => $geolocalizacao,
                 ':id_registro' => $registroAberto['id_registro_ponto']
             ]);
             return 'saida';
         }
         else {
-            $sql = "INSERT INTO folha_ponto (id_colaborador, data_hora_entrada) 
-                    VALUES (:id_colaborador, :data_hora)";
+            $sql = "INSERT INTO folha_ponto (id_colaborador, data_hora_entrada, geolocalizacao) 
+                    VALUES (:id_colaborador, :data_hora, :geolocalizacao)";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 ':id_colaborador' => $idColaborador,
-                ':data_hora' => $dataHoraAtual
+                ':data_hora' => $dataHoraAtual,
+                ':geolocalizacao' => $geolocalizacao
             ]);
             return 'entrada';
         }
