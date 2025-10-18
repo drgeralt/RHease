@@ -1,7 +1,6 @@
-/* =================== VARIÁVEIS DE CORES =================== */
 :root {
-    --green-dark: #25621C; /* Cor principal de texto/títulos */
-    --green-light: #489D3B; /* Cor principal de destaque (menu ativo/botões) */
+    --green-dark: #25621C;
+    --green-light: #489D3B;
     --background-color: #f9f9f9; 
     --card-background: #ffffff;
     --text-color-dark: #333;
@@ -14,7 +13,6 @@
     --chart-temporario: #757575;
 }
 
-/* =================== GERAL E RESET (Seu código) =================== */
 html, body {
     height: 100%; 
     margin: 0;
@@ -26,7 +24,6 @@ html, body {
     color: #dc3545;
 }
 
-/* =================== HEADER (Seu código) =================== */
 header{
     background-color: #D9D9D9;
     display: flex;
@@ -47,16 +44,14 @@ header{
     padding: 5px;
 }
 
-/* =================== CONTAINER (Seu código) =================== */
 .container {
     display: flex;
     min-height: calc(100vh - 50px); 
 }
 
-/* =================== MENU LATERAL (Seu código) =================== */
 .sidebar {
     width: 250px; 
-    background: var(--card-background); /* Alterado de #f5f5f5 para branco, mais fiel ao painel */
+    background: var(--card-background);
     padding: 10px 0;
     display: flex;
     flex-direction: column;
@@ -109,10 +104,9 @@ header{
     color: #fff;
 }
 
-/* =================== CONTEÚDO PRINCIPAL (PAINEL) =================== */
 .content {
     flex: 1; 
-    padding: 30px; /* Aumentado o padding para 30px para dar mais espaço, como na imagem */
+    padding: 30px;
     background: var(--background-color);
 }
 
@@ -123,10 +117,8 @@ header{
     color: var(--text-color-dark);
 }
 
-/* 3. Grid dos Cards de Métricas */
 .metrics-grid {
     display: grid;
-    /* 3 Colunas: 2 cards de métricas (1fr) e 1 card de gráfico (1.5fr) */
     grid-template-columns: repeat(2, 1fr) 1.5fr; 
     gap: 20px;
 }
@@ -145,7 +137,6 @@ header{
 }
 
 .icon-wrapper {
-    /* Estilo do círculo do ícone */
     background-color: #f0f0f0;
     color: var(--text-color-light);
     border-radius: 50%;
@@ -170,11 +161,9 @@ header{
     color: var(--text-color-light);
 }
 
-/* Posicionamento dos 4º e 5º Cards (na segunda linha, coluna 1 e 2) */
 .metrics-grid > :nth-child(4) { grid-column: 1 / span 1; } 
 .metrics-grid > :nth-child(5) { grid-column: 2 / span 1; } 
 
-/* 4. Card do Gráfico (Tipos de contrato) */
 .chart-card {
     grid-row: 1 / span 2; 
     grid-column: 3; 
@@ -256,10 +245,6 @@ header{
 .chart-legend li.pj .dot { background-color: var(--chart-pj); }
 .chart-legend li.estagio .dot { background-color: var(--chart-estagio); }
 .chart-legend li.temporario .dot { background-color: var(--chart-temporario); }
-
-/* Adicione ESTE BLOCO no final do seu style.css, ou integre onde for mais organizado. */
-
-/* =================== VARIÁVEIS DE CORES PARA MÉTRICAS =================== */
 :root {
     /* Cores de destaque (mantendo suas cores) */
     --green-dark: #25621C;
