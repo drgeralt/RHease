@@ -56,6 +56,7 @@ class PontoController
             $caminhoRelativo = 'storage/fotos_ponto/' . $nomeArquivo;
             $caminhoCompleto = BASE_PATH . '/' . $caminhoRelativo;
             $diretorioFotos = dirname($caminhoCompleto);
+            $ipAddress = $_SERVER['REMOTE_ADDR'] ?? "Não identificado";
 
             if (!is_dir($diretorioFotos)) {
                 if (!mkdir($diretorioFotos, 0775, true)) {
@@ -68,7 +69,8 @@ class PontoController
             }
 
             $pontoModel = new PontoModel();
-            $tipoDeRegisto = $pontoModel->registrarPonto($idColaborador, $dataHoraAtual, $geolocalizacao, $caminhoRelativo);
+            $tipoDeRegisto = $pontoModel->registrarPonto($idColaborador, $dataHoraAtual, $geolocalizacao,
+                $caminhoRelativo, $ipAddress);
 
             echo json_encode([
                 'status' => 'success',

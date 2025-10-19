@@ -32,7 +32,7 @@ class PontoModel
         return $stmt->fetch();
     }
 
-    public function registrarPonto(int $idColaborador, string $dataHoraAtual, string $geolocalizacao, string $caminhoFoto): string
+    public function registrarPonto(int $idColaborador, string $dataHoraAtual, string $geolocalizacao, string $caminhoFoto, string $ipAddress): string
     {
         $pdo = Database::getInstance();
         $dataAtual = date('Y-m-d', strtotime($dataHoraAtual));
@@ -53,7 +53,8 @@ class PontoModel
         if ($registroAberto) {
             $sql = "UPDATE folha_ponto SET data_hora_saida = :data_hora,
                     geolocalizacao = :geolocalizacao,
-                    caminho_foto = :caminho_foto
+                    caminho_foto = :caminho_foto,
+                    ip_address = :ip_address
                     WHERE id_registro_ponto = :id_registro";
 
             $stmt = $pdo->prepare($sql);
@@ -61,20 +62,22 @@ class PontoModel
                 ':data_hora' => $dataHoraAtual,
                 ':geolocalizacao' => $geolocalizacao,
                 ':caminho_foto' => $caminhoFoto,
+                ':ip_address' => $ipAddress,
                 ':id_registro' => $registroAberto['id_registro_ponto']
             ]);
             return 'saida';
         }
         else {
-            $sql = "INSERT INTO folha_ponto (id_colaborador, data_hora_entrada, geolocalizacao, caminho_foto) 
-                    VALUES (:id_colaborador, :data_hora, :geolocalizacao, :caminho_foto)";
+            $sql = "INSERT INTO folha_ponto (id_colaborador, data_hora_entrada, geolocalizacao, caminho_foto, ip_address) 
+                    VALUES (:id_colaborador, :data_hora, :geolocalizacao, :caminho_foto, :ip_address)";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 ':id_colaborador' => $idColaborador,
                 ':data_hora' => $dataHoraAtual,
                 ':geolocalizacao' => $geolocalizacao,
-                ':caminho_foto' => $caminhoFoto
+                ':caminho_foto' => $caminhoFoto,
+                ':ip_address' => $ipAddress
             ]);
             return 'entrada';
         }
