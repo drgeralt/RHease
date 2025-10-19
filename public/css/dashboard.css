@@ -1,4 +1,5 @@
 :root {
+    /* Cores de destaque */
     --green-dark: #25621C;
     --green-light: #489D3B;
     --background-color: #f9f9f9; 
@@ -6,13 +7,14 @@
     --text-color-dark: #333;
     --text-color-light: #757575; 
     
-    /* Cores do Gráfico de Rosca (simulação) */
+    /* Cores do Gráfico de Rosca (manter, mesmo que não usadas no layout atual) */
     --chart-clt: #d32f2f;
     --chart-pj: #489D3B; 
     --chart-estagio: #1976d2;
     --chart-temporario: #757575;
 }
 
+/* =================== ESTILOS GERAIS/BASE =================== */
 html, body {
     height: 100%; 
     margin: 0;
@@ -24,13 +26,26 @@ html, body {
     color: #dc3545;
 }
 
+/* Header */
 header{
     background-color: #D9D9D9;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 5px;
+    padding: 5px 20px; 
+    height: 50px; 
 }
+/* Estilização da nova logo (texto) */
+.header-logo {
+    font-size: 24px; 
+    font-weight: 700; 
+    color: var(--green-light); /* 'RH' */
+}
+.header-logo-ease {
+    color: var(--green-dark); /* 'ease' */
+}
+/* Fim da estilização da nova logo (texto) */
+
 .header-tabela h2{
     color: var(--green-dark);
 }
@@ -44,11 +59,13 @@ header{
     padding: 5px;
 }
 
+/* Container Principal */
 .container {
     display: flex;
     min-height: calc(100vh - 50px); 
 }
 
+/* Sidebar e Menu */
 .sidebar {
     width: 250px; 
     background: var(--card-background);
@@ -58,13 +75,11 @@ header{
     flex-shrink: 0; 
     border-right: 1px solid #ddd;
 }
-
 .menu {
     list-style: none;
     padding-left: 15px;
     padding-right: 15px;
 }
-
 .menu li {
     padding: 15px 20px;
     font-weight: 600;
@@ -77,7 +92,6 @@ header{
     transition: background 0.3s;
     border-radius: 15px;
 }
-
 .menu li a{
     text-decoration: none;
     color: inherit; 
@@ -86,318 +100,33 @@ header{
     gap: 10px;
     width: 100%;
 }
-
 .menu li:hover,
 .menu li.active {
     background: var(--green-light);
     color: #fff;
     border-radius: 15px;
 }
-
-.menu .bi{
+/* Garante que o ícone fique branco quando o item está ativo ou hover */
+.menu .bi, .menu li a i {
     color: var(--text-color-light);
     padding-right: 5px;
 }
-
 .menu li:hover .bi,
-.menu li.active .bi {
-    color: #fff;
+.menu li.active .bi,
+.menu li:hover a i,
+.menu li.active a i {
+    color: #fff !important; /* Força a cor branca para o ícone ativo */
 }
 
+/* Conteúdo Principal */
 .content {
     flex: 1; 
     padding: 30px;
     background: var(--background-color);
 }
-
 .page-title-content {
     font-size: 28px;
     font-weight: 600;
     margin-bottom: 30px;
     color: var(--text-color-dark);
 }
-
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr) 1.5fr; 
-    gap: 20px;
-}
-
-.metric-card, .chart-card {
-    background-color: var(--card-background);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-}
-
-.metric-card {
-    align-items: flex-start;
-}
-
-.icon-wrapper {
-    background-color: #f0f0f0;
-    color: var(--text-color-light);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px;
-    margin-bottom: 15px;
-}
-
-.metric-value {
-    font-size: 36px;
-    font-weight: bold;
-    color: var(--text-color-dark);
-    margin-bottom: 5px;
-}
-
-.metric-label {
-    font-size: 14px;
-    color: var(--text-color-light);
-}
-
-.metrics-grid > :nth-child(4) { grid-column: 1 / span 1; } 
-.metrics-grid > :nth-child(5) { grid-column: 2 / span 1; } 
-
-.chart-card {
-    grid-row: 1 / span 2; 
-    grid-column: 3; 
-}
-
-.chart-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 20px;
-}
-
-.chart-area {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-grow: 1;
-    padding: 10px 0;
-}
-
-/* Simulação do Gráfico de Rosca */
-.donut-chart-mock {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: conic-gradient(
-        var(--chart-clt) 0% 40%,       
-        var(--chart-pj) 40% 60%,        
-        var(--chart-estagio) 60% 80%,   
-        var(--chart-temporario) 80% 100% 
-    );
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.donut-chart-mock::before {
-    content: "";
-    position: absolute;
-    width: 100px; 
-    height: 100px;
-    background: var(--card-background);
-    border-radius: 50%;
-}
-
-.donut-center-value {
-    position: relative;
-    z-index: 1;
-    font-size: 36px;
-    font-weight: bold;
-    color: var(--text-color-dark);
-}
-
-/* Legenda do Gráfico */
-.chart-legend ul {
-    list-style: none;
-    padding: 0;
-}
-
-.chart-legend li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    color: var(--text-color-light);
-    font-size: 14px;
-}
-
-.chart-legend .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 8px;
-    flex-shrink: 0;
-}
-
-/* Cores dos pontos da legenda */
-.chart-legend li.clt .dot { background-color: var(--chart-clt); }
-.chart-legend li.pj .dot { background-color: var(--chart-pj); }
-.chart-legend li.estagio .dot { background-color: var(--chart-estagio); }
-.chart-legend li.temporario .dot { background-color: var(--chart-temporario); }
-:root {
-    /* Cores de destaque (mantendo suas cores) */
-    --green-dark: #25621C;
-    --green-light: #489D3B;
-    --background-color: #f9f9f9; 
-    --card-background: #ffffff;
-    --text-color-dark: #333;
-    --text-color-light: #757575; 
-    
-    /* Cores do Gráfico de Rosca (simulação) */
-    --chart-clt: #d32f2f;
-    --chart-pj: #489D3B; 
-    --chart-estagio: #1976d2;
-    --chart-temporario: #757575;
-}
-
-/* =================== GERAL DO CONTEÚDO (JÁ EXISTENTE NO SEU CÓDIGO) =================== */
-.content {
-    flex: 1; 
-    padding: 30px; /* Ajuste feito no pedido anterior para espaçamento */
-    background: var(--background-color);
-}
-
-.page-title-content {
-    font-size: 28px;
-    font-weight: 500;
-    margin-bottom: 30px;
-    color: var(--text-color-dark);
-}
-
-/* =================== GRID E CARDS DE MÉTRICAS =================== */
-.metrics-grid {
-    display: grid;
-    /* 3 Colunas: 2 cards de métricas (1fr) e 1 card de gráfico (1.5fr) */
-    grid-template-columns: repeat(2, 1fr) 1.5fr; 
-    gap: 20px;
-}
-
-.metric-card, .chart-card {
-    background-color: var(--card-background);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-}
-
-.metric-card {
-    align-items: flex-start;
-}
-
-.icon-wrapper {
-    background-color: #f0f0f0;
-    color: var(--text-color-light);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px;
-    margin-bottom: 15px;
-}
-
-.metric-value {
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--green-light);
-    margin-bottom: 5px;
-}
-
-.metric-label {
-    font-size: 14px;
-    color: var(--text-color-light);
-}
-
-/* Posicionamento dos 4º e 5º Cards */
-.metrics-grid > :nth-child(4) { grid-column: 1 / span 1; } 
-.metrics-grid > :nth-child(5) { grid-column: 2 / span 1; } 
-
-/* =================== GRÁFICO DE ROSCA =================== */
-.chart-card {
-    grid-row: 1 / span 2; 
-    grid-column: 3; 
-}
-
-.chart-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 20px;
-}
-
-.chart-area {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-grow: 1;
-    padding: 10px 0;
-}
-
-.donut-chart-mock {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    /* O background será gerado dinamicamente no PHP usando 'conic-gradient' */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.donut-chart-mock::before {
-    content: "";
-    position: absolute;
-    width: 100px; 
-    height: 100px;
-    background: var(--card-background);
-    border-radius: 50%;
-}
-
-.donut-center-value {
-    position: relative;
-    z-index: 1;
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--text-color-dark);
-}
-
-/* Legenda do Gráfico */
-.chart-legend ul {
-    list-style: none;
-    padding: 0;
-}
-
-.chart-legend li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    color: var(--text-color-dark);
-    font-size: 14px;
-}
-
-.chart-legend .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 8px;
-    flex-shrink: 0;
-}
-
-/* Cores dos pontos da legenda (Baseado nas cores definidas em :root) */
-.chart-legend li.clt .dot { background-color: var(--chart-clt); }
-.chart-legend li.pj .dot { background-color: var(--chart-pj); }
-.chart-legend li.estagio .dot { background-color: var(--chart-estagio); }
-.chart-legend li.temporario .dot { background-color: var(--chart-temporario); }
