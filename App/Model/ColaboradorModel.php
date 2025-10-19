@@ -126,4 +126,16 @@ class ColaboradorModel extends Model
         $stmt->bindValue(':email_corporativo', $data['email_corporativo']);
         $stmt->bindValue(':status', $data['status']);
     }
+    /**
+     * Busca um colaborador pelo ID.
+     * @param int $id O ID do colaborador.
+     * @return array|false Retorna um array com os dados ou false se não encontrar.
+     */
+    public function findById(int $id)
+    {
+        $sql = "SELECT * FROM colaborador WHERE id_colaborador = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC); // fetch() retorna false se não encontrar
+    }
 }

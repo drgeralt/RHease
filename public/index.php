@@ -25,18 +25,23 @@ use App\Core\Router;
 use App\Controller\BeneficioController;
 use App\Controller\HoleriteController;
 use App\Controller\FolhaPagamentoController;
+use App\Controller\AuthController;
 
 // registro de rotas
 $router = new Router();
 
 // --- Rotas de Autenticação ---
-$router->addRoute('GET', '/', UserController::class, 'show_login');
-$router->addRoute('GET', '/login', UserController::class, 'show_login');
-$router->addRoute('POST', '/login', UserController::class, 'process_login');
-$router->addRoute('GET', '/cadastro', UserController::class, 'show_cadastro');
-$router->addRoute('POST', '/register', UserController::class, 'register');
-$router->addRoute('GET', '/registro-sucesso', UserController::class, 'show_registro_sucesso');
-$router->addRoute('GET', '/verify', UserController::class, 'verify_account');
+$router->addRoute('GET', '/', AuthController::class, 'showLogin');
+$router->addRoute('GET', '/login', AuthController::class, 'showLogin');
+$router->addRoute('POST', '/login', AuthController::class, 'processLogin');
+$router->addRoute('GET', '/cadastro', AuthController::class, 'showCadastro');
+$router->addRoute('POST', '/register', AuthController::class, 'register');
+$router->addRoute('GET', '/verify', AuthController::class, 'verifyAccount');
+$router->addRoute('GET', '/registro-sucesso', AuthController::class, 'showRegistroSucesso');
+$router->addRoute('GET', '/esqueceu-senha', AuthController::class, 'showForgotPasswordForm');// Exibe a página "Esqueci minha senha"
+$router->addRoute('POST', '/solicitar-recuperacao', AuthController::class, 'handleForgotPasswordRequest');
+$router->addRoute('GET', '/redefinir-senha', AuthController::class, 'showResetPasswordForm');// Exibe a página para o usuário definir a nova senha (acessada pelo link no e-mail)
+$router->addRoute('POST', '/atualizar-senha', AuthController::class, 'handleResetPassword');
 
 // --- Rotas de Colaboradores ---
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
