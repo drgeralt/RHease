@@ -32,7 +32,7 @@ class PontoModel
         return $stmt->fetch();
     }
 
-    public function registrarPonto(int $idColaborador, string $dataHoraAtual, string $geolocalizacao): string
+    public function registrarPonto(int $idColaborador, string $dataHoraAtual, string $geolocalizacao, string $caminhoFoto): string
     {
         $pdo = Database::getInstance();
         $dataAtual = date('Y-m-d', strtotime($dataHoraAtual));
@@ -52,26 +52,29 @@ class PontoModel
 
         if ($registroAberto) {
             $sql = "UPDATE folha_ponto SET data_hora_saida = :data_hora,
-                    geolocalizacao = :geolocalizacao
+                    geolocalizacao = :geolocalizacao,
+                    caminho_foto = :caminho_foto
                     WHERE id_registro_ponto = :id_registro";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 ':data_hora' => $dataHoraAtual,
                 ':geolocalizacao' => $geolocalizacao,
+                ':caminho_foto' => $caminhoFoto,
                 ':id_registro' => $registroAberto['id_registro_ponto']
             ]);
             return 'saida';
         }
         else {
-            $sql = "INSERT INTO folha_ponto (id_colaborador, data_hora_entrada, geolocalizacao) 
-                    VALUES (:id_colaborador, :data_hora, :geolocalizacao)";
+            $sql = "INSERT INTO folha_ponto (id_colaborador, data_hora_entrada, geolocalizacao, caminho_foto) 
+                    VALUES (:id_colaborador, :data_hora, :geolocalizacao, :caminho_foto)";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 ':id_colaborador' => $idColaborador,
                 ':data_hora' => $dataHoraAtual,
-                ':geolocalizacao' => $geolocalizacao
+                ':geolocalizacao' => $geolocalizacao,
+                ':caminho_foto' => $caminhoFoto
             ]);
             return 'entrada';
         }

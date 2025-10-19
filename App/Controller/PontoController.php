@@ -53,14 +53,22 @@ class PontoController
             $dataHoraAtual = date('Y-m-d H:i:s', $timestamp);
             $geolocalizacao = $_POST['geolocalizacao'] ?? 'Não informada';
             $nomeArquivo = $idColaborador . '_' . $timestamp . '.jpg';
-            $caminhoCompleto = BASE_PATH . '/storage/fotos_ponto/' . $nomeArquivo;
+            $caminhoRelativo = 'storage/fotos_ponto/' . $nomeArquivo;
+            $caminhoCompleto = BASE_PATH . '/' . $caminhoRelativo;
+            $diretorioFotos = dirname($caminhoCompleto);
+
+            if (!is_dir($diretorioFotos)) {
+                if (!mkdir($diretorioFotos, 0775, true)) {
+                    throw new Exception("Falha ao criar diretório 'RHease/storage/fotos_ponto'!");
+                };
+            }
 
             if (file_put_contents($caminhoCompleto, $imgData) === false) {
-                throw new Exception('Falha ao guardar a imagem no servidor. Verifique as permissões da pasta storage.');
+                throw new Exception('Falha ao guardar a imagem no servidor. Verifique as permissões da pasta /storage.');
             }
 
             $pontoModel = new PontoModel();
-            $tipoDeRegisto = $pontoModel->registrarPonto($idColaborador, $dataHoraAtual, $geolocalizacao);
+            $tipoDeRegisto = $pontoModel->registrarPonto($idColaborador, $dataHoraAtual, $geolocalizacao, $caminhoRelativo);
 
             echo json_encode([
                 'status' => 'success',
