@@ -1,5 +1,6 @@
 <?php
-
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 ini_set('display_errors', 1);
@@ -58,8 +59,11 @@ $router->addRoute('GET', '/beneficios', BeneficioController::class, 'gerenciamen
 $router->addRoute('POST', '/beneficios/criar', BeneficioController::class, 'criar');
 $router->addRoute('POST', '/beneficios/editar', BeneficioController::class, 'editar');
 $router->addRoute('GET', '/beneficios/desativar/{id}', BeneficioController::class, 'desativar');
+$router->addRoute('POST', '/beneficios/deletar', BeneficioController::class, 'deletarBeneficio');
 $router->addRoute('POST', '/beneficios/salvar', BeneficioController::class, 'salvarBeneficio'); 
 $router->addRoute('POST', '/colaborador/beneficios/salvar', BeneficioController::class, 'salvarBeneficiosColaborador');
+$router->addRoute('POST', '/beneficios/regras/salvar', BeneficioController::class, 'salvarRegrasAtribuicao');
+$router->addRoute('POST', '/beneficios/toggleStatus', BeneficioController::class, 'toggleStatus');
 
 
 $router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios'); 
