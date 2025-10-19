@@ -1,13 +1,20 @@
 <?php
 namespace App\Model;
+
 use PDO;
 use PDOException;
+use InvalidArgumentException;
 
+/**
+ * Classe BeneficioModel
+ *
+ * Responsável por toda a interação de dados e lógica de negócio
+ * relacionada à feature de Benefícios.
+ */
 class BeneficioModel {
     private $pdo;
 
     public function __construct() {
-        // ... (Seu código de conexão com PDO)
         $host = 'localhost';
         $user = 'root';
         $password = '';
@@ -17,142 +24,138 @@ class BeneficioModel {
             $this->pdo = new PDO("mysql:host=$host;dbname=$database;charset=utf8", $user, $password);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            // Em ambiente de produção, não exibir detalhes do erro
-            throw new \Exception("Falha na Conexão com o Banco de Dados: " . $e->getMessage()); 
+            // Em um ambiente de produção, logue o erro em vez de exibi-lo.
+            throw new \Exception("Falha na Conexão com o Banco de Dados.");
         }
     }
 
     // ===================================
-    // FUNÇÕES DE CATÁLOGO (CRUD BÁSICO)
+    // MÉTODOS DE LEITURA (READ)
     // ===================================
 
-    // Lista todos os benefícios com valor fixo para a tabela de gerenciamento
-    public function listarBeneficiosComCusto() {
-    $stmt = $this->pdo->query("
-        SELECT 
-            id_beneficio, 
-            nome, 
-            categoria, 
-            tipo_valor, 
-            custo_padrao_empresa AS valor_fixo, 
-            status
-        FROM beneficios_catalogo
-        ORDER BY nome ASC
-    ");
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+    public function listarBeneficiosComCusto(): array {
+        $stmt = $this->pdo->query("
+            SELECT id_beneficio, nome, categoria, tipo_valor, custo_padrao_empresa AS valor_fixo, status
+            FROM beneficios_catalogo ORDER BY nome ASC
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-    // Cria/Edita um benefício (Lógica de UPSET)
-    public function salvarBeneficio($id, $nome, $categoria, $tipo_valor, $valor_fixo) {
-    $this->pdo->beginTransaction();
-    try {
+    public function listarBeneficiosAtivosParaSelecao(): array {
+        $stmt = $this->pdo->query("SELECT id_beneficio, nome FROM beneficios_catalogo WHERE status = 'Ativo' ORDER BY nome");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function listarRegrasAtribuicao(): array {
+        $sql = "
+            SELECT rb.tipo_contrato, 
+                   GROUP_CONCAT(bc.nome ORDER BY bc.nome SEPARATOR ', ') as nomes_beneficios,
+                   GROUP_CONCAT(bc.id_beneficio ORDER BY bc.nome SEPARATOR ',') as ids_beneficios
+            FROM regras_beneficios rb
+            JOIN beneficios_catalogo bc ON rb.id_beneficio = bc.id_beneficio
+            WHERE bc.status = 'Ativo' GROUP BY rb.tipo_contrato
+        ";
+        $stmt = $this->pdo->query($sql);
+        $regras = [];
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $regras[$row['tipo_contrato']] = [
+                'nomes' => explode(', ', $row['nomes_beneficios'] ?? ''),
+                'ids' => explode(',', $row['ids_beneficios'] ?? '')
+            ];
+        }
+        return $regras;
+    }
+
+    public function buscarColaborador(string $termo): array {
+        $termoLike = "%" . $termo . "%";
+        $sql = "SELECT id_colaborador, nome_completo, matricula FROM colaborador WHERE nome_completo LIKE :termo1 OR matricula LIKE :termo2 LIMIT 5";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':termo1' => $termoLike, ':termo2' => $termoLike]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function carregarBeneficiosColaborador(int $id_colaborador): array {
+        $sql_colab = "SELECT id_colaborador, nome_completo, matricula, tipo_contrato FROM colaborador WHERE id_colaborador = :id";
+        $stmt_colab = $this->pdo->prepare($sql_colab);
+        $stmt_colab->execute([':id' => $id_colaborador]);
+        $dados_colaborador = $stmt_colab->fetch(PDO::FETCH_ASSOC);
+
+        if (!$dados_colaborador) {
+            throw new \Exception("Colaborador não encontrado.");
+        }
+
+        $sql_excecoes = "SELECT id_beneficio FROM colaborador_beneficio WHERE id_colaborador = :id";
+        $stmt_excecoes = $this->pdo->prepare($sql_excecoes);
+        $stmt_excecoes->execute([':id' => $id_colaborador]);
+
+        $beneficios_ids = $stmt_excecoes->fetchAll(PDO::FETCH_COLUMN, 0);
+
+        return [
+            'dados_colaborador' => $dados_colaborador,
+            'beneficios_ids' => $beneficios_ids
+        ];
+    }
+
+    // ===================================
+    // MÉTODOS DE ESCRITA E LÓGICA DE NEGÓCIO
+    // ===================================
+
+    public function salvarBeneficio(?int $id, string $nome, string $categoria, string $tipo_valor, ?float $valor_fixo): int {
+        if (empty(trim($nome)) || empty($categoria) || empty($tipo_valor)) {
+            throw new InvalidArgumentException("Nome, categoria e tipo de valor são obrigatórios.");
+        }
+        if ($tipo_valor === 'Fixo' && $valor_fixo === null) {
+            throw new InvalidArgumentException("Para benefícios do tipo 'Fixo', o valor é obrigatório.");
+        }
+
+        $custo = ($tipo_valor === 'Fixo') ? $valor_fixo : null;
+
         if ($id) {
-            // Edição
-            $stmt = $this->pdo->prepare("
-                UPDATE beneficios_catalogo 
-                SET nome = :nome, categoria = :categoria, tipo_valor = :tipo_valor,
-                    custo_padrao_empresa = :custo
-                WHERE id_beneficio = :id
-            ");
-            $stmt->execute([
-                ':nome' => $nome,
-                ':categoria' => $categoria,
-                ':tipo_valor' => $tipo_valor,
-                ':custo' => ($tipo_valor === 'Fixo') ? $valor_fixo : null,
-                ':id' => $id
-            ]);
+            $stmt = $this->pdo->prepare("UPDATE beneficios_catalogo SET nome = :nome, categoria = :categoria, tipo_valor = :tipo_valor, custo_padrao_empresa = :custo WHERE id_beneficio = :id");
+            $stmt->execute([':nome' => $nome, ':categoria' => $categoria, ':tipo_valor' => $tipo_valor, ':custo' => $custo, ':id' => $id]);
         } else {
-            // Criação
-            $stmt = $this->pdo->prepare("
-                INSERT INTO beneficios_catalogo 
-                (nome, categoria, tipo_valor, custo_padrao_empresa, status)
-                VALUES (:nome, :categoria, :tipo_valor, :custo, 'Ativo')
-            ");
-            $stmt->execute([
-                ':nome' => $nome,
-                ':categoria' => $categoria,
-                ':tipo_valor' => $tipo_valor,
-                ':custo' => ($tipo_valor === 'Fixo') ? $valor_fixo : null
-            ]);
+            $stmt = $this->pdo->prepare("INSERT INTO beneficios_catalogo (nome, categoria, tipo_valor, custo_padrao_empresa, status) VALUES (:nome, :categoria, :tipo_valor, :custo, 'Ativo')");
+            $stmt->execute([':nome' => $nome, ':categoria' => $categoria, ':tipo_valor' => $tipo_valor, ':custo' => $custo]);
             $id = $this->pdo->lastInsertId();
         }
-
-        $this->pdo->commit();
         return $id;
-    } catch (PDOException $e) {
-        $this->pdo->rollBack();
-        throw new \Exception("Erro ao salvar benefício: " . $e->getMessage());
     }
-}
 
-
-    // Deleta um benefício (incluindo dependências)
-    public function deletarBeneficio($id) {
+    public function deletarBeneficio(int $id): bool {
         $this->pdo->beginTransaction();
         try {
-            // 1. Deletar de regras_beneficios
-            $stmt_regras = $this->pdo->prepare("DELETE FROM regras_beneficios WHERE id_beneficio = :id");
-            $stmt_regras->execute([':id' => $id]);
-            
-            // 2. Deletar de colaborador_beneficio (Exceções)
-            $stmt_colab_beneficio = $this->pdo->prepare("DELETE FROM colaborador_beneficio WHERE id_beneficio = :id");
-            $stmt_colab_beneficio->execute([':id' => $id]);
-            
-            // 3. Deletar de beneficio (Custo)
-            // 1. Deletar regras e exceções
-            $stmt_regras = $this->pdo->prepare("DELETE FROM regras_beneficios WHERE id_beneficio = :id");
-            $stmt_regras->execute([':id' => $id]);
-
-            $stmt_colab = $this->pdo->prepare("DELETE FROM colaborador_beneficio WHERE id_beneficio = :id");
-            $stmt_colab->execute([':id' => $id]);
-
-            // 2. Deletar o benefício do catálogo
-            $stmt_catalogo = $this->pdo->prepare("DELETE FROM beneficios_catalogo WHERE id_beneficio = :id");
-            $stmt_catalogo->execute([':id' => $id]);
-
-
+            $this->pdo->prepare("DELETE FROM regras_beneficios WHERE id_beneficio = :id")->execute([':id' => $id]);
+            $this->pdo->prepare("DELETE FROM colaborador_beneficio WHERE id_beneficio = :id")->execute([':id' => $id]);
+            $this->pdo->prepare("DELETE FROM beneficios_catalogo WHERE id_beneficio = :id")->execute([':id' => $id]);
             $this->pdo->commit();
             return true;
-
         } catch (PDOException $e) {
             $this->pdo->rollBack();
             throw new \Exception("Erro ao deletar benefício: " . $e->getMessage());
         }
     }
 
-    // Altera status (Ativo/Inativo)
-    public function toggleStatus($id) {
+    public function toggleStatus(int $id): string {
         $stmt_status = $this->pdo->prepare("SELECT status FROM beneficios_catalogo WHERE id_beneficio = :id");
         $stmt_status->execute([':id' => $id]);
         $status_atual = $stmt_status->fetchColumn();
-        
+
+        if (!$status_atual) {
+            throw new \Exception("Benefício com ID $id não encontrado.");
+        }
+
         $novo_status = ($status_atual === 'Ativo') ? 'Inativo' : 'Ativo';
 
         $stmt_update = $this->pdo->prepare("UPDATE beneficios_catalogo SET status = :status WHERE id_beneficio = :id");
         $stmt_update->execute([':status' => $novo_status, ':id' => $id]);
-        
+
         return $novo_status;
     }
-    
-    // Lista benefícios com ID e Nome para usar no modal de regras/colaborador
-    public function listarBeneficiosAtivosParaSelecao() {
-        $stmt = $this->pdo->query("SELECT id_beneficio, nome FROM beneficios_catalogo WHERE status = 'Ativo' ORDER BY nome");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    // ===================================
-    // FUNÇÕES DE REGRAS DE ATRIBUIÇÃO
-    // ===================================
 
-    // Salva/Substitui as regras para um tipo de contrato
-    public function salvarRegrasAtribuicao($tipoContrato, $beneficios_ids) {
+    public function salvarRegrasAtribuicao(string $tipoContrato, array $beneficios_ids): bool {
         $this->pdo->beginTransaction();
         try {
-            // 1. DELETAR todas as regras existentes para este tipo de contrato
-            $stmt_delete = $this->pdo->prepare("DELETE FROM regras_beneficios WHERE tipo_contrato = :tipo");
-            $stmt_delete->execute([':tipo' => $tipoContrato]);
-
-            // 2. INSERIR as novas regras
+            $this->pdo->prepare("DELETE FROM regras_beneficios WHERE tipo_contrato = :tipo")->execute([':tipo' => $tipoContrato]);
             if (!empty($beneficios_ids)) {
                 $stmt_insert = $this->pdo->prepare("INSERT INTO regras_beneficios (tipo_contrato, id_beneficio) VALUES (:tipo, :id_beneficio)");
                 foreach ($beneficios_ids as $id_beneficio) {
@@ -167,85 +170,17 @@ class BeneficioModel {
         }
     }
 
-    // Lista todas as regras de atribuição para a tabela de gerenciamento
-    public function listarRegrasAtribuicao() {
-        $sql = "
-            SELECT 
-                rb.tipo_contrato, 
-                GROUP_CONCAT(bc.nome ORDER BY bc.nome SEPARATOR ', ') as nomes_beneficios,
-                GROUP_CONCAT(bc.id_beneficio ORDER BY bc.nome SEPARATOR ',') as ids_beneficios
-            FROM regras_beneficios rb
-            JOIN beneficios_catalogo bc ON rb.id_beneficio = bc.id_beneficio
-            WHERE bc.status = 'Ativo' 
-            GROUP BY rb.tipo_contrato
-        ";
-        $stmt = $this->pdo->query($sql);
-        $regras = [];
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $regras[$row['tipo_contrato']] = [
-                'nomes' => explode(', ', $row['nomes_beneficios']),
-                'ids' => explode(',', $row['ids_beneficios'])
-            ];
-        }
-        return $regras;
-    }
-
-    // ===================================
-    // FUNÇÕES DE COLABORADOR (EXCEÇÕES)
-    // ===================================
-
-    // Busca colaboradores por termo (nome ou matrícula)
-    public function buscarColaborador($termo) {
-        $termo = "%" . $termo . "%";
-        $sql = "SELECT id_colaborador, nome_completo, matricula FROM colaborador WHERE nome_completo LIKE :termo1 OR matricula LIKE :termo2 LIMIT 5";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':termo1' => $termo, ':termo2' => $termo]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    // Carrega dados do colaborador e seus benefícios manuais (exceções)
-    public function carregarBeneficiosColaborador($id_colaborador) {
-        // 1. Buscar os dados básicos do colaborador
-        $sql_colab = "SELECT id_colaborador, nome_completo, matricula, tipo_contrato FROM colaborador WHERE id_colaborador = :id";
-        $stmt_colab = $this->pdo->prepare($sql_colab);
-        $stmt_colab->execute([':id' => $id_colaborador]);
-        $dados_colaborador = $stmt_colab->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$dados_colaborador) {
-            throw new \Exception("Colaborador não encontrado.");
-        }
-
-        // 2. Buscar os IDs dos benefícios salvos como EXCEÇÃO
-        $sql_excecoes = "SELECT id_beneficio FROM colaborador_beneficio WHERE id_colaborador = :id";
-        $stmt_excecoes = $this->pdo->prepare($sql_excecoes);
-        $stmt_excecoes->execute([':id' => $id_colaborador]);
-        
-        $beneficios_ids = $stmt_excecoes->fetchAll(PDO::FETCH_COLUMN, 0);
-        
-        return [
-            'dados_colaborador' => $dados_colaborador,
-            'beneficios_ids' => $beneficios_ids
-        ];
-    }
-    
-    // Salva as atribuições manuais (exceções) de um colaborador
-    public function salvarBeneficiosColaborador($id_colaborador, $beneficios_ids) {
+    public function salvarBeneficiosColaborador(int $id_colaborador, array $beneficios_ids): bool {
         $this->pdo->beginTransaction();
         try {
-            // 1. DELETAR todas as atribuições manuais existentes (REGISTROS DE EXCEÇÃO)
-            $stmt_delete = $this->pdo->prepare("DELETE FROM colaborador_beneficio WHERE id_colaborador = :id");
-            $stmt_delete->execute([':id' => $id_colaborador]);
+            $this->pdo->prepare("DELETE FROM colaborador_beneficio WHERE id_colaborador = :id")->execute([':id' => $id_colaborador]);
 
-            // 2. INSERIR as novas exceções selecionadas
             if (!empty($beneficios_ids)) {
                 $stmt_insert = $this->pdo->prepare("INSERT INTO colaborador_beneficio (id_colaborador, id_beneficio) VALUES (:id_colaborador, :id_beneficio)");
-                
                 foreach ($beneficios_ids as $id_beneficio) {
-                    // Nota: O seu acoes_beneficio.php não estava salvando valor_especifico, então mantemos a simplificação.
                     $stmt_insert->execute([':id_colaborador' => $id_colaborador, ':id_beneficio' => (int)$id_beneficio]);
                 }
             }
-            
             $this->pdo->commit();
             return true;
         } catch (PDOException $e) {
@@ -253,42 +188,35 @@ class BeneficioModel {
             throw new \Exception("Erro ao salvar benefícios manuais: " . $e->getMessage());
         }
     }
-    
-    // Aplica regras padrão (Usada no cadastro de colaborador, por exemplo)
-    public function aplicarRegrasPadrao($idColaborador) {
-        // --- 1. BUSCAR O TIPO DE CONTRATO ---
-        $sqlTipo = "SELECT tipo_contrato FROM colaborador WHERE id_colaborador = :id";
-        $stmtTipo = $this->pdo->prepare($sqlTipo);
+
+    public function aplicarRegrasPadrao(int $idColaborador): bool {
+        $stmtTipo = $this->pdo->prepare("SELECT tipo_contrato FROM colaborador WHERE id_colaborador = :id");
         $stmtTipo->execute([':id' => $idColaborador]);
         $tipoContrato = $stmtTipo->fetchColumn();
-        
+
         if (empty($tipoContrato)) {
-            return true; // Sem regras para aplicar
+            return true;
         }
 
-        // --- 2. BUSCAR AS REGRAS PADRÃO ---
-        $sqlRegras = "SELECT id_beneficio FROM regras_beneficios WHERE tipo_contrato = :tipo";
-        $stmtRegras = $this->pdo->prepare($sqlRegras);
+        $stmtRegras = $this->pdo->prepare("SELECT id_beneficio FROM regras_beneficios WHERE tipo_contrato = :tipo");
         $stmtRegras->execute([':tipo' => $tipoContrato]);
-        $regras = $stmtRegras->fetchAll(PDO::FETCH_COLUMN, 0);
+        $regras_ids = $stmtRegras->fetchAll(PDO::FETCH_COLUMN, 0);
 
-        if (empty($regras)) {
-            return true; // Sem regras no catálogo para este tipo
+        if (empty($regras_ids)) {
+            return true;
         }
-        
-        // --- 3. INSERIR OS BENEFÍCIOS ---
+
         $this->pdo->beginTransaction();
         try {
-            $sqlInsert = "INSERT INTO colaborador_beneficio (id_colaborador, id_beneficio) VALUES (:id_colaborador, :id_beneficio)";
-            $stmtInsert = $this->pdo->prepare($sqlInsert);
+            // Garante que não haja duplicatas, limpando antes (opcional, mas seguro)
+            $this->pdo->prepare("DELETE FROM colaborador_beneficio WHERE id_colaborador = :id")->execute([':id' => $idColaborador]);
 
-            foreach ($regras as $idBeneficio) {
-                // valor_especifico é NULL ou tem um padrão, aqui simplificado
+            $stmtInsert = $this->pdo->prepare("INSERT INTO colaborador_beneficio (id_colaborador, id_beneficio) VALUES (:id_colaborador, :id_beneficio)");
+            foreach ($regras_ids as $idBeneficio) {
                 $stmtInsert->execute([':id_colaborador' => $idColaborador, ':id_beneficio' => (int)$idBeneficio]);
             }
             $this->pdo->commit();
             return true;
-            
         } catch (PDOException $e) {
             $this->pdo->rollBack();
             throw new \Exception("Erro ao aplicar regras padrão: " . $e->getMessage());

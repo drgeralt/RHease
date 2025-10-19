@@ -208,16 +208,16 @@ $(document).ready(function() {
 
     // --- LÓGICA DO NOVO MODAL DE REGRAS ---
     $(document).on('click', '.editar-regra', function() {
-        const icon = $(this);
-        const tipoContrato = icon.data('tipo-contrato'); 
-        const row = icon.closest('tr');
-        const idsAtribuidosString = row.data('beneficios-ids');
+        const row = $(this).closest('tr');
+        const tipoContrato = row.data('tipo-contrato');
+
+        const idsString = row.attr('data-beneficios-ids');
 
         let idsAtribuidos = [];
-        if (idsAtribuidosString) {
-            idsAtribuidos = idsAtribuidosString.split(',')
-                .map(id => parseInt(id.trim()))
-                .filter(id => !isNaN(id) && id > 0);
+        if (idsString && idsString.length > 0) {
+            idsAtribuidos = idsString.split(',')            // Agora é 100% seguro usar .split()
+                .map(id => parseInt(id.trim()))             // Converte cada item para número
+                .filter(id => !isNaN(id) && id > 0);        // Remove itens que não são números válidos
         }
 
         // 1. ATUALIZA O MODAL
