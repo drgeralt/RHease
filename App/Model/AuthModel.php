@@ -35,7 +35,7 @@ class AuthModel
 
         try {
             $mail->isSMTP();
-            $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+            //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
             $mail->Host       = $_ENV['MAIL_HOST'];
             $mail->SMTPAuth   = true;
             $mail->Username   = $_ENV['MAIL_USERNAME'];
@@ -106,7 +106,7 @@ class AuthModel
 
     public function activateAccount(string $token): array
     {
-        // ... (código do activateAccount existente, sem alterações)
+
         $tokenHash = hash('sha256', $token);
         $sql = "SELECT id_colaborador, token_expiracao FROM colaborador WHERE token_verificacao = :token AND status_conta = 'pendente_verificacao'";
         $stmt = $this->db->prepare($sql);
@@ -128,30 +128,99 @@ class AuthModel
         return ['success' => true, 'message' => 'Conta ativada com sucesso! Você já pode fazer login.'];
     }
 
+    /**
+     * Processa a tentativa de login do usuário, incluindo proteção contra força bruta.
+     * Versão Final Simplificada - Usa MySQL para verificar o bloqueio.
+     */
     public function loginUser(string $email, string $senha): array
     {
-        // ... (código do loginUser existente, sem alterações)
-        $sql = "SELECT id_colaborador, senha, status_conta FROM colaborador WHERE email_profissional = :email";
+        // Definir limites
+        $maxAttempts = 5;
+        $lockoutTimeMinutes = 15;
+
+        // --- BUSCA O UTILIZADOR E VERIFICA/CALCULA BLOQUEIO DIRETAMENTE NA CONSULTA ---
+        $sql = "SELECT
+                    id_colaborador,
+                    senha,
+                    status_conta,
+                    failed_login_attempts,
+                    last_failed_login_at,
+                    -- Verifica se está bloqueado
+                    (failed_login_attempts >= :max_attempts AND last_failed_login_at IS NOT NULL AND last_failed_login_at > DATE_SUB(NOW(), INTERVAL :lockout_minutes MINUTE)) AS is_locked,
+                    -- Calcula minutos restantes (se bloqueado), arredondando para cima
+                    CEIL(TIMESTAMPDIFF(SECOND, NOW(), DATE_ADD(last_failed_login_at, INTERVAL :lockout_minutes MINUTE)) / 60) AS minutes_remaining
+                FROM colaborador
+                WHERE email_profissional = :email";
+
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([':email' => $email]);
+        $stmt->bindValue(':max_attempts', $maxAttempts, PDO::PARAM_INT);
+        $stmt->bindValue(':lockout_minutes', $lockoutTimeMinutes, PDO::PARAM_INT);
+        $stmt->bindValue(':email', $email);
+        $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$user) {
             return ['status' => 'error', 'message' => 'E-mail ou senha inválidos.'];
         }
 
+        // --- VERIFICA SE A CONTA ESTÁ BLOQUEADA (CONFORME CALCULADO PELO MYSQL) ---
+        if ($user['is_locked']) {
+            // Usa o valor calculado pelo MySQL. Garante que seja pelo menos 1 minuto.
+            $remainingMinutes = max(1, (int)$user['minutes_remaining']); // Pega o valor da query
+            error_log("Tentativa de login bloqueada (MySQL check) para {$email}. Tempo restante (MySQL calc): {$remainingMinutes} min.");
+            return ['status' => 'error', 'message' => "Muitas tentativas falhadas. Tente novamente em {$remainingMinutes} minuto(s)."];
+        }
+        // --- FIM DA VERIFICAÇÃO DE BLOQUEIO ---
+
+
+        // Se chegou aqui, a conta NÃO está bloqueada. Verifica a senha.
         if (password_verify($senha, $user['senha'])) {
+            // Senha correta
             if ($user['status_conta'] === 'ativo') {
+                if ($user['failed_login_attempts'] > 0 || $user['last_failed_login_at'] !== null) {
+                    $this->resetLoginAttempts($user['id_colaborador']);
+                }
                 return ['status' => 'success', 'user_id' => $user['id_colaborador']];
             }
-            if ($user['status_conta'] === 'pendente_verificacao') {
-                return ['status' => 'error', 'message' => 'Sua conta ainda não foi ativada. Verifique seu e-mail.'];
+            // ... (código para status pendente/inativo) ...
+            if ($user['status_conta'] === 'pendente_verificacao') { return ['status' => 'error', 'message' => 'Sua conta ainda não foi ativada. Verifique seu e-mail.']; }
+            return ['status' => 'error', 'message' => 'Conta inativa ou com problemas. Contacte o suporte.'];
+
+        } else {
+            // --- SENHA INCORRETA ---
+            $newAttemptCount = ($user['failed_login_attempts'] ?? 0) + 1;
+            $this->incrementFailedLoginAttempts($user['id_colaborador']);
+
+            if ($newAttemptCount >= $maxAttempts) {
+                error_log("Conta bloqueada para {$email} após {$newAttemptCount} tentativas.");
+                return ['status' => 'error', 'message' => "E-mail ou senha inválidos. Sua conta foi bloqueada por $lockoutTimeMinutes minutos devido a muitas tentativas falhadas."];
+            } else {
+                $attemptsLeft = $maxAttempts - $newAttemptCount;
+                $plural = ($attemptsLeft !== 1) ? 's' : '';
+                return ['status' => 'error', 'message' => "E-mail ou senha inválidos. Você tem mais $attemptsLeft tentativa{$plural} antes do bloqueio."];
             }
         }
-        return ['status' => 'error', 'message' => 'E-mail ou senha inválidos.'];
     }
 
-    // --- NOVOS MÉTODOS PARA RECUPERAÇÃO DE SENHA ---
+    // Mantenha estes métodos como públicos
+    public function incrementFailedLoginAttempts(int $userId): void {
+        try {
+            $sql = "UPDATE colaborador SET failed_login_attempts = failed_login_attempts + 1, last_failed_login_at = CURRENT_TIMESTAMP WHERE id_colaborador = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id' => $userId]);
+        } catch (PDOException $e) { error_log("Erro ao incrementar tentativas para user ID $userId: " . $e->getMessage()); }
+    }
+
+    public function resetLoginAttempts(int $userId): void {
+        try {
+            $sql = "UPDATE colaborador SET failed_login_attempts = 0, last_failed_login_at = NULL WHERE id_colaborador = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id' => $userId]);
+        } catch (PDOException $e) { error_log("Erro ao resetar tentativas para user ID $userId: " . $e->getMessage()); }
+    }
+
+
+    // --- MÉTODOS PARA RECUPERAÇÃO DE SENHA ---
 
     private function sendPasswordResetEmail(string $email, string $token): void
     {
