@@ -14,7 +14,7 @@
 <main class="content-container">
 
     <h2 style="color: #25621C; font-weight: 600;">
-        Meus Holerites - <?php echo isset($colaborador) ? htmlspecialchars($colaborador['nome_completo']) : 'Colaborador'; ?>
+        Meus Holerites - <?php echo (!empty($colaborador) && isset($colaborador['nome_completo'])) ? htmlspecialchars($colaborador['nome_completo']) : 'Colaborador'; ?>
     </h2>
 
     <section>
