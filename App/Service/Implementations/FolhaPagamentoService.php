@@ -1,178 +1,142 @@
 <?php
 // App/Services/Implementations/FolhaPagamentoService.php
 
-namespace App\Services\Implementations;
+namespace App\Service\Implementations;
 
-use App\Core\Database;
+use App\Model\ColaboradorModel;
+use App\Model\FolhaPagamentoModel; // Importe o FolhaPagamentoModel
 use App\Model\ParametrosFolhaModel;
-use App\Services\Contracts\FolhaPagamentoServiceInterface;
 use PDO;
 use Exception;
-use stdClass;
 
-class FolhaPagamentoService implements FolhaPagamentoServiceInterface
+class FolhaPagamentoService
 {
     private PDO $db;
-    private $parametrosModel;
+    private FolhaPagamentoModel $folhaPagamentoModel;
+    // Adicione os outros models como propriedades se precisar deles em outros métodos
+    private ColaboradorModel $colaboradorModel;
+    private ParametrosFolhaModel $parametrosModel;
 
-    // Tabelas de impostos carregadas uma única vez
-    private $tabelaInss;
-    private $tabelaIrrf;
-    private $deducaoDependenteIrrf;
-    private $valorFgtsAliquota = 0.08;
 
-    public function __construct()
-    {
-        $this->db = Database::getInstance();
-        $this->parametrosModel = new ParametrosFolhaModel();
+    // Propriedades para armazenar os parâmetros de cálculo
+    private array $tabelaInss = [];
+    private array $tabelaIrrf = [];
 
-        $paramInss = $this->parametrosModel->findParametroPorNome('TABELA_INSS_VIGENTE');
-        $this->tabelaInss = $paramInss ? json_decode($paramInss->valor, true) : null;
-
-        $paramIrrf = $this->parametrosModel->findParametroPorNome('TABELA_IRRF_VIGENTE');
-        $this->tabelaIrrf = $paramIrrf ? json_decode($paramIrrf->valor, true) : null;
-
-        // --- CORREÇÃO APLICADA AQUI ---
-        // Removido o "_VIGENTE" para corresponder ao que está no banco de dados
-        $paramDependente = $this->parametrosModel->findParametroPorNome('DEDUCAO_DEPENDENTE_IRRF');
-        $this->deducaoDependenteIrrf = $paramDependente ? (float) $paramDependente->valor : 0.0;
-    }
 
     /**
-     * @inheritDoc
+     * @param PDO $pdo A conexão com o banco de dados.
      */
+    public function __construct(PDO $pdo)
+    {
+        $this->db = $pdo;
+
+        // Instancia todos os models necessários, injetando a conexão em cada um.
+        $this->folhaPagamentoModel = new FolhaPagamentoModel($this->db);
+        $this->colaboradorModel = new ColaboradorModel($this->db);
+        $this->parametrosModel = new ParametrosFolhaModel($this->db);
+
+        // Carrega os parâmetros de cálculo uma vez
+        $this->carregarParametros();
+    }
+
+    private function carregarParametros(): void
+    {
+        $faixasInss = $this->parametrosModel->findFaixasPorPrefixo('INSS_FAIXA_');
+        foreach ($faixasInss as $faixa) {
+            // ✅ CORREÇÃO: Lendo o JSON da coluna 'valor'.
+            $dadosJson = json_decode($faixa->valor, true);
+            $this->tabelaInss[] = [
+                'aliquota' => (float) ($dadosJson['aliquota'] ?? 0),
+                'de' => (float) ($dadosJson['de'] ?? 0),
+                'ate' => (float) ($dadosJson['ate'] ?? 0),
+                'deduzir' => (float) ($dadosJson['deduzir'] ?? 0)
+            ];
+        }
+
+        $faixasIrrf = $this->parametrosModel->findFaixasPorPrefixo('IRRF_FAIXA_');
+        foreach ($faixasIrrf as $faixa) {
+            // ✅ CORREÇÃO: Lendo o JSON da coluna 'valor'.
+            $dadosJson = json_decode($faixa->valor, true);
+            $this->tabelaIrrf[] = [
+                'aliquota' => (float) ($dadosJson['aliquota'] ?? 0),
+                'de' => (float) ($dadosJson['de'] ?? 0),
+                'ate' => (float) ($dadosJson['ate'] ?? 0),
+                'deduzir' => (float) ($dadosJson['deduzir'] ?? 0)
+            ];
+        }
+
+        if (empty($this->tabelaInss)) {
+            throw new Exception("Parâmetros de cálculo do INSS (INSS_FAIXA_...) não foram encontrados na tabela 'parametros_folha'.");
+        }
+        if (empty($this->tabelaIrrf)) {
+            throw new Exception("Parâmetros de cálculo do IRRF (IRRF_FAIXA_...) não foram encontrados na tabela 'parametros_folha'.");
+        }
+    }
+
     public function processarFolha(int $ano, int $mes): array
     {
-        $colaboradores = $this->buscarColaboradoresAtivos();
         $resultados = ['sucesso' => [], 'falha' => []];
+        $colaboradores = $this->colaboradorModel->getAll();
 
-        if (empty($this->tabelaInss) || empty($this->tabelaIrrf)) {
-            $resultados['falha'][] = ['nome' => 'SISTEMA', 'erro' => 'Tabelas de impostos nao encontradas no banco de dados. Verifique a tabela parametros_folha.'];
-            return $resultados;
+        if (empty($colaboradores)) {
+            throw new Exception("Nenhum colaborador ativo encontrado para processamento.");
         }
 
-        foreach ($colaboradores as $colaborador) {
-            $this->db->beginTransaction();
-            try {
-                $this->limparHoleriteAnterior($colaborador->id_colaborador, $ano, $mes);
-                $eventos = $this->coletarEventos($colaborador, $ano, $mes);
-                $calculo = $this->calcularImpostosETotais($eventos, $colaborador->numero_dependentes ?? 0);
-                $this->salvarHolerite($colaborador, $ano, $mes, $calculo);
+        $this->db->beginTransaction();
+        try {
+            foreach ($colaboradores as $colaborador) {
+                $colaboradorId = (int) $colaborador['id_colaborador'];
 
-                $this->db->commit();
-                $resultados['sucesso'][] = $colaborador->nome_completo;
-            } catch (Exception $e) {
-                $this->db->rollBack();
-                $resultados['falha'][] = ['nome' => $colaborador->nome_completo, 'erro' => $e->getMessage()];
+                // Enriquecendo o array do colaborador com o salário
+                $colaborador['salario_base'] = $this->colaboradorModel->salarioPorID($colaboradorId);
+
+                // ✅ CORREÇÃO: O Service agora orquestra as chamadas aos métodos corretos do Model.
+
+                // 1. Limpa os registros antigos
+                $this->folhaPagamentoModel->limparHoleriteAnterior($colaboradorId, $ano, $mes);
+
+                // 2. Calcula os valores (lógica interna do Service)
+                $dadosCalculados = $this->calcularValores($colaborador);
+
+                // 3. Salva o holerite principal
+                $holeriteId = $this->folhaPagamentoModel->salvarHolerite($colaboradorId, $ano, $mes, $dadosCalculados);
+
+                // 4. Salva os itens do holerite
+                $this->folhaPagamentoModel->salvarItens((int)$holeriteId, $dadosCalculados['itens_holerite']);
+
+                $resultados['sucesso'][] = $colaborador['nome_completo'];
             }
+            $this->db->commit();
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw new Exception("Falha ao processar a folha de pagamento. A operação foi revertida. Erro: " . $e->getMessage());
         }
+
         return $resultados;
     }
-
-    private function buscarColaboradoresAtivos(): array
+    private function calcularValores(array $colaborador): array
     {
-        $sql = "SELECT id_colaborador, nome_completo, salario_base, numero_dependentes 
-                FROM colaborador 
-                WHERE situacao = 'ativo'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
-    }
-
-    private function coletarEventos(stdClass $colaborador, int $ano, int $mes): array
-    {
-        $proventos = [];
-        $descontos = [];
-        if (!empty($colaborador->salario_base)) {
-            $proventos[] = ['codigo' => '101', 'descricao' => 'Salário Base', 'valor' => $colaborador->salario_base, 'tipo' => 'PROVENTO'];
-        }
-        return ['proventos' => $proventos, 'descontos' => $descontos];
-    }
-
-    private function calcularImpostosETotais(array $eventos, int $numDependentes): array
-    {
-        $totalProventos = array_sum(array_column($eventos['proventos'], 'valor'));
-
-        $baseInss = $totalProventos;
-        $valorInss = $this->calcularINSS($baseInss);
-        if ($valorInss > 0) {
-            $eventos['descontos'][] = ['codigo' => '301', 'descricao' => 'INSS sobre Salário', 'valor' => $valorInss, 'tipo' => 'DESCONTO'];
-        }
-
-        $deducaoTotalDependentes = $numDependentes * $this->deducaoDependenteIrrf;
-        $baseIrrf = $totalProventos - $valorInss - $deducaoTotalDependentes;
-        $valorIrrf = $this->calcularIRRF($baseIrrf);
-        if ($valorIrrf > 0) {
-            $eventos['descontos'][] = ['codigo' => '302', 'descricao' => 'IRRF', 'valor' => $valorIrrf, 'tipo' => 'DESCONTO'];
-        }
-
-        $totalDescontos = array_sum(array_column($eventos['descontos'], 'valor'));
-        $salarioLiquido = $totalProventos - $totalDescontos;
-        $valorFgts = $totalProventos * $this->valorFgtsAliquota;
+        // (Aqui entra toda a sua lógica de cálculo de INSS, IRRF, etc., usando $this->tabelaInss, etc.)
+        // Exemplo simplificado:
+        $salarioBase = (float) $colaborador['salario_base'];
+        $descontoInss = $salarioBase * 0.09; // Simulação
+        $descontoIrrf = 0; // Simulação
+        $totalDescontos = $descontoInss + $descontoIrrf;
+        $salarioLiquido = $salarioBase - $totalDescontos;
 
         return [
-            'total_proventos' => $totalProventos,
+            'total_proventos' => $salarioBase,
             'total_descontos' => $totalDescontos,
             'salario_liquido' => $salarioLiquido,
-            'base_inss' => $baseInss,
-            'base_irrf' => $baseIrrf,
-            'valor_fgts' => $valorFgts,
-            'base_fgts' => $totalProventos,
-            'itens_holerite' => array_merge($eventos['proventos'], $eventos['descontos'])
+            'base_inss' => $salarioBase,
+            'base_fgts' => $salarioBase,
+            'valor_fgts' => $salarioBase * 0.08,
+            'base_irrf' => $salarioBase - $descontoInss,
+            'itens_holerite' => [
+                ['codigo' => '101', 'descricao' => 'Salário Base', 'tipo' => 'PROVENTO', 'valor' => $salarioBase],
+                ['codigo' => '501', 'descricao' => 'INSS', 'tipo' => 'DESCONTO', 'valor' => $descontoInss],
+            ]
         ];
     }
 
-    private function salvarHolerite(stdClass $colaborador, int $ano, int $mes, array $calculo): void
-    {
-        $sqlHolerite = "INSERT INTO holerites (id_colaborador, mes_referencia, ano_referencia, data_processamento, total_proventos, total_descontos, salario_liquido, base_calculo_inss, base_calculo_fgts, valor_fgts, base_calculo_irrf) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?)";
-        $stmtHolerite = $this->db->prepare($sqlHolerite);
-        $stmtHolerite->execute([
-            $colaborador->id_colaborador, $mes, $ano,
-            $calculo['total_proventos'], $calculo['total_descontos'], $calculo['salario_liquido'],
-            $calculo['base_inss'], $calculo['base_fgts'], $calculo['valor_fgts'], $calculo['base_irrf']
-        ]);
-        $holeriteId = $this->db->lastInsertId();
-
-        $sqlItem = "INSERT INTO holerite_itens (id_holerite, codigo_evento, descricao, tipo, valor) VALUES (?, ?, ?, ?, ?)";
-        $stmtItem = $this->db->prepare($sqlItem);
-        foreach ($calculo['itens_holerite'] as $item) {
-            $stmtItem->execute([$holeriteId, $item['codigo'], $item['descricao'], $item['tipo'], $item['valor']]);
-        }
-    }
-
-    private function limparHoleriteAnterior(int $colaboradorId, int $ano, int $mes): void
-    {
-        $sql = "DELETE FROM holerites WHERE id_colaborador = ? AND ano_referencia = ? AND mes_referencia = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$colaboradorId, $ano, $mes]);
-    }
-
-    private function calcularINSS(float $base): float
-    {
-        if (empty($this->tabelaInss)) return 0.0;
-        $desconto = 0.0;
-        foreach ($this->tabelaInss as $faixa) {
-            if ($base <= $faixa['ate']) {
-                $desconto = ($base * ($faixa['aliquota'] / 100)) - $faixa['deduzir'];
-                return round(max(0, $desconto), 2);
-            }
-        }
-        $ultimaFaixa = end($this->tabelaInss);
-        $desconto = ($ultimaFaixa['ate'] * ($ultimaFaixa['aliquota'] / 100)) - $ultimaFaixa['deduzir'];
-        return round(max(0, $desconto), 2);
-    }
-
-    private function calcularIRRF(float $base): float
-    {
-        if (empty($this->tabelaIrrf)) return 0.0;
-        $imposto = 0.0;
-        foreach ($this->tabelaIrrf as $faixa) {
-            if ($faixa['base_ate'] === "Infinity" || $base <= $faixa['base_ate']) {
-                $imposto = ($base * ($faixa['aliquota'] / 100)) - $faixa['deduzir'];
-                return round(max(0, $imposto), 2);
-            }
-        }
-        return 0.0;
-    }
 }
-

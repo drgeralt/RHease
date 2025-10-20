@@ -12,7 +12,7 @@ define('BASE_PATH', dirname(__DIR__));
 
 require_once BASE_PATH . '/config.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../'); 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 use App\Controller\ColaboradorController;
@@ -58,7 +58,7 @@ $router->addRoute('POST', '/beneficios/criar', BeneficioController::class, 'cria
 $router->addRoute('POST', '/beneficios/editar', BeneficioController::class, 'editar');
 $router->addRoute('GET', '/beneficios/desativar', BeneficioController::class, 'desativar');
 
-$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios'); 
+$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios');
 
 
 // --- Rotas de Candidatura e IA ---
@@ -79,7 +79,7 @@ $router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redireci
 // ----------------------
 // Rota para a página de listagem de holerites do colaborador
 $router->addRoute('GET', '/meus-holerites', HoleriteController::class, 'index');
-$router->addRoute('GET', '/holerite/pdf', HoleriteController::class, 'gerarPDF');
+$router->addRoute('POST', '/holerite/pdf', HoleriteController::class, 'gerarPDF');
 
 $router->addRoute('GET', '/folha/processar', FolhaPagamentoController::class, 'index');
 $router->addRoute('POST', '/folha/processar', FolhaPagamentoController::class, 'processar');
