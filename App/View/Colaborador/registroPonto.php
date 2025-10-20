@@ -63,8 +63,6 @@
                 <button id="register-button" class="register-btn">
                     <?php echo (isset($horaEntrada) && $horaEntrada) ? 'REGISTAR SAÍDA' : 'REGISTAR ENTRADA'; ?>
                 </button>
-
-                <a href="<?php echo BASE_URL; ?>" id="exit-button" class="exit-btn">VOLTAR AO PAINEL</a>
             </div>
         </main>
     </div> </div> <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
