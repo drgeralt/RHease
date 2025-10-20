@@ -39,6 +39,15 @@ class ColaboradorModel extends Model
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function salarioPorID(int $id): float
+    {
+        $sql = "SELECT salario_base FROM colaborador WHERE id_colaborador = :id";
+        $stmt = $this->db_connection->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        $salario = $stmt->fetchColumn();
+        return $salario ? (float) $salario : 0.0;
+    }
 
     public function create(array $data): void
     {
