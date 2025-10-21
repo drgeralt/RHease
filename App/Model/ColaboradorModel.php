@@ -50,6 +50,7 @@ class ColaboradorModel extends Model
     }
 
 
+
     public function create(array $data): void
     {
         $query = "INSERT INTO colaborador (
