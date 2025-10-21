@@ -82,4 +82,10 @@ class Controller
         echo json_encode($response);
         exit;
     }
+    function formatarValor($valor) {
+        if (is_numeric($valor) && $valor > 0) {
+            return 'R$ ' . number_format((float)$valor, 2, ',', '.');
+        }
+        return '';
+    }
 }

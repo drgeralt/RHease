@@ -1,7 +1,7 @@
 /vendor/
-/composer.lock
+composer.lock
 /.env
-/composer.phar
+composer.phar
 /.idea
 /.vscode
-/.gitignore
+.gitignore
