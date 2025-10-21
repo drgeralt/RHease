@@ -2,8 +2,7 @@
 namespace App\Controller;
 
 use App\Model\BeneficioModel;
-use App\Core\Controller; // Supondo que você tenha um Controller base
-use JetBrains\PhpStorm\NoReturn;
+use App\Core\Controller;
 
 class BeneficioController extends Controller {
     private $model;
@@ -199,5 +198,26 @@ class BeneficioController extends Controller {
             error_log("Erro ao salvar benefícios do colaborador: " . $e->getMessage());
             return $this->jsonResponse(false, 'Ocorreu um erro ao salvar. Por favor, contate o suporte.', null, 500);
         }
+    }
+    public function meusBeneficios() {
+        // A lógica de sessão deve ser centralizada, mas por agora, isso funciona.
+        session_start();
+        $id_colaborador_logado = $_SESSION['id_colaborador'] ?? null;
+
+        if (!$id_colaborador_logado) {
+            header('Location: ' . BASE_URL); // Redireciona se não estiver logado
+            exit();
+        }
+
+        // 1. Controller chama o Model para buscar os dados
+        $dados = $this->model->buscarBeneficiosParaColaborador($id_colaborador_logado);
+        $lista_beneficios = $dados['beneficios'];
+        $nome_colaborador = $dados['nome']; // Passa o nome para a View
+
+        // 2. Controller carrega a View e passa as variáveis para ela
+        return $this->view('Beneficios/meus_beneficios', [
+            'lista_beneficios' => $lista_beneficios,
+            'nome_colaborador' => $nome_colaborador
+        ]);
     }
 }
