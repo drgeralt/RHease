@@ -14,62 +14,62 @@ class ColaboradorController extends Controller
 {
     public function criar(): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/colaboradores/adicionar');
+            exit;
+        }
+
         $post = $_POST;
         $pdo = Database::getInstance();
 
         $pdo->beginTransaction();
 
         try {
+            // 1. Cria ou encontra Endereço, Cargo e Setor
             $enderecoModel = new EnderecoModel($pdo);
             $idEndereco = $enderecoModel->create($post);
 
             $cargoModel = new CargoModel($pdo);
-            $idCargo = $cargoModel->findOrCreateByName($post['cargo']);
+            $salario = (float)str_replace(['.', ','], ['', '.'], $post['salario'] ?? 0);
+            $idCargo = $cargoModel->findOrCreateByName($post['cargo'], $salario);
 
             $setorModel = new SetorModel($pdo);
-            $idSetor = $setorModel->findOrCreateByName($post['departamento']);
+            $idSetor = $setorModel->findOrCreateByName($post['setor']);
 
+            // 2. Monta o array de dados APENAS para a tabela 'colaborador'
             $dadosColaborador = [
-                'id_colaborador' => (int)($_POST['id_colaborador'] ?? 0),
-                'nome_completo' => $_POST['nome'] ?? '',
-                'data_nascimento' => $_POST['data_nascimento'] ?? null,
-                'genero' => $_POST['genero'] ?? null,
-                'email_pessoal' => $_POST['email'] ?? '',
-                'email_profissional' => $_POST['email_corporativo'] ?? '',
-                'telefone' => $_POST['telefone'] ?? '',
-                'situacao' => $_POST['situacao'] ?? 'ativo',
-                'data_admissao' => $_POST['data_admissao'] ?? null,
-                'tipo_contrato' => $_POST['tipo_contrato'] ?? 'CLT',
-
-                'endereco' => [
-                    'CEP' => $_POST['CEP'] ?? '',
-                    'logradouro' => $_POST['logradouro'] ?? '',
-                    'numero' => $_POST['numero'] ?? '',
-                    'bairro' => $_POST['bairro'] ?? '',
-                    'cidade' => $_POST['cidade'] ?? '',
-                    'estado' => $_POST['estado'] ?? '',
-                ],
-                'cargo' => [
-                    'nome_cargo' => $_POST['cargo'] ?? '',
-                    'salario_base' => (float)str_replace(',', '.', $_POST['salario'] ?? 0),
-                ],
-                'setor' => [
-                    'nome_setor' => $_POST['departamento'] ?? '',
-                ],
+                'matricula' => $post['matricula'] ?? null,
+                'nome_completo' => $post['nome_completo'] ?? '',
+                'data_nascimento' => $post['data_nascimento'] ?? null,
+                'cpf' => $post['cpf'] ?? '',
+                'rg' => $post['rg'] ?? '',
+                'genero' => $post['genero'] ?? null,
+                'email_pessoal' => $post['email_pessoal'] ?? '',
+                'email_profissional' => $post['email_corporativo'] ?? '',
+                'telefone' => $post['telefone'] ?? '',
+                'data_admissao' => $post['data_admissao'] ?? null,
+                'tipo_contrato' => $post['tipo_contrato'] ?? 'CLT',
+                'situacao' => 'ativo', // Define 'ativo' como padrão
+                'id_cargo' => $idCargo,
+                'id_setor' => $idSetor,
+                'id_endereco' => $idEndereco,
             ];
 
+            // 3. Cria o colaborador
             $colaboradorModel = new ColaboradorModel($pdo);
             $colaboradorModel->create($dadosColaborador);
 
-            //Se tudo deu certo, confirma as operações no banco
+            // Se tudo deu certo, confirma as operações no banco
             $pdo->commit();
 
-            header('Location: ' . BASE_URL);
+            // Redireciona para a lista de colaboradores após o sucesso
+            header('Location: ' . BASE_URL . '/colaboradores');
             exit;
 
         } catch (PDOException $e) {
-            //Deu erro, fudeu, abortar
+            // Se algo deu errado, desfaz tudo
             $pdo->rollBack();
+            // Em um ambiente de produção, logue o erro em vez de usar 'die'
             die("Erro ao salvar colaborador: " . $e->getMessage());
         }
     }

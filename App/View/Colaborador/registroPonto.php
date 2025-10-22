@@ -31,7 +31,7 @@
             <li><a href="<?= BASE_URL ?>/"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
             <li><a href="#"><i class="bi bi-person-vcard-fill"></i> Dados Cadastrais</a></li>
             <li class="active"><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
-            <li><a href="#"><i class="bi bi-wallet-fill"></i> Salário</a></li>
+            <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
             <li><a href="#"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
             <li><a href="#"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
         </ul>
@@ -45,7 +45,7 @@
         <main class="main-content">
             <div class="clock-widget">
                 <div id="initial-view">
-                    <h1 class="greeting">Olá, Rick Ribeiro!</h1>
+                    <h1 class="greeting">Olá, <?= htmlspecialchars($colaborador['nome_completo'] ?? 'Colaborador') ?>!</h1>
                     <?php if (isset($horaEntrada) && $horaEntrada): ?>
                         <p class="entry-time-info">A sua entrada foi registada às <strong><?php echo $horaEntrada; ?></strong>.</p>
                     <?php endif; ?>
@@ -122,16 +122,21 @@
                 context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
                 const imageData = canvasElement.toDataURL('image/jpeg');
                 stopCamera();
+                
                 const formData = new FormData();
                 formData.append('imagem', imageData);
                 formData.append('geolocalizacao', location);
 
+                // CORREÇÃO FINAL: Usando a URL correta do roteador: /registrarponto/salvar
                 const response = await fetch(`${baseUrl}/registrarponto/salvar`, {
                     method: 'POST',
                     body: formData
                 });
 
-                if (!response.ok) throw new Error(`Erro: ${response.status}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Erro no servidor: ${response.status} ${errorText}`);
+                }
                 const result = await response.json();
 
                 if (result.status === 'success') {
@@ -140,7 +145,7 @@
                     if (exitButton) exitButton.classList.add('hidden');
                     setTimeout(() => { window.location.reload(); }, 2500);
                 } else {
-                    throw new Error(result.message || 'Erro no backend.');
+                    throw new Error(result.message || 'Erro desconhecido no backend.');
                 }
             } catch (error) {
                 console.error("Falha:", error);

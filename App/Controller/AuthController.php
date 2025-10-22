@@ -81,9 +81,19 @@ class AuthController extends Controller
             $_SESSION['user_logged_in'] = true;
             $_SESSION['user_id'] = $result['user_id'];
 
-            // Redireciona para a página principal
-            header('Location: ' . BASE_URL . '/colaboradores');
+            // --- LÓGICA DE REDIRECIONAMENTO CORRIGIDA ---
+            // 1. Armazene o perfil do usuário na sessão (boa prática)
+            $_SESSION['user_perfil'] = $result['user_perfil'];
+
+            // 2. Verifique o perfil para decidir para onde ir
+            if ($_SESSION['user_perfil'] === 'gestor_rh' || $_SESSION['user_perfil'] === 'diretor') {
+                // Se for gestor ou diretor, vai para o dashboard principal
+                header('Location: ' . BASE_URL . '/inicio');
+            } else {
+                header('Location: ' . BASE_URL . '/inicio');
+            }
             exit();
+            // --- FIM DA CORREÇÃO ---
         } else {
             // Se falhar, exibe a página de login com a mensagem de erro.
             $this->view('Auth/login', ['error' => $result['message']]);

@@ -19,7 +19,7 @@
             <section>
                 <h3>1. Dados Pessoais</h3>
                 <div class="grid">
-                    <div><label>Nome completo</label><input type="text" name="nome" placeholder="Ex.: Maria Oliveira da Silva" required></div>
+                    <div><label>Nome completo</label><input type="text" name="nome_completo" placeholder="Ex.: Maria Oliveira da Silva" required></div>
                     <div><label>CPF</label><input type="text" name="cpf" placeholder="999.999.999-99" required oninput="mascaraCPF(this)"></div>
                     <div><label>RG</label><input type="text" name="rg"></div>
                     <div><label>Data de nascimento</label><input type="date" name="data_nascimento" required></div>
@@ -33,7 +33,7 @@
                             <option value="Prefiro não informar">Prefiro não informar</option>
                         </select>
                     </div>
-                    <div><label>E-mail</label><input type="email" name="email" placeholder="exemplo@gmail.com" required></div>
+                    <div><label>E-mail Pessoal</label><input type="email" name="email_pessoal" placeholder="exemplo@gmail.com" required></div>
                     <div><label>Telefone celular</label><input type="text" name="telefone" placeholder="(99) 99999-9999" oninput="mascaraTelefone(this)"></div>
                 </div>
             </section>
@@ -90,7 +90,7 @@
                 <div class="grid">
                     <div><label>ID (Matrícula)</label><input type="text" name="matricula" placeholder="99999-999"></div>
                     <div><label>Cargo</label><input type="text" name="cargo" placeholder="Ex.: Analista de Sistemas" required></div>
-                    <div><label>Departamento</label><input type="text" name="departamento" placeholder="Ex.: TI, Financeiro" required></div>
+                    <div><label>Departamento</label><input type="text" name="setor" placeholder="Ex.: TI, Financeiro" required></div>
                     <div><label>Salário (R$)</label><input type="text" name="salario" placeholder="Ex.: 3.500,75" required></div>
                     <div><label>Data de Admissão</label><input type="date" name="data_admissao" required></div>
                     <div>

@@ -1,10 +1,10 @@
 <?php
-// App/Services/Implementations/FolhaPagamentoService.php
+// App/Service/Implementations/FolhaPagamentoService.php
 
 namespace App\Service\Implementations;
 
 use App\Model\ColaboradorModel;
-use App\Model\FolhaPagamentoModel; // Importe o FolhaPagamentoModel
+use App\Model\FolhaPagamentoModel;
 use App\Model\ParametrosFolhaModel;
 use PDO;
 use Exception;
@@ -13,15 +13,12 @@ class FolhaPagamentoService
 {
     private PDO $db;
     private FolhaPagamentoModel $folhaPagamentoModel;
-    // Adicione os outros models como propriedades se precisar deles em outros métodos
     private ColaboradorModel $colaboradorModel;
     private ParametrosFolhaModel $parametrosModel;
-
 
     // Propriedades para armazenar os parâmetros de cálculo
     private array $tabelaInss = [];
     private array $tabelaIrrf = [];
-
 
     /**
      * @param PDO $pdo A conexão com o banco de dados.
@@ -29,13 +26,11 @@ class FolhaPagamentoService
     public function __construct(PDO $pdo)
     {
         $this->db = $pdo;
-
-        // Instancia todos os models necessários, injetando a conexão em cada um.
         $this->folhaPagamentoModel = new FolhaPagamentoModel($this->db);
         $this->colaboradorModel = new ColaboradorModel($this->db);
         $this->parametrosModel = new ParametrosFolhaModel($this->db);
 
-        // Carrega os parâmetros de cálculo uma vez
+        // Carrega os parâmetros de INSS e IRRF uma vez na instanciação do serviço.
         $this->carregarParametros();
     }
 
@@ -43,7 +38,7 @@ class FolhaPagamentoService
     {
         $faixasInss = $this->parametrosModel->findFaixasPorPrefixo('INSS_FAIXA_');
         foreach ($faixasInss as $faixa) {
-            // ✅ CORREÇÃO: Lendo o JSON da coluna 'valor'.
+            // ✅ CORRIGIDO: Acessando 'valor' como uma propriedade de objeto.
             $dadosJson = json_decode($faixa->valor, true);
             $this->tabelaInss[] = [
                 'aliquota' => (float) ($dadosJson['aliquota'] ?? 0),
@@ -55,7 +50,7 @@ class FolhaPagamentoService
 
         $faixasIrrf = $this->parametrosModel->findFaixasPorPrefixo('IRRF_FAIXA_');
         foreach ($faixasIrrf as $faixa) {
-            // ✅ CORREÇÃO: Lendo o JSON da coluna 'valor'.
+            // ✅ CORRIGIDO: Acessando 'valor' como uma propriedade de objeto.
             $dadosJson = json_decode($faixa->valor, true);
             $this->tabelaIrrf[] = [
                 'aliquota' => (float) ($dadosJson['aliquota'] ?? 0),
@@ -75,22 +70,25 @@ class FolhaPagamentoService
 
     public function processarFolha(int $ano, int $mes): array
     {
-        $resultados = ['sucesso' => [], 'falha' => []];
+        // ✅ CORRIGIDO: O método correto é getAll().
         $colaboradores = $this->colaboradorModel->getAll();
 
         if (empty($colaboradores)) {
             throw new Exception("Nenhum colaborador ativo encontrado para processamento.");
         }
 
+        $resultados = ['sucesso' => [], 'falha' => []];
+
         $this->db->beginTransaction();
         try {
             foreach ($colaboradores as $colaborador) {
-                $colaboradorId = (int) $colaborador['id_colaborador'];
+                // ✅ CORRIGIDO: A chave correta é 'id_colaborador', como definido no model.
+                $colaboradorId = (int) ($colaborador['id_colaborador'] ?? 0);
 
-                // Enriquecendo o array do colaborador com o salário
-                $colaborador['salario_base'] = $this->colaboradorModel->salarioPorID($colaboradorId);
-
-                // ✅ CORREÇÃO: O Service agora orquestra as chamadas aos métodos corretos do Model.
+                // Supondo que exista um método para buscar o salário.
+                // Se o salário já vem em 'obterTodosCompletos', esta linha pode ser removida.
+                $salario = $this->colaboradorModel->salarioPorID($colaboradorId);
+                $colaborador['salario_base'] = $salario;
 
                 // 1. Limpa os registros antigos
                 $this->folhaPagamentoModel->limparHoleriteAnterior($colaboradorId, $ano, $mes);
@@ -104,6 +102,7 @@ class FolhaPagamentoService
                 // 4. Salva os itens do holerite
                 $this->folhaPagamentoModel->salvarItens((int)$holeriteId, $dadosCalculados['itens_holerite']);
 
+                // ✅ CORRIGIDO: A chave correta para o nome é 'nome_completo'.
                 $resultados['sucesso'][] = $colaborador['nome_completo'];
             }
             $this->db->commit();
@@ -114,6 +113,7 @@ class FolhaPagamentoService
 
         return $resultados;
     }
+
     private function calcularValores(array $colaborador): array
     {
         // (Aqui entra toda a sua lógica de cálculo de INSS, IRRF, etc., usando $this->tabelaInss, etc.)
@@ -138,5 +138,4 @@ class FolhaPagamentoService
             ]
         ];
     }
-
 }

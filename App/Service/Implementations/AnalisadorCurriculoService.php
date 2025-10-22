@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Implementations;
 
 use GeminiAPI\Client;
 use GeminiAPI\Resources\Parts\TextPart;
@@ -21,8 +21,8 @@ class AnalisadorCurriculoService
         $titulo = $dadosVaga['titulo_vaga'] ?? 'Não especificado';
         $descricao = $dadosVaga['descricao_vaga'] ?? 'Não especificada.';
         $reqNecessarios = $dadosVaga['requisitos_necessarios'] ?? 'Não especificados.';
-        $reqRecomendados = $dadosVaga['requisitos_recomendados'] ?? 'Não especificados.';
-        $reqDesejados = $dadosVaga['requisitos_desejados'] ?? 'Não especificados.';
+        $reqRecomendados = $dadosVaga['requisitos_recomendados'] ?? 'Não especificados';
+        $reqDesejados = $dadosVaga['requisitos_desejados'] ?? 'Não especificados';
 
         $contextoVaga = "
 --- INFORMAÇÕES DETALHADAS DA VAGA ---
