@@ -143,6 +143,7 @@ class AuthModel
                     id_colaborador,
                     senha,
                     status_conta,
+                    perfil,
                     failed_login_attempts,
                     last_failed_login_at,
                     -- Verifica se está bloqueado
@@ -180,7 +181,7 @@ class AuthModel
                 if ($user['failed_login_attempts'] > 0 || $user['last_failed_login_at'] !== null) {
                     $this->resetLoginAttempts($user['id_colaborador']);
                 }
-                return ['status' => 'success', 'user_id' => $user['id_colaborador']];
+                return ['status' => 'success', 'user_id' => $user['id_colaborador'], 'user_perfil' => $user['perfil']];
             }
             // ... (código para status pendente/inativo) ...
             if ($user['status_conta'] === 'pendente_verificacao') { return ['status' => 'error', 'message' => 'Sua conta ainda não foi ativada. Verifique seu e-mail.']; }

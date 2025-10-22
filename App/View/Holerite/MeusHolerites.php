@@ -44,13 +44,13 @@
                             <td><?php echo date('d/m/Y', strtotime($holerite['data_processamento'])); ?></td>
                             <td><?php echo 'R$ ' . number_format($holerite['salario_liquido'], 2, ',', '.'); ?></td>
                             <td>
-                                <form action="<?php echo BASE_URL; ?>/holerite/pdf" method="POST" target="_blank">
+                                <form action="<?php echo BASE_URL; ?>/holerite/gerarPDF" method="POST" target="_blank">
                                     <input type="hidden" name="mes" value="<?php echo $holerite['mes_referencia']; ?>">
                                     <input type="hidden" name="ano" value="<?php echo $holerite['ano_referencia']; ?>">
 
                                     <input type="hidden" name="id_colaborador" value="<?php echo $colaborador['id_colaborador']; ?>">
 
-                                    <button type="submit" class="btn-action">Visualizar</button>
+                                    <button type="button" class="btn-action" onclick="this.closest('form').submit();">Visualizar</button>
                                 </form>
                             </td>
                         </tr>

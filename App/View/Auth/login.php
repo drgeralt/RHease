@@ -63,8 +63,7 @@
         </div>
 
         <div class="button-group">
-            <button type="submit" class="btn btn-primary">Entrar como Colaborador</button>
-            <a href="<?= BASE_URL ?>/colaboradores" class="btn btn-secondary" role="button">Entrar como Gestor</a>
+            <button type="submit" class="btn btn-primary">Entrar</button>
         </div>
         <div class="button-group">
             <a href="<?= BASE_URL ?>/candidatura" class="btn btn-third" role="button">Candidatar-se</a>

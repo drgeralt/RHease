@@ -8,7 +8,7 @@ use App\Core\Database;
 use App\Model\CandidaturaModel;
 use App\Model\GestaoVagasModel;
 use App\Model\CandidatoModel;
-use App\Service\AnalisadorCurriculoService;
+use App\Service\Implementations\AnalisadorCurriculoService;
 use Smalot\PdfParser\Parser;
 // Adicionado para a nova função
 use GeminiAPI\Client;
@@ -41,7 +41,7 @@ class CandidaturaController extends Controller
 
         if ($resultado['sucesso']) {
             // Redireciona para a rota de exibição (que fará a busca no banco)
-            header('Location: ' . BASE_URL . '/candidatura/analise-ia?id=' . $idCandidatura);
+            header('Location: ' . BASE_URL . '/candidatura/ver-analise?id=' . $idCandidatura);
             exit;
         } else {
             die("Erro no processamento da IA: " . $resultado['erro']);

@@ -27,6 +27,7 @@ use App\Core\Router;
 use App\Controller\BeneficioController;
 use App\Controller\HoleriteController;
 use App\Controller\FolhaPagamentoController;
+use App\Controller\DashboardController;
 
 // registro de rotas
 $router = new Router();
@@ -39,6 +40,9 @@ $router->addRoute('GET', '/cadastro', UserController::class, 'show_cadastro');
 $router->addRoute('POST', '/register', UserController::class, 'register');
 $router->addRoute('GET', '/registro-sucesso', UserController::class, 'show_registro_sucesso');
 $router->addRoute('GET', '/verify', UserController::class, 'verify_account');
+
+// --- Rotas de Home ---
+$router->addRoute('GET', '/inicio', DashboardController::class, 'index');
 
 // --- Rotas de Colaboradores ---
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
@@ -87,7 +91,7 @@ $router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redireci
 // ----------------------
 // Rota para a página de listagem de holerites do colaborador
 $router->addRoute('GET', '/meus-holerites', HoleriteController::class, 'index');
-$router->addRoute('GET', '/holerite/pdf', HoleriteController::class, 'gerarPDF');
+$router->addRoute('POST', '/holerite/gerarPDF', HoleriteController::class, 'gerarPDF');
 
 $router->addRoute('GET', '/folha/processar', FolhaPagamentoController::class, 'index');
 $router->addRoute('POST', '/folha/processar', FolhaPagamentoController::class, 'processar');

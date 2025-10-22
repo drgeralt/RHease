@@ -135,6 +135,12 @@ section h3 {
     box-sizing: border-box;
 }
 
+/* Adicionado para agrupar os botões lado a lado */
+.btn-group {
+    flex-direction: row-reverse; /* Inverte a ordem para "Voltar" aparecer à esquerda */
+    gap: 10px;
+}
+
 /* Área de mensagens */
 .messages {
     margin-top: 25px;

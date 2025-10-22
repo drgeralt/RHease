@@ -18,13 +18,20 @@ class HoleriteController extends Controller
 
     public function index()
     {
-        // Altere este ID para testar os holerites de outros colaboradores (ex: 48, 49, 50).
-        $idColaboradorParaTeste = 49;
+        // 1. Verifica se o usuário está logado. Se não, redireciona para o login.
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . BASE_URL . '/login');
+            exit;
+        }
 
-        // ✅ CORREÇÃO: Busca os dados do colaborador e os holerites usando o HoleriteModel.
-        $colaborador = $this->model->findColaboradorById($idColaboradorParaTeste);
-        $holerites = $this->model->findByColaboradorId($idColaboradorParaTeste);
+        // 2. Pega o ID do colaborador logado a partir da sessão.
+        $idColaborador = $_SESSION['user_id'];
 
+        // 3. Busca os dados do colaborador e seus holerites usando o ID da sessão.
+        $colaborador = $this->model->findColaboradorById($idColaborador);
+        $holerites = $this->model->findByColaboradorId($idColaborador);
+
+        // 4. Envia os dados corretos para a view.
         $this->view('Holerite/meusHolerites', [
             'colaborador' => $colaborador,
             'holerites' => $holerites
@@ -153,7 +160,7 @@ class HoleriteController extends Controller
         $pdf->Cell(190, 7, 'Assinatura do Colaborador', 0, 1, 'C');
 
         // 5. Envia o PDF para o navegador
-        $pdf->Output('D', 'holerite_' . $mes . '_' . $ano . '.pdf');
+        $pdf->Output('I', 'holerite_' . $mes . '_' . $ano . '.pdf');
         exit;
     }
 }

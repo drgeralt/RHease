@@ -201,7 +201,6 @@ class BeneficioController extends Controller {
     }
     public function meusBeneficios() {
         // A lógica de sessão deve ser centralizada, mas por agora, isso funciona.
-        session_start();
         $id_colaborador_logado = $_SESSION['id_colaborador'] ?? null;
 
         if (!$id_colaborador_logado) {

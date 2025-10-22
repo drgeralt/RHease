@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Service\Implementations;
+namespace App\Services;
 
-use App\Service\Contracts\UsuarioServiceInterface;
-use App\Model\ColaboradorModel;
 use App\Model\CargoModel;
-use PDO;
+use App\Model\ColaboradorModel;
+use App\Service\Contracts\UsuarioServiceInterface;
 
 class UsuarioService implements UsuarioServiceInterface
 {
