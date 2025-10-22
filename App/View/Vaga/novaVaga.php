@@ -1,3 +1,10 @@
+<?php
+// Pega os erros e dados antigos da sessão, e depois limpa
+$erros = $_SESSION['erros_vaga'] ?? [];
+$oldData = $_SESSION['old_data'] ?? [];
+unset($_SESSION['erros_vaga'], $_SESSION['old_data']);
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -38,14 +45,20 @@
                         <div>
                             <label for="titulo">Título da Vaga</label>
                             <input id="titulo" type="text" name="titulo" placeholder="Ex.: Analista de Marketing" required>
+                            <?php if (isset($erros['titulo'])): ?> 
+                        <span class="error-message"><?php echo $erros['titulo']; ?></span>
+                    <?php endif; ?>
                         </div>
                         <div>
                             <label for="departamento">Departamento</label>
                             <input id="departamento" type="text" name="departamento" placeholder="Ex.: Marketing" required>
+                            <?php if (isset($erros['departamento'])): ?>
+                        <span class="error-message"><?php echo $erros['departamento']; ?></span>
+                    <?php endif; ?>
                         </div>
-                        
-                        <div>
-                        <!--    <label for="tipo_contrato">Tipo de Contrato</label>
+
+                       <!-- <div>
+                           <label for="tipo_contrato">Tipo de Contrato</label>
                             <select id="tipo_contrato" name="tipo_contrato" required>
                                 <option value="" disabled selected>Selecione</option>
                                 <option value="CLT">CLT</option>

@@ -58,10 +58,10 @@
                 <tr>
                     <td><?php echo htmlspecialchars($colaborador['id_colaborador']); ?></td>
                     <td><?php echo htmlspecialchars($colaborador['nome_completo']); ?></td>
-                    <td><?php echo htmlspecialchars($colaborador['cargo']); ?></td>
-                    <td><?php echo htmlspecialchars($colaborador['departamento']); ?></td>
-                    <td><?php echo date('d/m/Y', strtotime($colaborador['data_admissao'])); ?></td>
-                    <td><span class="badge bg-success"><?php echo ucfirst(htmlspecialchars($colaborador['situacao'])); ?></span></td>
+                    <td><?php echo htmlspecialchars($colaborador['cargo'] ?? ''); ?></td>
+                    <td><?php echo htmlspecialchars($colaborador['departamento'] ?? ''); ?></td>
+                    <td><?php echo !empty($colaborador['data_admissao']) ? date('d/m/Y', strtotime($colaborador['data_admissao'])) : ''; ?></td>
+                    <td><span class="badge bg-success"><?php echo ucfirst(htmlspecialchars($colaborador['situacao'] ?? '')); ?></span></td>
                     <td class="text-center">
                         <a href="#" class="btn btn-sm btn-primary" title="Editar"><i class="bi bi-pencil-fill"></i></a>
                         <a href="#" class="btn btn-sm btn-danger" title="Excluir"><i class="bi bi-trash-fill"></i></a>

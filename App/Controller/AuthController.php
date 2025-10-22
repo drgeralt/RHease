@@ -17,47 +17,157 @@ class AuthController extends Controller
     /**
      * Exibe a página de login.
      */
-    public function login()
+    public function showLogin(): void
     {
-        // Apenas carrega a view do formulário de login
         $this->view('Auth/login');
+    }
+
+    /**
+     * Exibe a página de cadastro.
+     */
+    public function showCadastro(): void
+    {
+        $this->view('Auth/cadastro');
+    }
+
+    /**
+     * Exibe a página de sucesso após o registro.
+     */
+    public function showRegistroSucesso(): void
+    {
+        $this->view('Auth/registroSucesso');
+    }
+
+    /**
+     * Processa os dados do formulário de registro.
+     */
+    public function register(): void
+    {
+        $data = $_POST;
+        $result = $this->authModel->registerUser($data);
+
+        header('Content-Type: application/json');
+        echo json_encode($result);
+        exit();
+    }
+
+    /**
+     * Ativa a conta do usuário a partir do token de verificação.
+     */
+    public function verifyAccount(): void
+    {
+        $token = $_GET['token'] ?? null;
+        $result = $this->authModel->activateAccount($token);
+        $this->view('Auth/verificacaoResultado', $result);
     }
 
     /**
      * Processa a tentativa de login do usuário.
      */
-    public function processLogin()
-{
-    // Verifica se os dados foram enviados via POST (formulário)
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    public function processLogin(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/login');
+            exit();
+        }
+
         $email = $_POST['email_profissional'] ?? '';
         $senha = $_POST['senha'] ?? '';
-
         $result = $this->authModel->loginUser($email, $senha);
 
         if ($result['status'] === 'success') {
-            // Se o login for bem-sucedido, inicia a sessão
-            // e redireciona para a página principal
-            session_start();
+            // Previne ataques de fixação de sessão
+            session_regenerate_id(true);
             $_SESSION['user_logged_in'] = true;
-            
-            // Salva o ID do colaborador na sessão usando a chave 'user_id'
-            if (isset($result['user_id'])) {
-                $_SESSION['id_colaborador'] = $result['user_id']; 
+            $_SESSION['user_id'] = $result['user_id'];
+
+            // --- LÓGICA DE REDIRECIONAMENTO CORRIGIDA ---
+            // 1. Armazene o perfil do usuário na sessão (boa prática)
+            $_SESSION['user_perfil'] = $result['user_perfil'];
+
+            // 2. Verifique o perfil para decidir para onde ir
+            if ($_SESSION['user_perfil'] === 'gestor_rh' || $_SESSION['user_perfil'] === 'diretor') {
+                // Se for gestor ou diretor, vai para o dashboard principal
+                header('Location: ' . BASE_URL . '/inicio');
+            } else {
+                header('Location: ' . BASE_URL . '/inicio');
             }
-            
-            // Redireciona para a página "principal"
-            header("Location: /tabelaColaborador");
             exit();
+            // --- FIM DA CORREÇÃO ---
         } else {
-            // Se o login falhar, exibe a página de login novamente
-            // com a mensagem de erro.
+            // Se falhar, exibe a página de login com a mensagem de erro.
             $this->view('Auth/login', ['error' => $result['message']]);
         }
-    } else {
-        // Se não for POST, apenas redireciona para a página de login
-        header("Location: /login");
-        exit();
     }
-}
+    /**
+     * Mostra o formulário para solicitar a recuperação de senha.
+     */
+    public function showForgotPasswordForm(): void
+    {
+        $this->view('Auth/esqueceuSenha');
+    }
+
+    /**
+     * Lida com o pedido de recuperação de senha, chamando o Model.
+     */
+    public function handleForgotPasswordRequest(): void
+    {
+        $email = $_POST['email'] ?? '';
+        $result = $this->authModel->generatePasswordResetToken($email);
+
+        if ($result['status'] === 'success') {
+            $this->view('Auth/esqueceuSenha', ['success' => $result['message']]);
+        } else {
+            $this->view('Auth/esqueceuSenha', ['error' => $result['message']]);
+        }
+    }
+
+    /**
+     * Mostra o formulário para redefinir a senha, se o token for válido.
+     */
+    public function showResetPasswordForm(): void
+    {
+        $token = $_GET['token'] ?? '';
+
+        // Verifica se o token é válido antes de mostrar a página
+        if ($this->authModel->isPasswordResetTokenValid($token)) {
+            $this->view('Auth/redefinirSenha', ['token' => $token]);
+        } else {
+            // Se o token for inválido ou expirado, mostra uma mensagem de erro
+            $this->view('Auth/esqueceuSenha', ['error' => 'O link de redefinição de senha é inválido ou expirou.']);
+        }
+    }
+
+    /**
+     * Lida com a atualização da nova senha.
+     */
+    public function handleResetPassword(): void
+    {
+        $token = $_POST['token'] ?? '';
+        $novaSenha = $_POST['nova_senha'] ?? '';
+        $confirmarSenha = $_POST['confirmar_senha'] ?? '';
+        if ($novaSenha !== $confirmarSenha) {
+            $this->view('Auth/redefinirSenha', [
+                'token' => $token,
+                'error' => 'As senhas não coincidem.'
+            ]);
+            return;
+        }
+
+        $result = $this->authModel->resetPassword($token, $novaSenha);
+
+        if ($result['status'] === 'success') {
+            // Redireciona para o login com uma mensagem de sucesso
+            // (Usaremos a sessão para passar a mensagem)
+            $_SESSION['success_message'] = $result['message'];
+            header('Location: ' . BASE_URL . '/login');
+            exit();
+        } else {
+            // Mostra o erro na própria página de redefinição
+            $this->view('Auth/redefinirSenha', [
+                'token' => $token,
+                'error' => $result['message']
+            ]);
+        }
+    }
 }

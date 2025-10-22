@@ -1,0 +1,24 @@
+Index: .idea/php.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"MessDetectorOptionsConfiguration\">\r\n    <option name=\"transferred\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PHPCSFixerOptionsConfiguration\">\r\n    <option name=\"transferred\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PHPCodeSnifferOptionsConfiguration\">\r\n    <option name=\"highlightLevel\" value=\"WARNING\" />\r\n    <option name=\"transferred\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PhpIncludePathManager\">\r\n    <include_path>\r\n      <path value=\"D:/Downloads/mysql-8.2.0\" />\r\n      <path value=\"$PROJECT_DIR$/vendor/composer\" />\r\n      <path value=\"$PROJECT_DIR$/vendor/phpmailer/phpmailer\" />\r\n      <path value=\"$PROJECT_DIR$/vendor/phpoption/phpoption\" />\r\n      <path value=\"$PROJECT_DIR$/vendor/graham-campbell/result-type\" />\r\n      <path value=\"$PROJECT_DIR$/vendor/vlucas/phpdotenv\" />\r\n      <path value=\"$PROJECT_DIR$/vendor/symfony/polyfill-ctype\" />\r\n      <path value=\"$PROJECT_DIR$/vendor/symfony/polyfill-mbstring\" />\r\n      <path value=\"$PROJECT_DIR$/vendor/symfony/polyfill-php80\" />\r\n    </include_path>\r\n  </component>\r\n  <component name=\"PhpProjectSharedConfiguration\" php_language_level=\"8.5\" />\r\n  <component name=\"PhpStanOptionsConfiguration\">\r\n    <option name=\"transferred\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PhpUnit\">\r\n    <phpunit_settings>\r\n      <PhpUnitSettings custom_loader_path=\"$PROJECT_DIR$/vendor/autoload.php\" />\r\n    </phpunit_settings>\r\n  </component>\r\n  <component name=\"PsalmOptionsConfiguration\">\r\n    <option name=\"transferred\" value=\"true\" />\r\n  </component>\r\n</project>
+===================================================================
+diff --git a/.idea/php.xml b/.idea/php.xml
+--- a/.idea/php.xml	(revision 76214a8463aaf287432e71df6059f949618c1c6b)
++++ b/.idea/php.xml	(date 1760487140313)
+@@ -13,7 +13,6 @@
+   <component name="PhpIncludePathManager">
+     <include_path>
+       <path value="D:/Downloads/mysql-8.2.0" />
+-      <path value="$PROJECT_DIR$/vendor/composer" />
+       <path value="$PROJECT_DIR$/vendor/phpmailer/phpmailer" />
+       <path value="$PROJECT_DIR$/vendor/phpoption/phpoption" />
+       <path value="$PROJECT_DIR$/vendor/graham-campbell/result-type" />
+@@ -23,7 +22,6 @@
+       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php80" />
+     </include_path>
+   </component>
+-  <component name="PhpProjectSharedConfiguration" php_language_level="8.5" />
+   <component name="PhpStanOptionsConfiguration">
+     <option name="transferred" value="true" />
+   </component>

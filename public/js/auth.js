@@ -9,21 +9,17 @@ document.addEventListener('DOMContentLoaded', function() {
             button.disabled = true;
             button.textContent = 'Aguarde...';
 
-            // FormData pega todos os campos do formulário com o atributo "name"
             const formData = new FormData(formCadastro);
 
-            // Usamos fetch para enviar os dados para a nossa rota da API
             fetch('/RHease/public/register', {
                 method: 'POST',
-                body: formData // Enviando como FormData
+                body: formData
             })
-                .then(response => response.json()) // Esperamos uma resposta JSON
+                .then(response => response.json())
                 .then(result => {
                     if (result.status === 'success') {
-                        // Se o PHP retornar sucesso, redirecionamos
                         window.location.href = '/RHease/public/registro-sucesso';
                     } else {
-                        // Se der erro, mostramos a mensagem do PHP
                         alert('Erro no cadastro: ' + result.message);
                     }
                 })
@@ -37,4 +33,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
     }
+    const togglePasswordIcons = document.querySelectorAll('.password-toggle-icon');
+
+    // Para cada ícone encontrado, adiciona a funcionalidade
+    togglePasswordIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            const passwordInput = this.closest('.input-wrapper').querySelector('input');
+            const eyeIcon = this.querySelector('.eye-icon');
+            const eyeOffIcon = this.querySelector('.eye-off-icon');
+
+            if (passwordInput && eyeIcon && eyeOffIcon) {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                if (type === 'password') {
+                    eyeIcon.style.display = 'block';
+                    eyeOffIcon.style.display = 'none';
+                } else {
+                    eyeIcon.style.display = 'none';
+                    eyeOffIcon.style.display = 'block';
+                }
+            }
+        });
+    });
+
 });

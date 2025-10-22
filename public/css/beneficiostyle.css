@@ -134,12 +134,12 @@ header{
     margin-bottom: 40px; 
 }
 .secao-colaborador {
-    margin-top: 5px;
+    margin-top: 50px;
     margin-bottom: 40px;
 }
 .secao-regras {
     margin-top: 40px;
-    color: #25621C;
+    margin-bottom: 60px;
 }
 
 /* =================== TABELAS (LAYOUT E ESTILO) =================== */
@@ -177,32 +177,28 @@ tbody td {
     vertical-align: middle; 
 }
 
-.regras-tabela tbody tr td:nth-child(3) {
-    text-align: center;
-    padding-right: 100px;
-}
+/* CORREÇÃO APLICADA AQUI: Aumentamos a largura para garantir espaço e ajustamos o padding */
 
-#acoes_style{
-    padding-left: 130px;
-}
-.regras-tabela 
+/* DEFINIÇÃO DE LARGURA PARA A TABELA DE CATÁLOGO (RH) */
 /* 5 Colunas: Benefício, Categoria, Valor, Status, Ações */
 .tabela-container table:not(.regras-tabela) thead th:nth-child(1),
 .tabela-container table:not(.regras-tabela) tbody td:nth-child(1) { width: 25%; } /* Benefício */
 .tabela-container table:not(.regras-tabela) thead th:nth-child(2),
-.tabela-container table:not(.regras-tabela) tbody td:nth-child(2) { width: 13%; } /* Categoria */
+.tabela-container table:not(.regras-tabela) tbody td:nth-child(2) { width: 13%; } /* Categoria (Ajustado) */
 .tabela-container table:not(.regras-tabela) thead th:nth-child(3),
-.tabela-container table:not(.regras-tabela) tbody td:nth-child(3) { width: 11%; } /* Valor */
+.tabela-container table:not(.regras-tabela) tbody td:nth-child(3) { width: 11%; } /* Valor (Ajustado) */
+
 .tabela-container table:not(.regras-tabela) thead th:nth-child(4),
 .tabela-container table:not(.regras-tabela) tbody td:nth-child(4) { 
     width: 12%; 
     text-align: center;
 } /* Status */
+
 .tabela-container table:not(.regras-tabela) thead th:nth-child(5) {padding-left: 15px;}
 .tabela-container table:not(.regras-tabela) tbody td:nth-child(5) { 
-    width: 29%; 
+    width: 29%; /* Aumentado para 29% */
     text-align: center;
-    padding: 10px 5px;
+    padding: 10px 5px; /* Padding ajustado para não empurrar demais */
 } 
 
 /* Estilo para as ações (ícones e switch) */
@@ -389,220 +385,4 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 .btn-cancelar:hover { 
     background-color: #CCE3D4; 
-}
-/* =================== MELHORIAS NO POP-UP DE EDIÇÃO/CRIAÇÃO =================== */
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee; /* Linha sutil para separar o cabeçalho */
-}
-
-#tituloModal {
-    /* Manteve o estilo forte, mas agora está dentro do header flexível */
-    font-size: 1.4em;
-    font-weight: 700;
-    color: #25621C; /* Um verde escuro para dar destaque */
-    margin: 0; /* Remove margem padrão */
-}
-
-/* Reajuste o 'X' de fechar */
-.close-btn {
-    color: #777;
-    font-size: 35px; /* Maior e mais fácil de clicar */
-    line-height: 1; /* Alinhamento vertical perfeito */
-    font-weight: 400; /* Mais sutil, menos negrito */
-    transition: color 0.2s;
-}
-
-.close-btn:hover {
-    color: #dc3545; /* Vermelho no hover para indicar ação de fechar */
-}
-
-/* Estilo para os botões dentro do formulário */
-#formBeneficio button {
-    border-radius: 6px;
-    font-size: 15px;
-    padding: 8px 15px;
-    cursor: pointer;
-    transition: all 0.2s;
-    height: 40px; /* Alinha com os inputs */
-}
-
-/* Garante que o container do modal tenha um pouco mais de destaque e espaçamento interno */
-.modal-content {
-    background-color: #fff;
-    padding: 30px; /* Mais padding */
-    border-radius: 12px;
-    width: 480px; /* Mais largura */
-    max-width: 90%;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* Sombra mais elegante */
-}
-
-/* =================== ESTILOS ESPECÍFICOS PARA O MODAL DE REGRAS (AJUSTADO) =================== */
-
-#tituloRegrasModal {
-    font-size: 1.4em;
-    font-weight: 700;
-    color: #25621C;
-    margin: 0;
-}
-
-#listaBeneficiosRegra {
-    border: 1px solid #ccc;
-    padding: 15px;
-    height: 250px; 
-    overflow-y: auto;
-    background-color: #fcfcfc;
-    border-radius: 8px;
-
-    /* REMOVIDO: column-count e column-gap (Para que fiquem um debaixo do outro) */
-}
-
-/* Estiliza o wrapper de cada item (LABEL) */
-#listaBeneficiosRegra label {
-    /* Faz o label ocupar a largura total e alinha os itens */
-    display: flex;
-    align-items: center; /* Alinha o checkbox com o texto verticalmente */
-    
-    /* ORGANIZAÇÃO VERTICAL */
-    margin-bottom: 5px; /* Menos espaço vertical, mais compacto */
-    padding: 4px 5px;
-    
-    font-size: 0.95em; /* Um pouco maior para melhor leitura */
-    font-weight: 500;
-    color: #333;
-    cursor: pointer;
-    transition: background-color 0.1s;
-    border-radius: 4px;
-    width: 100%; /* Ocupa a largura total do contêiner */
-    box-sizing: border-box;
-}
-
-#listaBeneficiosRegra label:hover {
-    background-color: #eaf3e8; 
-}
-
-/* =================== ESTILOS UNIFICADOS PARA CHECKBOXES DE MODAIS =================== */
-
-/* Estiliza o próprio CHECKBOX (INPUT) no Modal de Regras */
-#listaBeneficiosRegra input[type="checkbox"] {
-    width: 16px; /* Tamanho padrão para checkbox */
-    height: 16px;
-    margin: 0; 
-    margin-right: 8px;
-    flex-shrink: 0;
-    cursor: pointer;
-}
-
-/* Estiliza o próprio CHECKBOX (INPUT) no Modal de Exceções do Colaborador */
-/* (Se você usa este ID/Classe para a lista de exceções) */
-#listaBeneficiosColaborador input[type="checkbox"],
-.lista-checkbox-excecoes input[type="checkbox"] { 
-    width: 16px; /* Tamanho padrão para checkbox */
-    height: 16px;
-    margin: 0; 
-    margin-right: 8px;
-    flex-shrink: 0;
-    cursor: pointer;
-}
-
-/* Reduz o checkbox genérico para 16px, se for o caso */
-.checkbox-item input[type="checkbox"] {
-    width: 16px; 
-    height: 16px;
-    margin-right: 10px;
-    cursor: pointer;
-}
-/* =================== MODAL DE EXCEÇÕES DO COLABORADOR =================== */
-
-.modal-excecoes {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; 
-    left: 0;
-    top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgba(0,0,0,0.4); /* Fundo semi-transparente */
-}
-
-.modal-content-excecoes {
-    background-color: #fefefe;
-    margin: 5% auto; /* 5% do topo e centralizado */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 90%; 
-    max-width: 600px; /* Largura máxima razoável */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-}
-
-.modal-header-excecoes {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-}
-
-.modal-header-excecoes h3 {
-    color: #25621C;
-    margin: 0;
-    font-size: 1.3em;
-}
-
-.close-btn-excecoes {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close-btn-excecoes:hover,
-.close-btn-excecoes:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.modal-footer-excecoes {
-    border-top: 1px solid #eee;
-    padding-top: 15px;
-    margin-top: 15px;
-    text-align: right;
-}
-
-.lista-checkbox-excecoes {
-    border: 1px solid #ccc;
-    padding: 10px;
-    height: 200px; 
-    overflow-y: auto;
-    background-color: #fcfcfc;
-    border-radius: 5px;
-}
-
-.lista-checkbox-excecoes label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-/* Estilo do botão de lápis (opcional) */
-.btn-edit-colaborador {
-    background: none;
-    border: none;
-    color: #489D3B;
-    cursor: pointer;
-    font-size: 1.1em;
-    margin-left: 10px;
-    padding: 0 5px;
-}
-.btn-edit-colaborador:hover {
-    color: #25621C;
 }
