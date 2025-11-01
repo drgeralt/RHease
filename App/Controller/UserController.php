@@ -21,6 +21,13 @@ class UserController extends Controller
     {
         $this->view('Auth/registroSucesso');
     }
+    /**
+     * Exibe a página "Esqueceu Senha".
+     */
+    public function show_esqueceu_senha(): void
+    {
+        $this->view('Auth/esqueceuSenha');
+    }
     public function register(): void
     {
         //var_dump($_POST);

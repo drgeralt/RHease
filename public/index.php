@@ -37,6 +37,7 @@ $router->addRoute('GET', '/', UserController::class, 'show_login');
 $router->addRoute('GET', '/login', UserController::class, 'show_login');
 $router->addRoute('POST', '/login', UserController::class, 'process_login');
 $router->addRoute('GET', '/cadastro', UserController::class, 'show_cadastro');
+$router->addRoute('GET', '/esqueceu-senha', UserController::class, 'show_esqueceu_senha');
 $router->addRoute('POST', '/register', UserController::class, 'register');
 $router->addRoute('GET', '/registro-sucesso', UserController::class, 'show_registro_sucesso');
 $router->addRoute('GET', '/verify', UserController::class, 'verify_account');
