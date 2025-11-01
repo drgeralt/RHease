@@ -1,5 +1,6 @@
 {
   "name": "matheus/r-hease",
+  "description": "Project description.",
   "autoload": {
     "psr-4": {
       "Matheus\\RHease\\": "src/",
@@ -13,7 +14,18 @@
     }
   ],
   "require": {
-    "vlucas/phpdotenv": "^5.0",
-    "phpmailer/phpmailer": "^6.9"
+    "ext-pdo": "*",
+    "ext-mysqli": "*",
+    "phpmailer/phpmailer": "^6.11",
+    "vlucas/phpdotenv": "^5.6",
+    "smalot/pdfparser": "^2.0",
+    "gemini-api-php/client": "^1.0",
+    "php-http/guzzle7-adapter": "^1.0",
+    "setasign/fpdf": "^1.8"
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
   }
 }
