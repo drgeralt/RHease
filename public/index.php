@@ -14,7 +14,7 @@ define('BASE_PATH', dirname(__DIR__));
 
 require_once BASE_PATH . '/config.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../'); 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 use App\Controller\ColaboradorController;
@@ -28,6 +28,7 @@ use App\Controller\BeneficioController;
 use App\Controller\HoleriteController;
 use App\Controller\FolhaPagamentoController;
 use App\Controller\DashboardController;
+use App\Controller\AuthController;
 
 // registro de rotas
 $router = new Router();
@@ -37,10 +38,15 @@ $router->addRoute('GET', '/', UserController::class, 'show_login');
 $router->addRoute('GET', '/login', UserController::class, 'show_login');
 $router->addRoute('POST', '/login', UserController::class, 'process_login');
 $router->addRoute('GET', '/cadastro', UserController::class, 'show_cadastro');
-$router->addRoute('GET', '/esqueceu-senha', UserController::class, 'show_esqueceu_senha');
 $router->addRoute('POST', '/register', UserController::class, 'register');
 $router->addRoute('GET', '/registro-sucesso', UserController::class, 'show_registro_sucesso');
 $router->addRoute('GET', '/verify', UserController::class, 'verify_account');
+$router->addRoute('GET', '/registro-sucesso', AuthController::class, 'showRegistroSucesso');
+$router->addRoute('GET', '/esqueceu-senha', AuthController::class, 'showForgotPasswordForm');// Exibe a página "Esqueci minha senha"
+$router->addRoute('POST', '/solicitar-recuperacao', AuthController::class, 'handleForgotPasswordRequest');
+$router->addRoute('GET', '/redefinir-senha', AuthController::class, 'showResetPasswordForm');// Exibe a página para o usuário definir a nova senha (acessada pelo link no e-mail)
+$router->addRoute('POST', '/atualizar-senha', AuthController::class, 'handleResetPassword');
+
 
 // --- Rotas de Home ---
 $router->addRoute('GET', '/inicio', DashboardController::class, 'index');
@@ -65,13 +71,13 @@ $router->addRoute('POST', '/beneficios/criar', BeneficioController::class, 'cria
 $router->addRoute('POST', '/beneficios/editar', BeneficioController::class, 'editar');
 $router->addRoute('GET', '/beneficios/desativar/{id}', BeneficioController::class, 'desativar');
 $router->addRoute('POST', '/beneficios/deletar', BeneficioController::class, 'deletarBeneficio');
-$router->addRoute('POST', '/beneficios/salvar', BeneficioController::class, 'salvarBeneficio'); 
+$router->addRoute('POST', '/beneficios/salvar', BeneficioController::class, 'salvarBeneficio');
 $router->addRoute('POST', '/colaborador/beneficios/salvar', BeneficioController::class, 'salvarBeneficiosColaborador');
 $router->addRoute('POST', '/beneficios/regras/salvar', BeneficioController::class, 'salvarRegrasAtribuicao');
 $router->addRoute('POST', '/beneficios/toggleStatus', BeneficioController::class, 'toggleStatus');
 
 
-$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios'); 
+$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios');
 
 
 // --- Rotas de Candidatura e IA ---
