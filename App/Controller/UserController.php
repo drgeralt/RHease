@@ -52,6 +52,40 @@ class UserController extends Controller
         // Envia o resultado para a view de verificação
         $this->view('Auth/verificacaoResultado', $result);
     }
+    /**
+     * Exibe a página para solicitar um novo link de verificação.
+     */
+    public function show_reenviar_verificacao(): void
+    {
+        $this->view('Auth/reenviarVerificacao');
+    }
+
+    /**
+     * Processa a solicitação de reenvio de verificação.
+     */
+    public function process_reenviar_verificacao(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/reenviar-verificacao');
+            exit();
+        }
+
+        $email = $_POST['email'] ?? '';
+        $authModel = new AuthModel();
+
+        // Este método 'reenviarVerificacao' será criado no AuthModel no próximo passo
+        $result = $authModel->reenviarVerificacao($email);
+
+        $data = [];
+        if ($result['status'] === 'success') {
+            $data['success'] = $result['message'];
+        } else {
+            $data['error'] = $result['message'];
+        }
+
+        // Recarrega a view com a mensagem
+        $this->view('Auth/reenviarVerificacao', $data);
+    }
     public function process_login(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
