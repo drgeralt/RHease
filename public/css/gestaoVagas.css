@@ -377,3 +377,195 @@ body {
         display: none;
     }
 }
+/* --- ESTILOS PARA O MODAL DE CANDIDATOS --- */
+
+/* O fundo escuro transparente */
+.modal-backdrop {
+    display: none; /* Começa escondido */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1040;
+}
+
+/* A janela do modal */
+.modal-container {
+    display: none; /* Começa escondido */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 800px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1050;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-close {
+    font-size: 28px;
+    font-weight: 300;
+    color: #000;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.5;
+}
+.modal-close:hover {
+    opacity: 1;
+}
+
+.modal-body {
+    padding: 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Garante que os ícones de ação dentro do modal funcionem */
+.modal-body .action-icons {
+    justify-content: flex-start; /* Alinha ícones à esquerda no modal */
+    gap: 15px;
+}
+/* --- ESTILOS PARA O FORMULÁRIO DENTRO DO MODAL --- */
+
+/* Torna o modal de edição um pouco mais largo */
+.modal-container.modal-lg {
+    max-width: 900px;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.modal-form .modal-body {
+    max-height: 70vh; /* Aumenta a altura máxima para formulários longos */
+}
+
+.modal-form section {
+    margin-bottom: 35px;
+}
+
+.modal-form h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #3498db;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.modal-form .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.modal-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #555;
+}
+
+.modal-form input[type="text"],
+.modal-form textarea,
+.modal-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-form input[type="text"]:focus,
+.modal-form textarea:focus,
+.modal-form select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+.modal-form textarea {
+    resize: vertical;
+}
+
+.modal-form .grid > div[style*="grid-column: span 2;"] {
+    grid-column: span 2;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px 24px;
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+.btn-salvar, .btn-cancelar {
+    text-decoration: none;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-salvar {
+    background-color: #28a745;
+    color: white;
+}
+.btn-salvar:disabled {
+    background-color: #94d3a2;
+}
+
+.btn-cancelar {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Mensagens de erro/sucesso da API dentro do modal */
+#api-message-edit {
+    margin: 0 0 15px 0;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: 500;
+    display: none; /* Começa escondido */
+}
+.msg-sucesso {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.msg-erro {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}

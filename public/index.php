@@ -50,19 +50,16 @@ $router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar
 // --- Rotas de Gestão de Vagas ---
 $router->addRoute('GET', '/vagas/listar', GestaoVagasController::class, 'listarVagas');
 $router->addRoute('GET', '/vagas/criar', GestaoVagasController::class, 'criar');
-$router->addRoute('POST', '/vagas/salvar', GestaoVagasController::class, 'salvar');
-$router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos');
 $router->addRoute('GET', '/vagas/editar', GestaoVagasController::class, 'editar');
-$router->addRoute('POST', '/vagas/atualizar', GestaoVagasController::class, 'atualizar');
-$router->addRoute('GET', '/vagas/excluir', GestaoVagasController::class, 'excluir');
+$router->addRoute('GET', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos'); // MUDANÇA: Agora é GET
 
 // --- Rotas da API de Vagas ---
 $router->addRoute('GET', '/api/vagas/listar', VagaApiController::class, 'listarVagas');
-$router->addRoute('GET', '/api/vagas/editar', VagaApiController::class, 'editar'); // Ex: /api/vagas/editar?id=5
-$router->addRoute('GET', '/api/vagas/excluir', VagaApiController::class, 'excluir'); // Ex: /api/vagas/excluir?id=5
 $router->addRoute('POST', '/api/vagas/salvar', VagaApiController::class, 'salvar');
+$router->addRoute('GET', '/api/vagas/editar', VagaApiController::class, 'editar'); 
 $router->addRoute('POST', '/api/vagas/atualizar', VagaApiController::class, 'atualizar');
-$router->addRoute('POST', '/api/vagas/candidatos', VagaApiController::class, 'verCandidatos');
+$router->addRoute('GET', '/api/vagas/excluir', VagaApiController::class, 'excluir'); 
+$router->addRoute('GET', '/api/vagas/candidatos', VagaApiController::class, 'verCandidatos'); // MUDANÇA: Agora é GET
 
 // Benefícios
 $router->addRoute('GET', '/beneficios', BeneficioController::class, 'index');
