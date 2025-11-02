@@ -3,46 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>Editar Vaga</title>
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/editarVaga.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/novaVaga.css"> <style>
+        #api-message {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none; /* Começa escondido */
+        }
+        .msg-sucesso {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .msg-erro {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
         <main class="main-container">
-
             <div class="header-actions">
                 <h1>Editar Vaga</h1>
                 <a href="<?php echo BASE_URL; ?>/vagas/listar" class="btn-voltar">
                     <i class="fas fa-arrow-left"></i> Voltar para a Lista
                 </a>
             </div>
-            
-            <p style="margin-top: -15px; margin-bottom: 25px; color: #555;">Alterando a vaga: <strong><?php echo htmlspecialchars($vaga['titulo_vaga']); ?></strong></p>
 
+            <div id="api-message"></div>
 
-            <form action="<?php echo BASE_URL; ?>/vagas/atualizar" method="POST">
-                <input type="hidden" name="id_vaga" value="<?php echo $vaga['id_vaga']; ?>">
+            <form id="form-editar-vaga">
+                <input type="hidden" id="id_vaga" name="id_vaga">
 
                 <section>
                     <h3>Dados da Vaga</h3>
                     <div class="grid">
                         <div>
                             <label for="titulo">Título da Vaga</label>
-                            <input id="titulo" type="text" name="titulo" value="<?php echo htmlspecialchars($vaga['titulo_vaga']); ?>" required>
+                            <input id="titulo" type="text" name="titulo" required>
                         </div>
                         <div>
                             <label for="departamento">Departamento</label>
-                            <input id="departamento" type="text" name="departamento" value="<?php echo htmlspecialchars($vaga['nome_setor']); ?>" required>
+                            <input id="departamento" type="text" name="departamento" required>
                         </div>
                         <div style="grid-column: span 2;">
                             <label for="descricao">Descrição da Vaga</label>
-                            <textarea id="descricao" name="descricao" rows="5" required><?php echo htmlspecialchars($vaga['descricao_vaga']); ?></textarea>
+                            <textarea id="descricao" name="descricao" rows="5" required></textarea>
                         </div>
                         <div>
                             <label for="status">Status da Vaga</label>
                             <select id="status" name="status" required>
-                                <option value="aberta" <?php echo ($vaga['situacao'] === 'aberta') ? 'selected' : ''; ?>>Aberta</option>
-                                <option value="rascunho" <?php echo ($vaga['situacao'] === 'rascunho') ? 'selected' : ''; ?>>Rascunho</option>
-                                <option value="fechada" <?php echo ($vaga['situacao'] === 'fechada') ? 'selected' : ''; ?>>Fechada</option>
+                                <option value="aberta">Aberta</option>
+                                <option value="rascunho">Rascunho</option>
+                                <option value="fechada">Fechada</option>
                             </select>
                         </div>
                     </div>
@@ -53,23 +71,28 @@
                     <div class="grid">
                         <div style="grid-column: span 2;">
                             <label for="skills_necessarias">Skills Necessárias</label>
-                            <textarea id="skills_necessarias" name="skills_necessarias" rows="3" placeholder="Ex.: Trabalho em equipe, Comunicação"><?php echo htmlspecialchars($vaga['requisitos_necessarios']); ?></textarea>
+                            <textarea id="skills_necessarias" name="skills_necessarias" rows="3"></textarea>
                         </div>
                         <div style="grid-column: span 2;">
                             <label for="skills_recomendadas">Skills Recomendadas</label>
-                            <textarea id="skills_recomendadas" name="skills_recomendadas" rows="3" placeholder="Ex.: Criatividade, Proatividade"><?php echo htmlspecialchars($vaga['requisitos_recomendados']); ?></textarea>
+                            <textarea id="skills_recomendadas" name="skills_recomendadas" rows="3"></textarea>
                         </div>
                        <div style="grid-column: span 2;">
                             <label for="skills_desejadas">Skills Desejadas (Opcional)</label>
-                            <textarea id="skills_desejadas" name="skills_desejadas" rows="3" placeholder="Ex.: Liderança, Gestão de projetos"><?php echo htmlspecialchars($vaga['requisitos_desejados']); ?></textarea>
+                            <textarea id="skills_desejadas" name="skills_desejadas" rows="3"></textarea>
                         </div>
                     </div>
                 </section>
 
-                <button type="submit" class="submit-button">Salvar Alterações</button>
-                <a href="<?php echo BASE_URL; ?>/vagas/listar" class="cancel-button">Cancelar</a>
+                <button type="submit" id="btn-salvar-vaga" class="submit-button">Salvar Alterações</button>
             </form>
         </main>
     </div>
+
+<script>
+    const BASE_URL = "<?php echo BASE_URL; ?>";
+</script>
+<script src="<?php echo BASE_URL; ?>/js/vagas-editar.js"></script>
+
 </body>
 </html>

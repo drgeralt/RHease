@@ -13,12 +13,10 @@ class GestaoVagasController extends Controller
 {
     // lista as vagas e exibe a view
     public function listarVagas(): void 
-    {
-        $db = Database::getInstance();
-        $vagaModel = $this->model('GestaoVagas');
-        $vagas = $vagaModel->listarVagas();
-        $this->view('vaga/GestaoVagas', ['vagas' => $vagas]);
-    }
+{
+    // Apenas carrega a página HTML. O JavaScript fará o resto.
+    $this->view('vaga/GestaoVagas'); 
+}
 
     public function verCandidatos()
     {
@@ -50,9 +48,9 @@ class GestaoVagasController extends Controller
     // exibe o formulário de criação
     public function criar(): void
     {
-        $cargoModel = $this->model('Cargo');
-        $cargosDisponiveis = $cargoModel->findAll();
-        $this->view('vaga/NovaVaga', ['cargos' => $cargosDisponiveis]);
+        // Não precisamos mais buscar dados aqui.
+        // Apenas carregamos o "esqueleto" da página.
+        $this->view('vaga/novaVaga');
     }
 
 
@@ -127,23 +125,10 @@ public function salvar(): void
 
     public function editar(): void
     {
-        $idVaga = (int)($_GET['id'] ?? 0);
-
-        if ($idVaga === 0) {
-            header('Location: ' . BASE_URL . '/vagas/listar');
-            exit;
-        }
-
-        $vagaModel = $this->model('GestaoVagas');
-        $vaga = $vagaModel->buscarPorId($idVaga);
-
-        if (!$vaga) {
-            // Vaga não encontrada, redireciona para a lista
-            header('Location: ' . BASE_URL . '/vagas/listar');
-            exit;
-        }
-
-        $this->view('vaga/editarVaga', ['vaga' => $vaga]);
+        // Não precisamos mais buscar dados aqui.
+        // Apenas carregamos a view. O JavaScript na view
+        // será responsável por ler o ID da URL e buscar os dados.
+        $this->view('vaga/editarVaga');
     }
 
     //Processa os dados do formulário de edição e atualiza no banco.

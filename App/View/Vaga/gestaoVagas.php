@@ -98,44 +98,21 @@
                 </div>
 
                 <div class="table-container">
+                    
                     <table class="data-table">
                         <thead>
-                        <tr>
-                            <th>Título <i class="fas fa-sort"></i></th>
-                            <th>Departamento <i class="fas fa-sort"></i></th>
-                            <th>Status <i class="fas fa-sort"></i></th>
-                            <th>Ações <i class="fas fa-sort"></i></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($vagas as $vaga): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($vaga['titulo']); ?></td>
-                                <td><?php echo htmlspecialchars($vaga['departamento']); ?></td>
-                                <td>
-                                        <span class="status-badge <?php echo $vaga['situacao'] === 'aberta' ? 'status-open' : 'status-draft'; ?>">
-                                            <?php echo htmlspecialchars(ucfirst($vaga['situacao'])); ?>
-                                        </span>
-                                </td>
-                                <td class="actions">
-                                    <div class="action-icons">
-                                        <a href="<?php echo BASE_URL; ?>/vagas/editar?id=<?php echo $vaga['id_vaga']; ?>" class="icon-btn icon-edit" title="Editar Vaga">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-
-                                        <a href="<?php echo BASE_URL; ?>/vagas/excluir?id=<?php echo $vaga['id_vaga']; ?>" class="icon-btn icon-delete" title="Excluir Vaga" onclick="return confirm('Tem certeza que deseja excluir esta vaga? Esta ação não pode ser desfeita.');">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
-
-                                        <form action="<?php echo BASE_URL; ?>/vagas/candidatos" method="POST">
-                                            <input type="hidden" name="id" value="<?php echo $vaga['id_vaga']; ?>">
-                                            <button type="submit" class="icon-btn icon-view" title="Ver Candidatos">
-                                                <i class="fas fa-search"></i> </button>
-                                        </form>
-                                    </div>
-                                </td>
+                                <th>Título</th>
+                                <th>Departamento</th>
+                                <th>Status</th>
+                                <th>Ações</th>
                             </tr>
-                        <?php endforeach; ?>
+                        </thead>
+                        
+                        <tbody id="tabela-vagas-corpo">
+                            <tr>
+                                <td colspan="4" style="text-align: center;">Carregando vagas...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -185,7 +162,11 @@
     </div>
 </div>
 
-<script src="assets/js/script.js"></script>
+<script>
+    const BASE_URL = "<?php echo BASE_URL; ?>";
+</script>
+<script src="<?php echo BASE_URL; ?>/js/vagas-gestao.js"></script>
+
 </body>
 </html>
 

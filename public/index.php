@@ -25,6 +25,7 @@ use App\Core\Router;
 use App\Controller\BeneficioController;
 use App\Controller\HoleriteController;
 use App\Controller\FolhaPagamentoController;
+use App\Controller\VagaApiController;
 
 // registro de rotas
 $router = new Router();
@@ -54,6 +55,14 @@ $router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 've
 $router->addRoute('GET', '/vagas/editar', GestaoVagasController::class, 'editar');
 $router->addRoute('POST', '/vagas/atualizar', GestaoVagasController::class, 'atualizar');
 $router->addRoute('GET', '/vagas/excluir', GestaoVagasController::class, 'excluir');
+
+// --- Rotas da API de Vagas ---
+$router->addRoute('GET', '/api/vagas/listar', VagaApiController::class, 'listarVagas');
+$router->addRoute('GET', '/api/vagas/editar', VagaApiController::class, 'editar'); // Ex: /api/vagas/editar?id=5
+$router->addRoute('GET', '/api/vagas/excluir', VagaApiController::class, 'excluir'); // Ex: /api/vagas/excluir?id=5
+$router->addRoute('POST', '/api/vagas/salvar', VagaApiController::class, 'salvar');
+$router->addRoute('POST', '/api/vagas/atualizar', VagaApiController::class, 'atualizar');
+$router->addRoute('POST', '/api/vagas/candidatos', VagaApiController::class, 'verCandidatos');
 
 // Benefícios
 $router->addRoute('GET', '/beneficios', BeneficioController::class, 'index');

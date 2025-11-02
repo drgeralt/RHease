@@ -118,5 +118,10 @@ unset($_SESSION['erros_vaga'], $_SESSION['old_data']);
             </form>
         </main>
     </div>
+<script>
+    const BASE_URL = "<?php echo BASE_URL; ?>";
+</script>
+<script src="<?php echo BASE_URL; ?>/js/vagas-nova.js"></script>
+
 </body>
 </html>
