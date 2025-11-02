@@ -91,10 +91,10 @@
             <section class="content-section">
                 <div class="section-header">
                     <h2 class="section-title">Gestão de Vagas</h2>
-                    <a href = "<?php echo BASE_URL;?>/vagas/criar" class="btn btn-primary">
-                        <i class="fas fa-plus"></i>
-                        Criar Nova Vaga
-                    </a>
+                   <button id="btn-abrir-modal-criacao" class="btn btn-primary">
+    <i class="fas fa-plus"></i>
+    Criar Nova Vaga
+</button>
                 </div>
 
                 <div class="table-container">
@@ -251,6 +251,69 @@
         <div class="modal-footer">
             <button type="button" id="modal-edicao-cancel-btn" class="btn-cancelar">Cancelar</button>
             <button type="submit" id="btn-salvar-edicao" class="btn-salvar">Salvar Alterações</button>
+        </div>
+    </form>
+</div>
+
+<div id="modal-criacao-vaga" class="modal-container modal-lg">
+    
+    <form id="form-criar-vaga" class="modal-form">
+        <div class="modal-header">
+            <h2>Criar Nova Vaga</h2>
+            <button type="button" id="modal-criacao-close-btn" class="modal-close">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div id="api-message-create"></div>
+
+            <section>
+                <h3>Dados da Vaga</h3>
+                <div class="grid">
+                    <div>
+                        <label for="create-titulo">Título da Vaga</label>
+                        <input id="create-titulo" type="text" name="titulo" required>
+                    </div>
+                    <div>
+                        <label for="create-departamento">Departamento</label>
+                        <input id="create-departamento" type="text" name="departamento" required>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label for="create-descricao">Descrição da Vaga</label>
+                        <textarea id="create-descricao" name="descricao" rows="5" required></textarea>
+                    </div>
+                    <div>
+                        <label for="create-status">Status da Vaga</label>
+                        <select id="create-status" name="status" required>
+                            <option value="aberta">Aberta</option>
+                            <option value="rascunho" selected>Rascunho</option>
+                            <option value="fechada">Fechada</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+            
+            <section>
+                <h3>Requisitos e Skills</h3>
+                <div class="grid">
+                    <div style="grid-column: span 2;">
+                        <label for="create-skills-necessarias">Skills Necessárias</label>
+                        <textarea id="create-skills-necessarias" name="skills_necessarias" rows="3"></textarea>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label for="create-skills-recomendadas">Skills Recomendadas</label>
+                        <textarea id="create-skills-recomendadas" name="skills_recomendadas" rows="3"></textarea>
+                    </div>
+                   <div style="grid-column: span 2;">
+                        <label for="create-skills-desejadas">Skills Desejadas (Opcional)</label>
+                        <textarea id="create-skills-desejadas" name="skills_desejadas" rows="3"></textarea>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" id="modal-criacao-cancel-btn" class="btn-cancelar">Cancelar</button>
+            <button type="submit" id="btn-salvar-criacao" class="btn-salvar">Salvar Vaga</button>
         </div>
     </form>
 </div>

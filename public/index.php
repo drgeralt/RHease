@@ -49,9 +49,6 @@ $router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar
 
 // --- Rotas de Gestão de Vagas ---
 $router->addRoute('GET', '/vagas/listar', GestaoVagasController::class, 'listarVagas');
-$router->addRoute('GET', '/vagas/criar', GestaoVagasController::class, 'criar');
-$router->addRoute('GET', '/vagas/editar', GestaoVagasController::class, 'editar');
-$router->addRoute('GET', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos'); // MUDANÇA: Agora é GET
 
 // --- Rotas da API de Vagas ---
 $router->addRoute('GET', '/api/vagas/listar', VagaApiController::class, 'listarVagas');

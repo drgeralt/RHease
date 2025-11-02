@@ -1,56 +1,70 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Pega todos os elementos dos modais DEPOIS que a página carregar
-    const modalCandidatos = document.getElementById('modal-candidatos');
-    const modalEdicao = document.getElementById('modal-edicao-vaga');
-    const modalBackdrop = document.getElementById('modal-backdrop');
-    
-    // 1. Carrega a tabela de vagas principal
+    // --- Carregamento Inicial ---
     carregarVagas();
 
-    // 2. Adiciona eventos para fechar os modais
-    // Verifica se os elementos existem antes de adicionar listeners
-    if (modalBackdrop) {
-        modalBackdrop.addEventListener('click', () => {
-            fecharModalCandidatos();
-            fecharModalEdicao();
-        });
-    }
-    
-    // Botões de fechar/cancelar do Modal de Candidatos
+    // --- Elementos do Modal de Candidatos ---
+    const modalCandidatos = document.getElementById('modal-candidatos');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     if (modalCloseBtn) {
         modalCloseBtn.addEventListener('click', fecharModalCandidatos);
     }
 
-    // Botões de fechar/cancelar do Modal de Edição
+    // --- Elementos do Modal de Edição ---
+    const modalEdicao = document.getElementById('modal-edicao-vaga');
     const modalEdicaoCloseBtn = document.getElementById('modal-edicao-close-btn');
     const modalEdicaoCancelBtn = document.getElementById('modal-edicao-cancel-btn');
+    const formEditar = document.getElementById('form-editar-vaga');
     if (modalEdicaoCloseBtn) {
         modalEdicaoCloseBtn.addEventListener('click', fecharModalEdicao);
     }
     if (modalEdicaoCancelBtn) {
         modalEdicaoCancelBtn.addEventListener('click', fecharModalEdicao);
     }
-
-    // 3. Adiciona evento de submit para o formulário de edição
-    const formEditar = document.getElementById('form-editar-vaga');
     if (formEditar) {
         formEditar.addEventListener('submit', function(event) {
-            event.preventDefault(); // Impede o envio tradicional
-            salvarEdicao(); // Chama nossa função de API
+            event.preventDefault();
+            salvarEdicao();
+        });
+    }
+
+    // --- Elementos do Modal de Criação (NOVO) ---
+    const modalCriacao = document.getElementById('modal-criacao-vaga');
+    const btnAbrirModalCriacao = document.getElementById('btn-abrir-modal-criacao');
+    const modalCriacaoCloseBtn = document.getElementById('modal-criacao-close-btn');
+    const modalCriacaoCancelBtn = document.getElementById('modal-criacao-cancel-btn');
+    const formCriar = document.getElementById('form-criar-vaga');
+    if (btnAbrirModalCriacao) {
+        btnAbrirModalCriacao.addEventListener('click', abrirModalCriacao);
+    }
+    if (modalCriacaoCloseBtn) {
+        modalCriacaoCloseBtn.addEventListener('click', fecharModalCriacao);
+    }
+    if (modalCriacaoCancelBtn) {
+        modalCriacaoCancelBtn.addEventListener('click', fecharModalCriacao);
+    }
+    if (formCriar) {
+        formCriar.addEventListener('submit', function(event) {
+            event.preventDefault();
+            salvarCriacao();
+        });
+    }
+
+    // --- Evento do Backdrop (Fundo) ---
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', () => {
+            fecharModalCandidatos();
+            fecharModalEdicao();
+            fecharModalCriacao(); // Adiciona o fechamento do modal de criação
         });
     }
 });
 
 async function carregarVagas() {
-    // ... (Esta função estava correta e não precisa de mudanças) ...
+    // ... (Esta função está 100% CORRETA, sem necessidade de mudanças) ...
     const tbody = document.getElementById('tabela-vagas-corpo');
-    if (!tbody) {
-        console.error("Erro: Elemento 'tabela-vagas-corpo' não encontrado.");
-        return;
-    }
+    if (!tbody) { console.error("Erro: 'tabela-vagas-corpo' não encontrado."); return; }
     tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Carregando...</td></tr>';
     try {
         const response = await fetch(`${BASE_URL}/api/vagas/listar`);
@@ -87,7 +101,7 @@ async function carregarVagas() {
 }
 
 async function excluirVaga(id, titulo) {
-    // ... (Esta função estava correta e não precisa de mudanças) ...
+    // ... (Esta função está 100% CORRETA, sem necessidade de mudanças) ...
     if (!confirm(`Tem certeza que deseja excluir a vaga "${titulo}"?`)) {
         return;
     }
@@ -97,7 +111,7 @@ async function excluirVaga(id, titulo) {
         if (resultado.sucesso) {
             document.getElementById(`vaga-${id}`).remove();
         } else {
-            alert('Erro ao excluir: ' (resultado.erro || 'Erro desconhecido'));
+            alert('Erro ao excluir: ' + (resultado.erro || 'Erro desconhecido'));
         }
     } catch (error) {
         alert('Erro de conexão ao tentar excluir a vaga.');
@@ -105,17 +119,15 @@ async function excluirVaga(id, titulo) {
 }
 
 async function abrirModalCandidatos(idVaga) {
-    // CORREÇÃO #2: Usa a variável correta `modalBackdrop`
+    // ... (Esta função está 100% CORRETA, sem necessidade de mudanças) ...
     const modalBackdrop = document.getElementById('modal-backdrop');
     const modalCandidatos = document.getElementById('modal-candidatos');
     const tituloEl = document.getElementById('modal-titulo-vaga');
     const tbodyEl = document.getElementById('modal-tabela-candidatos');
-
     modalBackdrop.style.display = 'block';
     modalCandidatos.style.display = 'block';
     tituloEl.textContent = 'Carregando...';
     tbodyEl.innerHTML = '<tr><td colspan="4" style="text-align: center;">Buscando candidatos...</td></tr>';
-
     try {
         const response = await fetch(`${BASE_URL}/api/vagas/candidatos?id=${idVaga}`);
         const data = await response.json();
@@ -152,26 +164,25 @@ async function abrirModalCandidatos(idVaga) {
 }
 
 function fecharModalCandidatos() {
-    document.getElementById('modal-candidatos').style.display = 'none';
-    document.getElementById('modal-backdrop').style.display = 'none';
+    const modalCandidatos = document.getElementById('modal-candidatos');
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    if(modalCandidatos) modalCandidatos.style.display = 'none';
+    if(modalBackdrop) modalBackdrop.style.display = 'none';
 }
 
 async function abrirModalEdicao(idVaga) {
-    // CORREÇÃO #2: Usa a variável correta `modalBackdrop`
+    // ... (Esta função está 100% CORRETA, sem necessidade de mudanças) ...
     const modalBackdrop = document.getElementById('modal-backdrop');
     const modalEdicao = document.getElementById('modal-edicao-vaga');
     const messageDiv = document.getElementById('api-message-edit');
     messageDiv.style.display = 'none';
-
     modalBackdrop.style.display = 'block';
     modalEdicao.style.display = 'block';
-
     try {
         const response = await fetch(`${BASE_URL}/api/vagas/editar?id=${idVaga}`);
         if (!response.ok) throw new Error('Falha ao buscar dados da vaga.');
         const vaga = await response.json();
         if (vaga.erro) throw new Error(vaga.erro);
-
         document.getElementById('edit-id-vaga').value = vaga.id_vaga;
         document.getElementById('modal-edicao-titulo').textContent = `Editar Vaga: ${vaga.titulo_vaga}`;
         document.getElementById('edit-titulo').value = vaga.titulo_vaga;
@@ -181,7 +192,6 @@ async function abrirModalEdicao(idVaga) {
         document.getElementById('edit-skills-necessarias').value = vaga.requisitos_necessarios || '';
         document.getElementById('edit-skills-recomendadas').value = vaga.requisitos_recomendados || '';
         document.getElementById('edit-skills-desejadas').value = vaga.requisitos_desejados || '';
-
     } catch (error) {
         messageDiv.innerHTML = error.message;
         messageDiv.className = 'msg-erro';
@@ -190,12 +200,14 @@ async function abrirModalEdicao(idVaga) {
 }
 
 function fecharModalEdicao() {
-    document.getElementById('modal-edicao-vaga').style.display = 'none';
-    document.getElementById('modal-backdrop').style.display = 'none';
+    const modalEdicao = document.getElementById('modal-edicao-vaga');
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    if(modalEdicao) modalEdicao.style.display = 'none';
+    if(modalBackdrop) modalBackdrop.style.display = 'none';
 }
 
 async function salvarEdicao() {
-    // ... (Esta função estava correta e não precisa de mudanças) ...
+    // ... (Esta função está 100% CORRETA, sem necessidade de mudanças) ...
     const form = document.getElementById('form-editar-vaga');
     const submitButton = document.getElementById('btn-salvar-edicao');
     const messageDiv = document.getElementById('api-message-edit');
@@ -225,7 +237,67 @@ async function salvarEdicao() {
     }
 }
 
-//funcao utilitaria
+function abrirModalCriacao() {
+    // 1. Limpa o formulário de valores antigos
+    document.getElementById('form-criar-vaga').reset();
+    
+    // 2. Esconde mensagens de erro/sucesso antigas
+    document.getElementById('api-message-create').style.display = 'none';
+    
+    // 3. Mostra o modal
+    document.getElementById('modal-backdrop').style.display = 'block';
+    document.getElementById('modal-criacao-vaga').style.display = 'block';
+}
+
+function fecharModalCriacao() {
+    document.getElementById('modal-criacao-vaga').style.display = 'none';
+    document.getElementById('modal-backdrop').style.display = 'none';
+}
+
+async function salvarCriacao() {
+    const form = document.getElementById('form-criar-vaga');
+    const submitButton = document.getElementById('btn-salvar-criacao');
+    const messageDiv = document.getElementById('api-message-create');
+    
+    submitButton.disabled = true;
+    submitButton.textContent = 'Salvando...';
+
+    const formData = new FormData(form);
+    const dadosVaga = Object.fromEntries(formData.entries());
+
+    try {
+        // Envia os dados para a API de "salvar"
+        const response = await fetch(`${BASE_URL}/api/vagas/salvar`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+            body: JSON.stringify(dadosVaga)
+        });
+
+        const resultado = await response.json();
+        if (!response.ok || !resultado.sucesso) {
+            let erroMsg = resultado.erro || 'Ocorreu um erro ao salvar.';
+            if (resultado.erros) {
+                erroMsg = Object.values(resultado.erros).join('<br>');
+            }
+            throw new Error(erroMsg);
+        }
+
+        // Sucesso! Fecha o modal e recarrega a tabela principal
+        fecharModalCriacao();
+        carregarVagas(); // Atualiza a tabela com a nova vaga
+
+    } catch (error) {
+        messageDiv.innerHTML = error.message;
+        messageDiv.className = 'msg-erro';
+        messageDiv.style.display = 'block';
+    } finally {
+        // Reabilita o botão
+        submitButton.disabled = false;
+        submitButton.textContent = 'Salvar Vaga';
+    }
+}
+
+// Função auxiliar para escapar HTML
 function escapeHTML(str) {
     if (!str) return '';
     return str.replace(/[&<>"']/g, function(m) {
