@@ -42,7 +42,7 @@
                 <nav class="sidebar-nav">
                     <ul class="nav-list">
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="<?php echo BASE_URL; ?>/inicio"class="nav-link">
                                 <i class="fas fa-chart-bar"></i>
                                 <span>Painel</span>
                             </a>
@@ -60,13 +60,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="<?php echo BASE_URL; ?>/folha/processar" class="nav-link">
                                 <i class="fas fa-credit-card"></i>
                                 <span>Pagamento</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="<?php echo BASE_URL; ?>/beneficios" class="nav-link">
                                 <i class="fas fa-gift"></i>
                                 <span>Benefícios</span>
                             </a>

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Core\Database;
+use App\Model\ColaboradorModel;
 use App\Model\PontoModel;
 use Exception;
 
@@ -12,17 +14,29 @@ class PontoController
      */
     public function index()
     {
-        $pontoModel = new PontoModel();
-        $idColaborador = $_SESSION['id_colaborador'] ?? 1; // MODIFICAR
+        $userId = $_SESSION['user_id'] ?? null;
+        if (!$userId) {
+            header('Location: ' . BASE_URL . '/login');
+            exit;
+        }
+
+        $pdo = Database::getInstance();
+        // CORREÇÃO: Passando a conexão PDO para o construtor do PontoModel.
+        $pontoModel = new PontoModel($pdo);
+        $colaboradorModel = new ColaboradorModel($pdo);
+
+        // Busca os dados do colaborador para a view
+        $colaborador = $colaboradorModel->getDadosColaborador($userId);
 
         $dataAtual = date('Y-m-d');
-        $ultimoPonto = $pontoModel->getUltimoPontoAberto($idColaborador, $dataAtual);
+        $ultimoPonto = $pontoModel->getUltimoPontoAberto($userId, $dataAtual);
 
         $horaEntrada = null;
         if ($ultimoPonto) {
             $horaEntrada = date('H:i', strtotime($ultimoPonto['data_hora_entrada']));
         }
 
+        // A variável $colaborador estará disponível na view
         require_once BASE_PATH . '/App/View/Colaborador/registroPonto.php';
     }
 
@@ -36,6 +50,11 @@ class PontoController
         $caminhoCompleto = null;
 
         try {
+            $userId = $_SESSION['user_id'] ?? null;
+            if (!$userId) {
+                throw new Exception('Usuário não autenticado. Faça login novamente.');
+            }
+
             if (!isset($_POST['imagem']) || empty($_POST['imagem'])) {
                 throw new Exception('Nenhuma imagem recebida.');
             }
@@ -48,18 +67,30 @@ class PontoController
             }
             $imgData = base64_decode($imgData);
 
-            $idColaborador = $_SESSION['id_colaborador'] ?? 1;
             $timestamp = time();
             $dataHoraAtual = date('Y-m-d H:i:s', $timestamp);
-            $nomeArquivo = $idColaborador . '_' . $timestamp . '.jpg';
-            $caminhoCompleto = BASE_PATH . '/storage/fotos_ponto/' . $nomeArquivo;
+            $geolocalizacao = $_POST['geolocalizacao'] ?? 'Não informada';
+            $nomeArquivo = $userId . '_' . $timestamp . '.jpg';
+            $caminhoRelativo = 'storage/fotos_ponto/' . $nomeArquivo;
+            $caminhoCompleto = BASE_PATH . '/' . $caminhoRelativo;
+            $diretorioFotos = dirname($caminhoCompleto);
+            $ipAddress = $_SERVER['REMOTE_ADDR'] ?? "Não identificado";
 
-            if (file_put_contents($caminhoCompleto, $imgData) === false) {
-                throw new Exception('Falha ao guardar a imagem no servidor. Verifique as permissões da pasta storage.');
+            if (!is_dir($diretorioFotos)) {
+                if (!mkdir($diretorioFotos, 0775, true)) {
+                    throw new Exception("Falha ao criar diretório 'RHease/storage/fotos_ponto'!");
+                };
             }
 
-            $pontoModel = new PontoModel();
-            $tipoDeRegisto = $pontoModel->registrarPonto($idColaborador, $dataHoraAtual);
+            if (file_put_contents($caminhoCompleto, $imgData) === false) {
+                throw new Exception('Falha ao guardar a imagem no servidor. Verifique as permissões da pasta /storage.');
+            }
+
+            $pdo = Database::getInstance();
+            // CORREÇÃO: Passando a conexão PDO para o construtor do PontoModel.
+            $pontoModel = new PontoModel($pdo);
+            $tipoDeRegisto = $pontoModel->registrarPonto($userId, $dataHoraAtual, $geolocalizacao,
+                $caminhoRelativo, $ipAddress);
 
             echo json_encode([
                 'status' => 'success',

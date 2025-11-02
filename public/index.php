@@ -1,5 +1,6 @@
 <?php
-
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 ini_set('display_errors', 1);
@@ -7,6 +8,7 @@ ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
 session_start();
+
 
 define('BASE_PATH', dirname(__DIR__));
 
@@ -39,6 +41,9 @@ $router->addRoute('POST', '/register', UserController::class, 'register');
 $router->addRoute('GET', '/registro-sucesso', UserController::class, 'show_registro_sucesso');
 $router->addRoute('GET', '/verify', UserController::class, 'verify_account');
 
+// --- Rotas de Home ---
+$router->addRoute('GET', '/inicio', DashboardController::class, 'index');
+
 // --- Rotas de Colaboradores ---
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
 $router->addRoute('POST', '/colaboradores/criar', ColaboradorController::class, 'criar');
@@ -59,10 +64,16 @@ $router->addRoute('GET', '/api/vagas/excluir', VagaApiController::class, 'exclui
 $router->addRoute('GET', '/api/vagas/candidatos', VagaApiController::class, 'verCandidatos'); // MUDANÇA: Agora é GET
 
 // Benefícios
-$router->addRoute('GET', '/beneficios', BeneficioController::class, 'index');
+$router->addRoute('GET', '/beneficios', BeneficioController::class, 'gerenciamento');
 $router->addRoute('POST', '/beneficios/criar', BeneficioController::class, 'criar');
 $router->addRoute('POST', '/beneficios/editar', BeneficioController::class, 'editar');
-$router->addRoute('GET', '/beneficios/desativar', BeneficioController::class, 'desativar');
+$router->addRoute('GET', '/beneficios/desativar/{id}', BeneficioController::class, 'desativar');
+$router->addRoute('POST', '/beneficios/deletar', BeneficioController::class, 'deletarBeneficio');
+$router->addRoute('POST', '/beneficios/salvar', BeneficioController::class, 'salvarBeneficio'); 
+$router->addRoute('POST', '/colaborador/beneficios/salvar', BeneficioController::class, 'salvarBeneficiosColaborador');
+$router->addRoute('POST', '/beneficios/regras/salvar', BeneficioController::class, 'salvarRegrasAtribuicao');
+$router->addRoute('POST', '/beneficios/toggleStatus', BeneficioController::class, 'toggleStatus');
+
 
 $router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios'); 
 
@@ -85,7 +96,7 @@ $router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redireci
 // ----------------------
 // Rota para a página de listagem de holerites do colaborador
 $router->addRoute('GET', '/meus-holerites', HoleriteController::class, 'index');
-$router->addRoute('GET', '/holerite/pdf', HoleriteController::class, 'gerarPDF');
+$router->addRoute('POST', '/holerite/gerarPDF', HoleriteController::class, 'gerarPDF');
 
 $router->addRoute('GET', '/folha/processar', FolhaPagamentoController::class, 'index');
 $router->addRoute('POST', '/folha/processar', FolhaPagamentoController::class, 'processar');
