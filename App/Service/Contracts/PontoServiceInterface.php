@@ -1,6 +1,6 @@
 <?php
 
-
+namespace App;
 /**
  * Contrato para o serviço de processamento de ponto.
  * Abstrai a complexidade dos cálculos de horas e fornece totais
