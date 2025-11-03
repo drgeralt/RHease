@@ -389,8 +389,6 @@ class ColaboradorModel extends Model
     return $resultado ? (float)$resultado['total_descontos'] : 0;
 }
 
-
-
     /**
      * Busca os itens detalhados (proventos e descontos) do último holerite de um colaborador.
      * @param int $userId

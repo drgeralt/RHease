@@ -10,7 +10,7 @@ $horas_semana = round($horas_semana ?? 0);
 // Calcula salário líquido e formata
 $salario_base = (float)$salario_base;
 $beneficios_valor = (float)$beneficios_valor;
-$descontos_valor = (float)$descontos_valor;
+$descontos_valor = $descontos_valor ?? 0;
 $salario_liquido = ($salario_base ?? 0) + $beneficios_valor - $descontos_valor;
 $salario_liquido_formatado = number_format($salario_liquido, 2, ',', '.');
 
@@ -33,30 +33,6 @@ $salario_chart_style = "
         #D32F2F " . ($porc_base + $porc_beneficios) . "% 100%
     );
 ";
-
-$horas_chart_data_present = true;
-$horas_semana = 35; // total de horas na semana
-
-// Exemplo de distribuição das horas por dia (em %)
-$porc_segunda = 20;
-$porc_terca   = 20;
-$porc_quarta  = 20;
-$porc_quinta  = 20;
-$porc_sexta   = 20;
-$porc_sabado  = 0;
-$porc_domingo = 0;
-
-// Monta o estilo do gráfico de horas
-$horas_chart_style = "
-    background: conic-gradient(
-        var(--color-segunda) 0% {$porc_segunda}%,
-        var(--color-terca) {$porc_segunda}% " . ($porc_segunda+$porc_terca) . "%,
-        var(--color-quarta) " . ($porc_segunda+$porc_terca) . "% " . ($porc_segunda+$porc_terca+$porc_quarta) . "%,
-        var(--color-quinta) " . ($porc_segunda+$porc_terca+$porc_quarta) . "% " . ($porc_segunda+$porc_terca+$porc_quarta+$porc_quinta) . "%,
-        var(--color-sexta) " . ($porc_segunda+$porc_terca+$porc_quarta+$porc_quinta) . "% 100%
-    );
-";
-
 
 ?>
 <!DOCTYPE html>
@@ -113,6 +89,83 @@ $horas_chart_style = "
             padding: 10px;
         }
         .hours-legend .dot-segunda { background-color: #ff7213ff; }
+        /* === Gráfico de Horas em formato de Rosca === */
+        .hours-donut {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Cria o "furo" no meio da rosca */
+.hours-donut::before {
+             content: "";
+             position: absolute;
+             width: 120px; /* Aumentado de 100px para 120px */
+             height: 120px; /* Aumentado de 100px para 120px */
+             background: #fff;
+             border-radius: 50%;
+            z-index: 1;
+    }
+
+         .hours-donut-center {
+             position: relative;
+             z-index: 2;
+             text-align: center;
+             line-height: 1.2;
+            /* Adicionado para garantir a centralização perfeita */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+    }
+
+         .donut-center-value {
+             font-size: 18px;
+             font-weight: 700;
+             color: #333;
+         }
+        /* Correção no CSS existente (na tag <style> ou em dashboardColaborador.css) */
+
+.donut-chart-mock::before {
+    content: "";
+    position: absolute;
+    width: 120px; /* Aumentado para cobrir a área */
+    height: 120px; /* Aumentado para cobrir a área */
+    background: #ffffff; /* Garantir que a cor seja branca */
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.donut-center {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    /* Adicionado para garantir a centralização perfeita */
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Também altere o .donut-center-value para garantir que o texto não quebre se for grande */
+.donut-center-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    /* Garante que o texto fique em uma linha, se possível */
+    white-space: nowrap; 
+}        
+
+.donut-center-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #757575;
+}
+
     </style>
 </head>
 
@@ -163,12 +216,12 @@ $horas_chart_style = "
                 <div class="chart-card-colaborador">
                     <h2 class="chart-title">Distribuição do salário</h2>
                     <div class="chart-content">
-                        <div class="chart-circle" style="<?= $salario_chart_style ?>">
-                            <div class="salary-chart-center">
-                                <span class="salary-chart-value"><?= $salario_liquido_formatado ?></span>
-                                <span class="salary-chart-label">Salário líquido</span>
-                            </div>
+                    <div class="donut-chart-mock" style="<?= $salario_chart_style ?>">
+                        <div class="donut-center">
+                            <span class="donut-center-value"><?= $salario_liquido_formatado ?></span>
+                            <span class="donut-center-label">Salário líquido</span>
                         </div>
+                    </div>
 
                         <div class="salary-legend">
                             <ul>
@@ -183,16 +236,17 @@ $horas_chart_style = "
                 <div class="chart-card-colaborador">
                     <h2 class="chart-title">Horas trabalhadas</h2>
                     <div class="chart-content">
-                        <?php if ($horas_chart_data_present): ?>
-                             <div class="chart-circle" style="<?= $horas_chart_style ?>">
-                                <div class="hours-chart-center">
-                                    <span class="hours-chart-value"><?= $horas_semana ?></span>
-                                    <span class="hours-chart-label">Horas semanais</span>
-                                </div>
-                            </div>
-                        <?php else: ?>
-                            <div class="no-data-placeholder">Sem dados para exibir</div>
-                        <?php endif; ?>
+                    <?php if ($horas_chart_data_present): ?>
+                    <div class="hours-donut" style="<?= $horas_chart_style ?>">
+                        <div class="hours-donut-center">
+                            <span class="hours-chart-value"><?= $horas_semana ?></span>
+                            <span class="hours-chart-label">Horas semanais</span>
+                        </div>
+                    </div>
+                    <?php else: ?>
+                        <div class="no-data-placeholder">Sem dados para exibir</div>
+                    <?php endif; ?>
+
 
                         <div class="hours-legend">
                             <ul>
