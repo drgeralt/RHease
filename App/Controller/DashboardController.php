@@ -42,16 +42,25 @@ class DashboardController extends Controller {
             $beneficios_grafico = 0;
             $descontos_grafico = 0;
 
-            foreach ($itens_holerite as $item) {
-                if (isset($item['descricao']) && $item['tipo'] === 'provento') {
-                    if (stripos($item['descricao'], 'Salário Base') !== false) {
-                        $salario_base_grafico += (float)$item['valor'];
-                    } else {
-                        $beneficios_grafico += (float)$item['valor'];
+            if (!empty($itens_holerite)) {
+                foreach ($itens_holerite as $item) {
+                    if (isset($item['descricao']) && $item['tipo'] === 'provento') {
+                        if (stripos($item['descricao'], 'Salário Base') !== false) {
+                            $salario_base_grafico += (float)$item['valor'];
+                        } else {
+                            $beneficios_grafico += (float)$item['valor'];
+                        }
+                    } elseif (isset($item['tipo']) && $item['tipo'] === 'desconto') {
+                        $descontos_grafico += (float)$item['valor'];
                     }
-                } elseif (isset($item['tipo']) && $item['tipo'] === 'desconto') {
-                    $descontos_grafico += (float)$item['valor'];
                 }
+            }
+
+            // Se não houver itens de holerite, usa o salário_base do colaborador
+            if ($salario_base_grafico == 0 && empty($itens_holerite)) {
+                $salario_base_grafico = (float)($dados_colaborador['salario_base'] ?? 0);
+                $beneficios_grafico = 0;
+                $descontos_grafico = 0;
             }
 
             $total_bruto_grafico = $salario_base_grafico + $beneficios_grafico;
