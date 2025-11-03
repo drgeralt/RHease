@@ -196,7 +196,7 @@
     margin-right: 5px;
 }
 /* Cores do gráfico de horas */
-.hours-legend .dot-segunda { background-color: #5D6063; }
+.hours-legend .dot-segunda { background-color: #ff7213ff; }
 .hours-legend .dot-terca { background-color: #489D3B; }
 .hours-legend .dot-quarta { background-color: #3B5A9D; }
 .hours-legend .dot-quinta { background-color: #D02C2C; }
@@ -215,4 +215,44 @@
 .menu li.active {
     background: #489D3B;
     color: #fff;
+}
+
+/* === Gráfico de Rosca (Donut) === */
+.donut-chart-mock {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.donut-chart-mock::before {
+    content: "";
+    position: absolute;
+    width: 100px; /* tamanho do furo interno */
+    height: 100px;
+    background: #fff; /* cor de fundo no centro */
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.donut-center {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.donut-center-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+}
+
+.donut-center-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #757575;
 }

@@ -66,6 +66,7 @@
                         $start_percent = 0;
                         $css_color_vars = ['CLT' => '--chart-clt', 'PJ' => '--chart-pj', 'Estágio' => '--chart-estagio', 'Temporário' => '--chart-temporario'];
 
+                        
                         if ($total_colaboradores > 0) {
                             foreach ($distribuicao as $tipo => $total) {
                                 $color_var = $css_color_vars[$tipo] ?? '--text-color-light';

@@ -41,7 +41,7 @@ class DashboardModel {
         $dados['total_beneficios_ativos'] = $stmt->fetchColumn();
 
         // 5. Distribuição de Tipos de Contrato
-        $stmt = $this->pdo->query("SELECT tipo_contrato, COUNT(*) as total FROM colaborador GROUP BY tipo_contrato");
+        $stmt = $this->pdo->query("SELECT tipo_contrato, COUNT(*) as total FROM colaborador WHERE situacao = 'ativo' GROUP BY tipo_contrato");
         $dados['distribuicao_contratos'] = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
         return $dados;
