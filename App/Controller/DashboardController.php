@@ -32,9 +32,24 @@ class DashboardController extends Controller {
         } else {
             // --- Dados Gerais ---
             $dados_colaborador = $this->colaboradorModel->getDadosColaborador($userId);
+            // Se não veio salário base do model, busca direto da tabela colaborador
+            if (empty($dados_colaborador['salario_base'])) {
+                $pdo = Database::getInstance();
+                $stmt = $pdo->prepare("SELECT salario_base FROM colaborador WHERE id_colaborador = :id");
+                $stmt->bindValue(':id', $userId, \PDO::PARAM_INT);
+                $stmt->execute();
+                $salarioDireto = $stmt->fetchColumn();
+
+                if ($salarioDireto !== false) {
+                    $dados_colaborador['salario_base'] = $salarioDireto;
+                }
+            }
             $ultimo_ponto = $this->colaboradorModel->getUltimoPonto($userId);
             $beneficios_count = $this->colaboradorModel->getBeneficiosAtivosCount($userId);
             $salario_liquido = $this->colaboradorModel->getUltimoSalarioLiquido($userId);
+            $beneficios_valor = $this->colaboradorModel->getTotalBeneficiosValor($userId);
+            $descontos_valor = $this->colaboradorModel->getTotalDescontos($userId);
+
 
             // --- Lógica para Gráfico de Salário ---
             $itens_holerite = $this->colaboradorModel->getItensUltimoHolerite($userId);
@@ -119,6 +134,7 @@ class DashboardController extends Controller {
             $viewData = array_merge((array)$dados_colaborador, [
                 'ultimo_ponto' => $ultimo_ponto,
                 'beneficios_count' => $beneficios_count,
+                'beneficios_valor' => $beneficios_valor,
                 'salario_liquido' => $salario_liquido,
                 'horas_semana' => round($total_horas_semana_grafico),
                 'salario_chart_style' => $salario_chart_style,

@@ -334,7 +334,7 @@ header .logo {
     margin-right: 5px;
 }
 /* Cores do gráfico de horas */
-.hours-legend .dot-segunda { background-color: #5D6063; }
+.hours-legend .dot-segunda { background-color: #ff7213ff; }
 .hours-legend .dot-terca { background-color: #489D3B; }
 .hours-legend .dot-quarta { background-color: #3B5A9D; }
 .hours-legend .dot-quinta { background-color: #D02C2C; }

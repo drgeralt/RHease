@@ -1,17 +1,63 @@
 <?php
-// Define valores padrão para evitar erros se as variáveis não existirem
 $nome_completo = $nome_completo ?? 'Colaborador';
 $ultimo_ponto_hora = isset($ultimo_ponto['data_hora_entrada']) ? date('H:i', strtotime($ultimo_ponto['data_hora_entrada'])) : '--:--';
 $salario_base_formatado = number_format($salario_base ?? 0, 2, ',', '.');
 $beneficios_count = $beneficios_count ?? 0;
-$salario_liquido_formatado = number_format($salario_liquido ?? 0, 2, ',', '.');
 $horas_semana = round($horas_semana ?? 0);
 
-// Estilos e flags para os gráficos
-$salario_chart_style = $salario_chart_style ?? '';
-$salario_chart_data_present = $salario_chart_data_present ?? false;
+
+
+// Calcula salário líquido e formata
+$salario_base = (float)$salario_base;
+$beneficios_valor = (float)$beneficios_valor;
+$descontos_valor = (float)$descontos_valor;
+$salario_liquido = ($salario_base ?? 0) + $beneficios_valor - $descontos_valor;
+$salario_liquido_formatado = number_format($salario_liquido, 2, ',', '.');
+
+
+// Calcula proporção para o gráfico
+$total = max($salario_base + $beneficios_valor + $descontos_valor, 1);
+$porc_base = round(($salario_base / $total) * 100);
+$porc_beneficios = round(($beneficios_valor / $total) * 100);
+$porc_descontos = round(($descontos_valor / $total) * 100);
+
+
 $horas_chart_style = $horas_chart_style ?? '';
 $horas_chart_data_present = $horas_chart_data_present ?? false;
+
+// Monta o estilo do gráfico com conic-gradient
+$salario_chart_style = "
+    background: conic-gradient(
+        #25621C 0% {$porc_base}%,
+        #489D3B {$porc_base}% " . ($porc_base + $porc_beneficios) . "%,
+        #D32F2F " . ($porc_base + $porc_beneficios) . "% 100%
+    );
+";
+
+$horas_chart_data_present = true;
+$horas_semana = 35; // total de horas na semana
+
+// Exemplo de distribuição das horas por dia (em %)
+$porc_segunda = 20;
+$porc_terca   = 20;
+$porc_quarta  = 20;
+$porc_quinta  = 20;
+$porc_sexta   = 20;
+$porc_sabado  = 0;
+$porc_domingo = 0;
+
+// Monta o estilo do gráfico de horas
+$horas_chart_style = "
+    background: conic-gradient(
+        var(--color-segunda) 0% {$porc_segunda}%,
+        var(--color-terca) {$porc_segunda}% " . ($porc_segunda+$porc_terca) . "%,
+        var(--color-quarta) " . ($porc_segunda+$porc_terca) . "% " . ($porc_segunda+$porc_terca+$porc_quarta) . "%,
+        var(--color-quinta) " . ($porc_segunda+$porc_terca+$porc_quarta) . "% " . ($porc_segunda+$porc_terca+$porc_quarta+$porc_quinta) . "%,
+        var(--color-sexta) " . ($porc_segunda+$porc_terca+$porc_quarta+$porc_quinta) . "% 100%
+    );
+";
+
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -30,17 +76,17 @@ $horas_chart_data_present = $horas_chart_data_present ?? false;
     <style>
         /* Cores para os gráficos - Injetadas para garantir o funcionamento */
         :root {
-            --color-base: #4CAF50;       /* Verde */
-            --color-benefits: #2196F3;  /* Azul */
-            --color-discounts: #F44336; /* Vermelho */
+            --color-base: #4CAF50;  
+            --color-benefits: #2196F3;  
+            --color-discounts: #F44336; 
 
-            --color-domingo: #9E9E9E;   /* Cinza */
-            --color-segunda: #FFC107;   /* Amarelo */
-            --color-terca: #FF9800;     /* Laranja */
-            --color-quarta: #8BC34A;    /* Verde Claro */
-            --color-quinta: #00BCD4;    /* Ciano */
-            --color-sexta: #673AB7;     /* Roxo */
-            --color-sabado: #E91E63;    /* Rosa */
+            --color-domingo: #EDADAD;  
+            --color-segunda: #ff7213ff;  
+            --color-terca: #489D3B;    
+            --color-quarta: #3B5A9D;  
+            --color-quinta: #D02C2C;    
+            --color-sexta: #25621C;     
+            --color-sabado: #667080;    
         }
 
         .chart-circle {
@@ -66,6 +112,7 @@ $horas_chart_data_present = $horas_chart_data_present ?? false;
             text-align: center;
             padding: 10px;
         }
+        .hours-legend .dot-segunda { background-color: #ff7213ff; }
     </style>
 </head>
 
@@ -113,21 +160,16 @@ $horas_chart_data_present = $horas_chart_data_present ?? false;
             </section>
             
             <section class="chart-grid">
-                
                 <div class="chart-card-colaborador">
                     <h2 class="chart-title">Distribuição do salário</h2>
                     <div class="chart-content">
-                        <?php if ($salario_chart_data_present): ?>
-                            <div class="chart-circle" style="<?= $salario_chart_style ?>">
-                                <div class="salary-chart-center">
-                                    <span class="salary-chart-value"><?= $salario_liquido_formatado ?></span>
-                                    <span class="salary-chart-label">Salário líquido</span>
-                                </div>
+                        <div class="chart-circle" style="<?= $salario_chart_style ?>">
+                            <div class="salary-chart-center">
+                                <span class="salary-chart-value"><?= $salario_liquido_formatado ?></span>
+                                <span class="salary-chart-label">Salário líquido</span>
                             </div>
-                        <?php else: ?>
-                            <div class="no-data-placeholder">Sem dados para exibir</div>
-                        <?php endif; ?>
-                        
+                        </div>
+
                         <div class="salary-legend">
                             <ul>
                                 <li><span class="dot dot-base"></span> Salário base</li>
