@@ -22,6 +22,7 @@ class ColaboradorModel extends Model
                     c.nome_completo, 
                     c.email_pessoal, 
                     c.cpf, 
+                    c.salario_base, 
                     c.data_nascimento, 
                     ca.nome_cargo as cargo, 
                     s.nome_setor as setor, 
