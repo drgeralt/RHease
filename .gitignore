@@ -2,6 +2,6 @@ vendor/
 composer.lock
 /.env
 composer.phar
-/.idea
+.idea/
 /.vscode
 .gitignore
