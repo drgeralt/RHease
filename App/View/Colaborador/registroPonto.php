@@ -86,12 +86,12 @@
 <div class="container">
     <div class="sidebar">
         <ul class="menu">
-            <li><a href="<?= BASE_URL ?>/"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
-            <li><a href="#"><i class="bi bi-person-vcard-fill"></i> Dados Cadastrais</a></li>
+            <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
+            <li><a href="<?=BASE_URL?>/dados.html"<i class="bi bi-person-vcard-fill"></i> Dados Cadastrais</a></li>
             <li class="active"><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
             <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
-            <li><a href="#"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
-            <li><a href="#"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
+            <li><a href="<?= BASE_URL ?>/beneficios"<i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
+            <li><a href="<?= BASE_URL ?>/contato.html"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
         </ul>
     </div>
 
