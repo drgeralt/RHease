@@ -14,12 +14,12 @@ class PontoController
      */
     public function index()
     {
-        /*$userId = $_SESSION['user_id'] ?? null;
+        $userId = $_SESSION['user_id'] ?? null;
         if (!$userId) {
             header('Location: ' . BASE_URL . '/login');
             exit;
-        }*/
-        $userId = 1;
+        }
+
         $pdo = Database::getInstance();
         $pontoModel = new PontoModel($pdo);
         $colaboradorModel = new ColaboradorModel($pdo);
@@ -59,17 +59,19 @@ class PontoController
             $geolocalizacao = $_POST['geolocalizacao'] ?? 'Não informada';
             $ipAddress = $_SERVER['REMOTE_ADDR'] ?? "Não identificado";
 
-            // Prepara os dados para enviar à API Python
+            $pdo = Database::getInstance();
+            $colaboradorModel = new ColaboradorModel($pdo);
+            $colaborador = $colaboradorModel->getDadosColaborador($userId);
+            $nomeColaborador = $colaborador['nome_completo'] ?? 'Colaborador';
+
             $apiData = [
                 'imagem' => $imgData,
                 'geolocalizacao' => $geolocalizacao,
                 'ip_address' => $ipAddress
             ];
 
-            // URL da API Python (ajuste se necessário)
             $apiUrl = 'http://localhost:5000/facial-api/verify';
 
-            // Inicializa cURL
             $ch = curl_init($apiUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
@@ -80,20 +82,34 @@ class PontoController
             ]);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
-            // Executa a requisição
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $curlError = curl_error($ch);
             curl_close($ch);
 
             if ($curlError) {
-                throw new Exception("Erro ao conectar com a API de reconhecimento facial: " . $curlError);
+                throw new Exception("Erro ao conectar com a API de reconhecimento facial. Verifique se a API Python está rodando.");
             }
 
             $result = json_decode($response, true);
 
+            // DEBUG: Log completo da resposta
+            error_log("DEBUG - Resposta completa da API: " . print_r($result, true));
+            error_log("DEBUG - HTTP Code: " . $httpCode);
+
             if ($httpCode !== 200) {
                 $errorMessage = $result['message'] ?? 'Erro desconhecido na verificação facial';
+
+                if (strpos($errorMessage, 'Face não reconhecida') !== false) {
+                    $errorMessage = 'Facial não identificada. Por favor, tente novamente ou cadastre sua face.';
+                } else if (strpos($errorMessage, 'Nenhuma face') !== false) {
+                    $errorMessage = 'Nenhuma face detectada na imagem. Posicione seu rosto corretamente.';
+                } else if (strpos($errorMessage, 'Múltiplas faces') !== false) {
+                    $errorMessage = 'Múltiplas faces detectadas. Apenas uma pessoa deve aparecer na foto.';
+                } else if (strpos($errorMessage, 'Nenhuma face cadastrada') !== false) {
+                    $errorMessage = 'Nenhuma face cadastrada no sistema. Por favor, cadastre sua face primeiro.';
+                }
+
                 throw new Exception($errorMessage);
             }
 
@@ -101,16 +117,19 @@ class PontoController
                 throw new Exception($result['message'] ?? 'Falha na verificação facial');
             }
 
-            // Verifica se o ID do colaborador reconhecido corresponde ao usuário logado
-            if ($result['id_colaborador'] != $userId) {
+            if (isset($result['id_colaborador']) && (int)$result['id_colaborador'] !== (int)$userId) {
+                // Log para debug
+                error_log("DEBUG - User ID logado: " . $userId . " (tipo: " . gettype($userId) . ")");
+                error_log("DEBUG - User ID reconhecido: " . $result['id_colaborador'] . " (tipo: " . gettype($result['id_colaborador']) . ")");
                 throw new Exception('A face reconhecida não corresponde ao usuário logado. Por favor, tire uma foto do próprio rosto.');
             }
 
             echo json_encode([
                 'status' => 'success',
-                'message' => 'Ponto registado como ' . $result['tipo'] . ' com sucesso!',
+                'message' => "Ponto de {$result['tipo']} registrado com sucesso!",
                 'horario' => $result['horario'],
                 'tipo' => $result['tipo'],
+                'nome_colaborador' => $nomeColaborador,
                 'similarity' => $result['similarity'] ?? null
             ]);
 
@@ -144,16 +163,13 @@ class PontoController
 
             $imgData = $_POST['imagem'];
 
-            // Prepara os dados para enviar à API Python
             $apiData = [
                 'imagem' => $imgData,
                 'id_colaborador' => $userId
             ];
 
-            // URL da API Python
             $apiUrl = 'http://localhost:5000/facial-api/register-face';
 
-            // Inicializa cURL
             $ch = curl_init($apiUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
@@ -164,14 +180,13 @@ class PontoController
             ]);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
-            // Executa a requisição
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $curlError = curl_error($ch);
             curl_close($ch);
 
             if ($curlError) {
-                throw new Exception("Erro ao conectar com a API de reconhecimento facial: " . $curlError);
+                throw new Exception("Erro ao conectar com a API de reconhecimento facial. Verifique se a API Python está rodando.");
             }
 
             $result = json_decode($response, true);

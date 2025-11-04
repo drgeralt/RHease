@@ -13,7 +13,6 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
-# Configurações do banco de dados -> AJUSTAR
 DB_CONFIG = {
     'host': 'localhost',
     'database': 'rhease',
@@ -21,7 +20,6 @@ DB_CONFIG = {
     'password': ''
 }
 
-# Inicializar o modelo
 face_app = FaceAnalysis(providers=['CPUExecutionProvider'])
 face_app.prepare(ctx_id=0, det_size=(640, 640))
 
@@ -41,7 +39,6 @@ def base64_to_image(base64_string):
             base64_string = base64_string.split(',')[1]
         img_data = base64.b64decode(base64_string)
         nparr = np.frombuffer(img_data, np.uint8)
-
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         return img
@@ -60,7 +57,6 @@ def extract_face_embedding(image):
         if len(faces) > 1:
             return None, "Múltiplas faces detectadas. Por favor, tire uma foto com apenas uma pessoa"
 
-        # Pega o embedding da primeira (e única) face
         embedding = faces[0].embedding
 
         return embedding, None
@@ -72,11 +68,9 @@ def calculate_similarity(embedding1, embedding2):
     embedding1 = np.array(embedding1)
     embedding2 = np.array(embedding2)
 
-    # Normaliza os vetores
     embedding1_norm = embedding1 / np.linalg.norm(embedding1)
     embedding2_norm = embedding2 / np.linalg.norm(embedding2)
 
-    # Calcula similaridade do cosseno
     similarity = np.dot(embedding1_norm, embedding2_norm)
 
     return float(similarity)
@@ -99,7 +93,6 @@ def register_face():
         id_colaborador = data['id_colaborador']
         imagem_base64 = data['imagem']
 
-        # Converte base64 para imagem
         image = base64_to_image(imagem_base64)
         if image is None:
             return jsonify({
@@ -107,7 +100,6 @@ def register_face():
                 'message': 'Falha ao processar a imagem'
             }), 400
 
-        # Extrai o embedding
         embedding, error = extract_face_embedding(image)
         if error:
             return jsonify({
@@ -128,8 +120,6 @@ def register_face():
 
         try:
             cursor = connection.cursor()
-
-            # Atualiza o embedding do colaborador
             query = """
                 UPDATE colaborador
                 SET facial_embedding = %s,
@@ -188,7 +178,7 @@ def verify_face():
                 'message': 'Falha ao processar a imagem'
             }), 400
 
-        # Extrai o embedding da foto atual
+        # Extrai o embedding da foto de input
         current_embedding, error = extract_face_embedding(image)
         if error:
             return jsonify({
@@ -196,7 +186,7 @@ def verify_face():
                 'message': error
             }), 400
 
-        # Busca todos os embeddings cadastrados
+        # Bsusca todos os embeddings cadastrados
         connection = get_db_connection()
         if not connection:
             return jsonify({
@@ -221,10 +211,9 @@ def verify_face():
                     'message': 'Nenhuma face cadastrada no sistema'
                 }), 404
 
-            # Encontra o colaborador com maior similaridade
             best_match = None
             best_similarity = -1
-            THRESHOLD = 0.5  # Limiar de similaridade (ajuste conforme necessário)
+            THRESHOLD = 0.6
 
             for colaborador in colaboradores:
                 stored_embedding = np.array(json.loads(colaborador['facial_embedding']))
@@ -234,7 +223,6 @@ def verify_face():
                     best_similarity = similarity
                     best_match = colaborador
 
-            # Verifica se a similaridade é suficiente
             if best_similarity < THRESHOLD:
                 return jsonify({
                     'status': 'error',
@@ -249,19 +237,16 @@ def verify_face():
             timestamp = int(datetime.now().timestamp())
             nome_arquivo = f"{id_colaborador}_{timestamp}.jpg"
             caminho_relativo = f"storage/fotos_ponto/{nome_arquivo}"
-            caminho_completo = os.path.join('/caminho/para/RHease', caminho_relativo)  # Ajuste o caminho
+            caminho_completo = os.path.join('C:/xampp/htdocs/RHease', caminho_relativo)
 
-            # Cria o diretório se não existir
             os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
 
-            # Salva a imagem
             cv2.imwrite(caminho_completo, image)
 
-            # Registra o ponto
+            # Regisstra o ponto
             data_hora_atual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             data_atual = datetime.now().strftime('%Y-%m-%d')
 
-            # Verifica se existe ponto em aberto
             query_busca = """
                 SELECT id_registro_ponto
                 FROM folha_ponto
@@ -275,7 +260,6 @@ def verify_face():
             registro_aberto = cursor.fetchone()
 
             if registro_aberto:
-                # Registra saída
                 query_update = """
                     UPDATE folha_ponto
                     SET data_hora_saida = %s,
@@ -293,7 +277,6 @@ def verify_face():
                 ))
                 tipo_registro = 'saida'
             else:
-                # Registra entrada
                 query_insert = """
                     INSERT INTO folha_ponto
                     (id_colaborador, data_hora_entrada, geolocalizacao, caminho_foto, ip_address)
@@ -341,5 +324,3 @@ def health_check():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-
-    #Flask flask-cors insightface onnxruntime opencv-python numpy mysql-connector-python Pillow
