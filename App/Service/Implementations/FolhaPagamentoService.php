@@ -6,6 +6,8 @@ namespace App\Service\Implementations;
 use App\Model\ColaboradorModel;
 use App\Model\FolhaPagamentoModel;
 use App\Model\ParametrosFolhaModel;
+use App\Service\Contracts\PontoServiceInterface;
+use App\Service\Implementations\PontoService;
 use PDO;
 use Exception;
 
@@ -15,7 +17,7 @@ class FolhaPagamentoService
     private FolhaPagamentoModel $folhaPagamentoModel;
     private ColaboradorModel $colaboradorModel;
     private ParametrosFolhaModel $parametrosModel;
-
+    private PontoServiceInterface $pontoService;
     // Propriedades para armazenar os parâmetros de cálculo
     private array $tabelaInss = [];
     private array $tabelaIrrf = [];
@@ -30,7 +32,9 @@ class FolhaPagamentoService
         $this->colaboradorModel = new ColaboradorModel($this->db);
         $this->parametrosModel = new ParametrosFolhaModel($this->db);
 
-        // Carrega os parâmetros de INSS e IRRF uma vez na instanciação do serviço.
+        // Instancia o PontoService (que agora funciona)
+        $this->pontoService = new PontoService($this->db);
+
         $this->carregarParametros();
     }
 
@@ -70,7 +74,7 @@ class FolhaPagamentoService
 
     public function processarFolha(int $ano, int $mes): array
     {
-        // ✅ CORRIGIDO: O método correto é getAll().
+        // ✅ Busca colaboradores ativos (getAll já traz salario_base agora!)
         $colaboradores = $this->colaboradorModel->getAll();
 
         if (empty($colaboradores)) {
@@ -82,60 +86,131 @@ class FolhaPagamentoService
         $this->db->beginTransaction();
         try {
             foreach ($colaboradores as $colaborador) {
-                // ✅ CORRIGIDO: A chave correta é 'id_colaborador', como definido no model.
                 $colaboradorId = (int) ($colaborador['id_colaborador'] ?? 0);
 
-                // Supondo que exista um método para buscar o salário.
-                // Se o salário já vem em 'obterTodosCompletos', esta linha pode ser removida.
-                $salario = $this->colaboradorModel->salarioPorID($colaboradorId);
-                $colaborador['salario_base'] = $salario;
+                // ✅ REMOVIDAS AS LINHAS PROBLEMÁTICAS!
+                // O salario_base agora vem diretamente do getAll()
 
-                // 1. Limpa os registros antigos
+                // Validação: verifica se o salário existe e é maior que zero
+                if (!isset($colaborador['salario_base']) || $colaborador['salario_base'] <= 0) {
+                    error_log("⚠️ Colaborador {$colaborador['nome_completo']} (ID: {$colaboradorId}) sem salário definido!");
+                    $resultados['falha'][] = [
+                        'colaborador' => $colaborador['nome_completo'],
+                        'motivo' => 'Salário base não definido (R$ 0,00)'
+                    ];
+                    continue; // Pula este colaborador
+                }
+
+                // 🔍 LOG para debug - veja os salários sendo processados
+                error_log("✅ Processando: {$colaborador['nome_completo']} | Salário: R$ " .
+                    number_format($colaborador['salario_base'], 2, ',', '.'));
+
+                // Busca horas de ausência do mês
+                $totalHorasAusencia = $this->pontoService->calcularTotalAusenciasEmHoras(
+                    $colaboradorId,
+                    $mes,
+                    $ano
+                );
+
+                // Limpa holerites anteriores do mesmo período
                 $this->folhaPagamentoModel->limparHoleriteAnterior($colaboradorId, $ano, $mes);
 
-                // 2. Calcula os valores (lógica interna do Service)
-                $dadosCalculados = $this->calcularValores($colaborador);
+                // Calcula os valores do holerite
+                $dadosCalculados = $this->calcularValores($colaborador, $totalHorasAusencia);
 
-                // 3. Salva o holerite principal
-                $holeriteId = $this->folhaPagamentoModel->salvarHolerite($colaboradorId, $ano, $mes, $dadosCalculados);
+                // Salva o holerite principal
+                $holeriteId = $this->folhaPagamentoModel->salvarHolerite(
+                    $colaboradorId,
+                    $ano,
+                    $mes,
+                    $dadosCalculados
+                );
 
-                // 4. Salva os itens do holerite
-                $this->folhaPagamentoModel->salvarItens((int)$holeriteId, $dadosCalculados['itens_holerite']);
+                // Salva os itens detalhados (proventos e descontos)
+                $this->folhaPagamentoModel->salvarItens(
+                    (int)$holeriteId,
+                    $dadosCalculados['itens_holerite']
+                );
 
-                // ✅ CORRIGIDO: A chave correta para o nome é 'nome_completo'.
                 $resultados['sucesso'][] = $colaborador['nome_completo'];
             }
+
             $this->db->commit();
+            error_log("✅ Folha processada com sucesso! Total: " . count($resultados['sucesso']) . " colaboradores.");
+
         } catch (Exception $e) {
             $this->db->rollBack();
-            throw new Exception("Falha ao processar a folha de pagamento. A operação foi revertida. Erro: " . $e->getMessage());
+            error_log("❌ ERRO ao processar folha: " . $e->getMessage());
+            throw new Exception("Falha ao processar a folha: " . $e->getMessage());
         }
 
         return $resultados;
     }
 
-    private function calcularValores(array $colaborador): array
-    {
-        // (Aqui entra toda a sua lógica de cálculo de INSS, IRRF, etc., usando $this->tabelaInss, etc.)
-        // Exemplo simplificado:
-        $salarioBase = (float) $colaborador['salario_base'];
-        $descontoInss = $salarioBase * 0.09; // Simulação
-        $descontoIrrf = 0; // Simulação
-        $totalDescontos = $descontoInss + $descontoIrrf;
-        $salarioLiquido = $salarioBase - $totalDescontos;
 
+    private function calcularValores(array $colaborador, float $totalHorasAusencia): array
+    {
+        $itensHolerite = [];
+
+        // ✅ Pega o salário base diretamente do array
+        $salarioBase = (float) ($colaborador['salario_base'] ?? 0);
+        $cargaHorariaMensal = 220.0; // TODO: Buscar do banco de dados
+
+        // 1. PROVENTOS
+        $itensHolerite[] = [
+            'codigo' => '101',
+            'descricao' => 'Salario Base',
+            'tipo' => 'provento',
+            'valor' => $salarioBase
+        ];
+
+        // 2. DESCONTOS
+
+        // Desconto INSS (simplificado - 9%)
+        $descontoInss = $salarioBase * 0.09;
+        if ($descontoInss > 0) {
+            $itensHolerite[] = [
+                'codigo' => '201',
+                'descricao' => 'Desconto INSS',
+                'tipo' => 'desconto',
+                'valor' => $descontoInss
+            ];
+        }
+
+        // Base para cálculo do IRRF
+        $baseIrrf = $salarioBase - $descontoInss;
+        $descontoIrrf = 0; // TODO: Implementar cálculo progressivo real
+
+        // Desconto de Faltas e Atrasos
+        $descontoFaltas = 0.0;
+        if ($totalHorasAusencia > 0) {
+            $valorHora = $salarioBase / $cargaHorariaMensal;
+            $descontoFaltas = $valorHora * $totalHorasAusencia;
+
+            $itensHolerite[] = [
+                'codigo' => '205',
+                'descricao' => "Faltas e Atrasos (" .
+                    number_format($totalHorasAusencia, 2, ',', '.') . " Horas)",
+                'tipo' => 'desconto',
+                'valor' => $descontoFaltas
+            ];
+        }
+
+        // 3. TOTALIZADORES
+        $totalProventos = $salarioBase;
+        $totalDescontos = $descontoInss + $descontoIrrf + $descontoFaltas;
+        $salarioLiquido = $totalProventos - $totalDescontos;
+
+        // 4. RETORNA ARRAY COM TODOS OS DADOS
         return [
-            'total_proventos' => $salarioBase,
+            'total_proventos' => $totalProventos,
             'total_descontos' => $totalDescontos,
             'salario_liquido' => $salarioLiquido,
             'base_inss' => $salarioBase,
             'base_fgts' => $salarioBase,
             'valor_fgts' => $salarioBase * 0.08,
-            'base_irrf' => $salarioBase - $descontoInss,
-            'itens_holerite' => [
-                ['codigo' => '101', 'descricao' => 'Salário Base', 'tipo' => 'PROVENTO', 'valor' => $salarioBase],
-                ['codigo' => '501', 'descricao' => 'INSS', 'tipo' => 'DESCONTO', 'valor' => $descontoInss],
-            ]
+            'base_irrf' => $baseIrrf,
+            'itens_holerite' => $itensHolerite // ← Chave correta esperada pelo Model
         ];
     }
 }
