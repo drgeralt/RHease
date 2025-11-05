@@ -68,8 +68,8 @@ $router->addRoute('GET', '/candidatura/formulario', CandidaturaController::class
 $router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redirecionarParaVagas');
 
 // Rotas Comuns
-$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
-$router->addRoute('GET', '/error', Controller::class, 'show_error');
+#$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
+#$router->addRoute('GET', '/error', Controller::class, 'show_error');
 
 // ----------------------
 // Inicia o roteamento
