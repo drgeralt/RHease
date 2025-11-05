@@ -17,6 +17,64 @@
             color: #555;
             margin-bottom: 10px;
         }
+
+        .feedback-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+            text-align: center;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .feedback-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .feedback-message.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .register-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -28,12 +86,12 @@
 <div class="container">
     <div class="sidebar">
         <ul class="menu">
-            <li><a href="<?= BASE_URL ?>/"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
-            <li><a href="#"><i class="bi bi-person-vcard-fill"></i> Dados Cadastrais</a></li>
+            <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
+            <li><a href="<?=BASE_URL?>/dados.html"<i class="bi bi-person-vcard-fill"></i> Dados Cadastrais</a></li>
             <li class="active"><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
             <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
-            <li><a href="#"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
-            <li><a href="#"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
+            <li><a href="<?= BASE_URL ?>/beneficios"<i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
+            <li><a href="<?= BASE_URL ?>/contato.html"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
         </ul>
     </div>
 
@@ -65,7 +123,10 @@
                 </button>
             </div>
         </main>
-    </div> </div> <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const baseUrl = '<?php echo BASE_URL; ?>';
@@ -76,8 +137,8 @@
         const canvasElement = document.getElementById('photo-canvas');
         const feedbackContainer = document.getElementById('feedback-container');
         const timeElement = document.getElementById('current-time');
-        const exitButton = document.getElementById('exit-button');
         let videoStream = null;
+
         function updateClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -86,6 +147,7 @@
         }
         updateClock();
         setInterval(updateClock, 1000);
+
         registerButton.addEventListener('click', handleRegistrationStep);
 
         async function handleRegistrationStep() {
@@ -98,21 +160,32 @@
 
         async function startCamera() {
             try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                });
                 videoElement.srcObject = videoStream;
+
                 initialView.classList.add('hidden');
                 cameraView.classList.remove('hidden');
+
                 const buttonActionText = '<?php echo (isset($horaEntrada) && $horaEntrada) ? "CONFIRMAR SAÍDA" : "CONFIRMAR ENTRADA"; ?>';
                 registerButton.textContent = `TIRAR FOTO E ${buttonActionText}`;
+
+                showFeedback('Posicione seu rosto na câmera e clique no botão para registrar', 'info');
             } catch (error) {
                 console.error("Erro ao aceder à câmera:", error);
-                showFeedback('Não foi possível aceder à câmera.', 'error');
+                showFeedback('Não foi possível aceder à câmera. Verifique as permissões.', 'error');
             }
         }
 
         async function captureAndSend() {
             registerButton.disabled = true;
-            registerButton.textContent = 'PROCESSANDO...';
+            registerButton.innerHTML = '<span class="spinner"></span>PROCESSANDO...';
             feedbackContainer.innerHTML = '';
             try {
                 const location = await getGeoLocation();
@@ -120,14 +193,17 @@
                 canvasElement.width = videoElement.videoWidth;
                 canvasElement.height = videoElement.videoHeight;
                 context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-                const imageData = canvasElement.toDataURL('image/jpeg');
+
+                const imageData = canvasElement.toDataURL('image/jpeg', 0.95);
+
                 stopCamera();
-                
+
+                showFeedback('Analisando reconhecimento facial...', 'info');
+
                 const formData = new FormData();
                 formData.append('imagem', imageData);
                 formData.append('geolocalizacao', location);
 
-                // CORREÇÃO FINAL: Usando a URL correta do roteador: /registrarponto/salvar
                 const response = await fetch(`${baseUrl}/registrarponto/salvar`, {
                     method: 'POST',
                     body: formData
@@ -137,19 +213,44 @@
                     const errorText = await response.text();
                     throw new Error(`Erro no servidor: ${response.status} ${errorText}`);
                 }
+
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    showFeedback(`Registo de ${result.tipo} às ${result.horario}! Processando...`, 'success');
+                    const nomeColaborador = '<?= htmlspecialchars($colaborador['nome_completo'] ?? 'Colaborador') ?>';
+                    const tipoRegistro = result.tipo === 'entrada' ? 'entrada' : 'saída';
+
+                    showFeedback(
+                        `✓ Ponto de ${tipoRegistro} registrado, ${nomeColaborador}! Horário: ${result.horario}`,
+                        'success'
+                    );
+
                     registerButton.classList.add('hidden');
-                    if (exitButton) exitButton.classList.add('hidden');
-                    setTimeout(() => { window.location.reload(); }, 2500);
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
                 } else {
                     throw new Error(result.message || 'Erro desconhecido no backend.');
                 }
             } catch (error) {
                 console.error("Falha:", error);
-                showFeedback(`Falha: ${error.message}`, 'error');
+
+                let errorMessage = error.message;
+
+                if (errorMessage.includes('Face não reconhecida') ||
+                    errorMessage.includes('não reconhecido') ||
+                    errorMessage.includes('não identificada')) {
+                    errorMessage = '✗ Facial não identificada. Por favor, tente novamente.';
+                } else if (errorMessage.includes('Nenhuma face detectada')) {
+                    errorMessage = '✗ Nenhuma face detectada. Posicione seu rosto corretamente na câmera.';
+                } else if (errorMessage.includes('Múltiplas faces')) {
+                    errorMessage = '✗ Múltiplas faces detectadas. Apenas uma pessoa por vez.';
+                } else if (errorMessage.includes('não corresponde')) {
+                    errorMessage = '✗ A face detectada não corresponde ao usuário logado.';
+                }
+
+                showFeedback(errorMessage, 'error');
                 restoreInitialState();
             }
         }
@@ -187,6 +288,7 @@
             registerButton.textContent = originalButtonText;
         }
 
+        // Menu toggle
         const menuToggle = document.querySelector('.menu-toggle');
         const sidebar = document.querySelector('.sidebar');
         if (menuToggle && sidebar) {
