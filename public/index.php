@@ -29,7 +29,9 @@ use App\Controller\HoleriteController;
 use App\Controller\FolhaPagamentoController;
 use App\Controller\DashboardController;
 use App\Controller\AuthController;
+
 use App\Controller\VagaApiController;
+
 
 // registro de rotas
 $router = new Router();
@@ -43,8 +45,10 @@ $router->addRoute('POST', '/register', UserController::class, 'register');
 $router->addRoute('GET', '/registro-sucesso', UserController::class, 'show_registro_sucesso');
 $router->addRoute('GET', '/verify', UserController::class, 'verify_account');
 $router->addRoute('GET', '/registro-sucesso', AuthController::class, 'showRegistroSucesso');
+
 $router->addRoute('GET', '/reenviar-verificacao', UserController::class, 'show_reenviar_verificacao');
 $router->addRoute('POST', '/reenviar-verificacao', UserController::class, 'process_reenviar_verificacao');
+
 $router->addRoute('GET', '/esqueceu-senha', AuthController::class, 'showForgotPasswordForm');// Exibe a página "Esqueci minha senha"
 $router->addRoute('POST', '/solicitar-recuperacao', AuthController::class, 'handleForgotPasswordRequest');
 $router->addRoute('GET', '/redefinir-senha', AuthController::class, 'showResetPasswordForm');// Exibe a página para o usuário definir a nova senha (acessada pelo link no e-mail)
