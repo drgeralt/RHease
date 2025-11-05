@@ -1,8 +1,0 @@
-Flask
-flask-cors
-insightface
-onnxruntime
-opencv-python
-numpy
-mysql-connector-python
-Pillow
