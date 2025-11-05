@@ -21,6 +21,13 @@ class UserController extends Controller
     {
         $this->view('Auth/registroSucesso');
     }
+    /**
+     * Exibe a página "Esqueceu Senha".
+     */
+    public function show_esqueceu_senha(): void
+    {
+        $this->view('Auth/esqueceuSenha');
+    }
     public function register(): void
     {
         //var_dump($_POST);
@@ -45,11 +52,43 @@ class UserController extends Controller
         // Envia o resultado para a view de verificação
         $this->view('Auth/verificacaoResultado', $result);
     }
+    /**
+     * Exibe a página para solicitar um novo link de verificação.
+     */
+    public function show_reenviar_verificacao(): void
+    {
+        $this->view('Auth/reenviarVerificacao');
+    }
+
+    /**
+     * Processa a solicitação de reenvio de verificação.
+     */
+    public function process_reenviar_verificacao(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/reenviar-verificacao');
+            exit();
+        }
+
+        $email = $_POST['email'] ?? '';
+        $authModel = new AuthModel();
+
+        // Este método 'reenviarVerificacao' será criado no AuthModel no próximo passo
+        $result = $authModel->reenviarVerificacao($email);
+
+        $data = [];
+        if ($result['status'] === 'success') {
+            $data['success'] = $result['message'];
+        } else {
+            $data['error'] = $result['message'];
+        }
+
+        // Recarrega a view com a mensagem
+        $this->view('Auth/reenviarVerificacao', $data);
+    }
     public function process_login(): void
     {
-        // Verifica se os dados foram enviados via POST
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            // Se não for POST, apenas redireciona para a página de login
             header('Location: ' . BASE_URL . '/login');
             exit();
         }
@@ -58,21 +97,29 @@ class UserController extends Controller
         $senha = $_POST['senha'] ?? '';
 
         $authModel = new AuthModel();
+
         $result = $authModel->loginUser($email, $senha);
 
         if ($result['status'] === 'success') {
-            // Se o login for bem-sucedido, iniciamos a sessão
-            // e guardamos a informação de que o utilizador está logado.
-            session_regenerate_id(true); // Previne ataques de fixação de sessão
+            session_regenerate_id(true);
+
             $_SESSION['user_logged_in'] = true;
             $_SESSION['user_id'] = $result['user_id'];
+            $_SESSION['user_perfil'] = $result['user_perfil']; // Armazena o perfil na sessão
 
-            // Redireciona para a página principal do sistema (ex: tabela de colaboradores)
-            header('Location: ' . BASE_URL . '/colaboradores');
+            // --- LÓGICA DE REDIRECIONAMENTO CORRETA ---
+            if ($_SESSION['user_perfil'] === 'gestor_rh' || $_SESSION['user_perfil'] === 'diretor') {
+                // Se for gestor ou diretor, vai para o dashboard principal
+                header('Location: ' . BASE_URL . '/inicio');
+            } else {
+                // Se for colaborador, vai para a página de "Meus Benefícios"
+                header('Location: ' . BASE_URL . '/inicio');
+            }
             exit();
+            // --- FIM DA LÓGICA CORRETA ---
+
         } else {
-            // Se o login falhar, exibe a página de login novamente
-            // com a mensagem de erro.
+            // Se o login falhar, mostra a página de login com a mensagem de erro.
             $this->view('Auth/login', ['error' => $result['message']]);
         }
     }

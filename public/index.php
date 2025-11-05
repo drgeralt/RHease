@@ -1,4 +1,21 @@
 <?php
+// Inicia output buffering para capturar qualquer output indesejado
+ob_start();
+
+ini_set('display_errors', 0); // Desabilitado para evitar HTML em APIs
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL); // Ainda loga erros, mas não exibe
+require_once __DIR__ . '/../vendor/autoload.php';
+
+session_start();
+
+
+define('BASE_PATH', dirname(__DIR__));
+
+require_once BASE_PATH . '/config.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 
 use App\Controller\ColaboradorController;
 use App\Controller\HomeController;
@@ -8,19 +25,13 @@ use App\Controller\CandidaturaController;
 use App\Controller\GestaoVagasController;
 use App\Core\Router;
 use App\Controller\BeneficioController;
+use App\Controller\HoleriteController;
+use App\Controller\FolhaPagamentoController;
+use App\Controller\DashboardController;
+use App\Controller\AuthController;
+use App\Controller\VagaApiController;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 0);
-error_reporting(E_ALL);
-
-session_start();
-
-define('BASE_PATH', dirname(__DIR__));
-
-require_once BASE_PATH . '/config.php';
-
+// registro de rotas
 $router = new Router();
 
 // --- Rotas de Autenticação ---
@@ -31,6 +42,17 @@ $router->addRoute('GET', '/cadastro', UserController::class, 'show_cadastro');
 $router->addRoute('POST', '/register', UserController::class, 'register');
 $router->addRoute('GET', '/registro-sucesso', UserController::class, 'show_registro_sucesso');
 $router->addRoute('GET', '/verify', UserController::class, 'verify_account');
+$router->addRoute('GET', '/registro-sucesso', AuthController::class, 'showRegistroSucesso');
+$router->addRoute('GET', '/reenviar-verificacao', UserController::class, 'show_reenviar_verificacao');
+$router->addRoute('POST', '/reenviar-verificacao', UserController::class, 'process_reenviar_verificacao');
+$router->addRoute('GET', '/esqueceu-senha', AuthController::class, 'showForgotPasswordForm');// Exibe a página "Esqueci minha senha"
+$router->addRoute('POST', '/solicitar-recuperacao', AuthController::class, 'handleForgotPasswordRequest');
+$router->addRoute('GET', '/redefinir-senha', AuthController::class, 'showResetPasswordForm');// Exibe a página para o usuário definir a nova senha (acessada pelo link no e-mail)
+$router->addRoute('POST', '/atualizar-senha', AuthController::class, 'handleResetPassword');
+
+
+// --- Rotas de Home ---
+$router->addRoute('GET', '/inicio', DashboardController::class, 'index');
 
 // --- Rotas de Colaboradores ---
 $router->addRoute('GET', '/colaboradores/adicionar', ColaboradorController::class, 'novo');
@@ -42,17 +64,28 @@ $router->addRoute('GET', '/colaboradores', ColaboradorController::class, 'listar
 
 // --- Rotas de Gestão de Vagas ---
 $router->addRoute('GET', '/vagas/listar', GestaoVagasController::class, 'listarVagas');
-$router->addRoute('GET', '/vagas/criar', GestaoVagasController::class, 'criar');
-$router->addRoute('POST', '/vagas/salvar', GestaoVagasController::class, 'salvar');
-$router->addRoute('POST', '/vagas/candidatos', GestaoVagasController::class, 'verCandidatos');
+
+// --- Rotas da API de Vagas ---
+$router->addRoute('GET', '/api/vagas/listar', VagaApiController::class, 'listarVagas');
+$router->addRoute('POST', '/api/vagas/salvar', VagaApiController::class, 'salvar');
+$router->addRoute('GET', '/api/vagas/editar', VagaApiController::class, 'editar'); 
+$router->addRoute('POST', '/api/vagas/atualizar', VagaApiController::class, 'atualizar');
+$router->addRoute('GET', '/api/vagas/excluir', VagaApiController::class, 'excluir'); 
+$router->addRoute('GET', '/api/vagas/candidatos', VagaApiController::class, 'verCandidatos'); // MUDANÇA: Agora é GET
 
 // Benefícios
-$router->addRoute('GET', '/beneficios', BeneficioController::class, 'index');
+$router->addRoute('GET', '/beneficios', BeneficioController::class, 'gerenciamento');
 $router->addRoute('POST', '/beneficios/criar', BeneficioController::class, 'criar');
 $router->addRoute('POST', '/beneficios/editar', BeneficioController::class, 'editar');
 $router->addRoute('GET', '/beneficios/desativar/{id}', BeneficioController::class, 'desativar');
+$router->addRoute('POST', '/beneficios/deletar', BeneficioController::class, 'deletarBeneficio');
+$router->addRoute('POST', '/beneficios/salvar', BeneficioController::class, 'salvarBeneficio');
+$router->addRoute('POST', '/colaborador/beneficios/salvar', BeneficioController::class, 'salvarBeneficiosColaborador');
+$router->addRoute('POST', '/beneficios/regras/salvar', BeneficioController::class, 'salvarRegrasAtribuicao');
+$router->addRoute('POST', '/beneficios/toggleStatus', BeneficioController::class, 'toggleStatus');
 
-$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios'); 
+
+$router->addRoute('GET', '/meus_beneficios', BeneficioController::class, 'meusBeneficios');
 
 
 // --- Rotas de Candidatura e IA ---
@@ -63,13 +96,24 @@ $router->addRoute('POST', '/candidatura/analisar', CandidaturaController::class,
 $router->addRoute('POST', '/candidatura/ver-analise', CandidaturaController::class, 'exibirAnaliseIA');
 $router->addRoute('GET', '/candidatura/ver-analise', CandidaturaController::class, 'exibirAnaliseIA');
 
+
 // --- Rotas de Redirecionamento ---
 $router->addRoute('GET', '/candidatura/formulario', CandidaturaController::class, 'redirecionarParaVagas');
 $router->addRoute('GET', '/candidatura', CandidaturaController::class, 'redirecionarParaVagas');
 
+// ----------------------
+// Holerites
+// ----------------------
+// Rota para a página de listagem de holerites do colaborador
+$router->addRoute('GET', '/meus-holerites', HoleriteController::class, 'index');
+$router->addRoute('POST', '/holerite/gerarPDF', HoleriteController::class, 'gerarPDF');
+
+$router->addRoute('GET', '/folha/processar', FolhaPagamentoController::class, 'index');
+$router->addRoute('POST', '/folha/processar', FolhaPagamentoController::class, 'processar');
+
 // Rotas Comuns
-#$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
-#$router->addRoute('GET', '/error', Controller::class, 'show_error');
+//$router->addRoute('GET', '/thank_you', Controller::class, 'show_thank_you');
+//$router->addRoute('GET', '/error', Controller::class, 'show_error');
 
 // ----------------------
 // Inicia o roteamento

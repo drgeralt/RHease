@@ -8,94 +8,134 @@ use App\Model\HoleriteModel;
 require_once(BASE_PATH . '/vendor/setasign/fpdf/fpdf.php');
 class HoleriteController extends Controller
 {
-    private $model;
+    private HoleriteModel $model;
 
-    /**
-     * O construtor cria a instância do nosso Model.
-     */
     public function __construct()
     {
-        $this->model = new HoleriteModel();
+        parent::__construct(); // Chama o construtor do Controller pai
+        $this->model = new HoleriteModel($this->db_connection); // Passa a conexão!
     }
 
-    /**
-     * Exibe a página "Meus Holerites".
-     */
     public function index()
     {
-        $colaboradorId = 1; // ID fixo para teste
+        // 1. Verifica se o usuário está logado. Se não, redireciona para o login.
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . BASE_URL . '/login');
+            exit;
+        }
 
-        $holeritesDoColaborador = $this->model->findByColaboradorId($colaboradorId);
+        // 2. Pega o ID do colaborador logado a partir da sessão.
+        $idColaborador = $_SESSION['user_id'] ;//$_SESSION['user_id'];
 
+        // 3. Busca os dados do colaborador e seus holerites usando o ID da sessão.
+        $colaborador = $this->model->findColaboradorById($idColaborador);
+        $holerites = $this->model->findByColaboradorId($idColaborador);
+
+        // 4. Envia os dados corretos para a view.
         $this->view('Holerite/meusHolerites', [
-            'holerites' => $holeritesDoColaborador
+            'colaborador' => $colaborador,
+            'holerites' => $holerites
         ]);
     }
 
-    public function gerarPDF($id)
+    public function gerarPDF()
     {
-        $holerite = $this->model->findHoleriteCompletoById($id);
-        $itens = $this->model->findItensByHoleriteId($id);
+        error_reporting(E_ALL & ~E_DEPRECATED);
+        /*
+        |--------------------------------------------------------------------------
+        | VERIFICAÇÃO DE LOGIN (TEMPORARIAMENTE DESATIVADA PARA TESTES)
+        |--------------------------------------------------------------------------
+        | O código original que verifica a sessão foi comentado para permitir
+        | a geração do PDF sem a necessidade de login durante o desenvolvimento.
+        | Lembre-se de reativá-lo antes de colocar o sistema em produção.
+        |
+        */
+        // if (session_status() == PHP_SESSION_NONE) {
+        //     session_start();
+        // }
+        // $idColaborador = $_SESSION['id_colaborador'] ?? null;
+        // if (!$idColaborador) {
+        //     header('Location: ' . BASE_URL . '/login');
+        //     exit();
+        // }
 
-        if (!$holerite) {
-            echo "Holerite não encontrado.";
-            return;
+        // ✅ ADIÇÃO PARA TESTE: Simulamos um colaborador logado com ID = 1.
+        // Você pode alterar este número para testar outros colaboradores.
+        $idColaborador = filter_input(INPUT_POST, 'id_colaborador', FILTER_VALIDATE_INT);
+        $mes = filter_input(INPUT_POST, 'mes', FILTER_VALIDATE_INT);
+        $ano = filter_input(INPUT_POST, 'ano', FILTER_VALIDATE_INT);
+        // As verificações agora são úteis e funcionam como deveriam.
+        if (!$idColaborador || !$mes || !$ano) {
+            die('Dados insuficientes para gerar o holerite. ID do colaborador, mês e ano são obrigatórios.');
         }
 
-        $proventos = array_filter($itens, function($item) { return $item->tipo == 'PROVENTO'; });
-        $descontos = array_filter($itens, function($item) { return $item->tipo == 'DESCONTO'; });
+        $holerite = $this->model->findHoleritePorColaboradorEMes($idColaborador, $mes, $ano);
 
+        if (!$holerite) {
+            die("Holerite não encontrado para o colaborador e período informados.");
+        }
+
+        $itens = $this->model->findItensByHoleriteId($holerite->id_holerite);
+
+        // 4. Inicia a geração do PDF com FPDF
         $pdf = new \FPDF('P', 'mm', 'A4');
         $pdf->AddPage();
         $pdf->SetFont('Arial', 'B', 12);
 
-
-
-        // --- Cabeçalho ---
-        $pdf->Cell(40, 10, 'Nome da Empresa LTDA', 0, 0, 'L');
-        $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(150, 10, 'Recibo de Pagamento de Salario', 0, 1, 'R');
-        $pdf->SetFont('Arial', '', 8);
-        $pdf->Cell(40, 5, 'CNPJ: 00.000.000/0001-00', 0, 0, 'L');
-        $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(150, 5, 'Referencia: ' . str_pad($holerite->mes_referencia, 2, '0', STR_PAD_LEFT) . '/' . $holerite->ano_referencia, 0, 1, 'R');
-        $pdf->Cell(40, 5, 'Endereco da Empresa, 123 - Centro', 0, 1, 'L');
-        $pdf->Ln(5);
+        // --- Cabeçalho do Holerite ---
+        $pdf->Cell(190, 10, 'DEMONSTRATIVO DE PAGAMENTO', 1, 1, 'C');
+        $pdf->Cell(95, 7, 'Empresa: RHease Solutions', 'L', 0);
+        $pdf->Cell(95, 7, 'Referencia: ' . str_pad((string)$mes, 2, '0', STR_PAD_LEFT) . '/' . $ano, 'R', 1, 'R');
+        $pdf->Cell(95, 7, 'CNPJ: 12.345.678/0001-99', 'L', 0);
+        $pdf->Cell(95, 7, 'Processamento: ' . date('d/m/Y', strtotime($holerite->data_processamento)), 'R', 1, 'R');
+        $pdf->Cell(190, 7, '', 'LRB', 1);
 
         // --- Dados do Colaborador ---
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell(25, 7, 'Matricula', 'LTR', 0, 'C');
-        $pdf->Cell(105, 7, 'Nome do Funcionario', 'LTR', 0, 'C');
-        $pdf->Cell(60, 7, 'Cargo', 'LTR', 1, 'C');
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(25, 7, $holerite->matricula, 'LBR', 0, 'C');
-        $pdf->Cell(105, 7, $holerite->nome_completo, 'LBR', 0, 'C');
-        $pdf->Cell(60, 7, $holerite->nome_cargo, 'LBR', 1, 'C');
-        $pdf->Ln(5);
-
-        // --- Tabela de Itens ---
+        $pdf->Cell(20, 7, 'Matricula:', 'L');
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell(15, 6, 'Cod.', '1', 0, 'C');
-        $pdf->Cell(80, 6, 'Descricao', '1', 0, 'C');
-        $pdf->Cell(30, 6, 'Proventos (R$)', '1', 0, 'C');
-        $pdf->Cell(65, 6, 'Descontos (R$)', '1', 1, 'C');
+        $pdf->Cell(75, 7, $holerite->matricula);
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell(15, 7, 'Nome:');
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell(80, 7, $holerite->nome_completo, 'R', 1);
 
-        $pdf->SetFont('Arial', '', 8);
-        $maxRows = max(count($proventos), count($descontos));
-        $proventos = array_values($proventos);
-        $descontos = array_values($descontos);
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell(20, 7, 'CPF:', 'L');
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell(75, 7, $holerite->CPF);
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell(15, 7, 'Cargo:');
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell(80, 7, $holerite->nome_cargo, 'R', 1);
+        $pdf->Cell(190, 7, '', 'LRB', 1);
 
-        for ($i = 0; $i < $maxRows; $i++) {
-            $pdf->Cell(15, 5, $proventos[$i]->codigo_evento ?? '', 'LRB', 0);
-            $pdf->Cell(80, 5, $proventos[$i]->descricao ?? '', 'LRB', 0);
-            $pdf->Cell(30, 5, isset($proventos[$i]) ? number_format($proventos[$i]->valor, 2, ',', '.') : '', 'LRB', 0, 'R');
-            $pdf->Cell(65, 5, isset($descontos[$i]) ? number_format($descontos[$i]->valor, 2, ',', '.') : '', 'LRB', 1, 'R');
+
+        // --- Corpo do Holerite (Itens) ---
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell(20, 7, 'Codigo', '1', 0, 'C');
+        $pdf->Cell(105, 7, 'Descricao', '1', 0, 'L');
+        $pdf->Cell(32.5, 7, 'Proventos', '1', 0, 'C');
+        $pdf->Cell(32.5, 7, 'Descontos', '1', 1, 'C');
+
+        $pdf->SetFont('Arial', '', 9);
+        foreach ($itens as $item) {
+            $pdf->Cell(20, 6, $item->codigo_evento, 'LR', 0, 'C');
+            $pdf->Cell(105, 6, $item->descricao, 'R', 0, 'L');
+            if ($item->tipo == 'provento') {
+                $pdf->Cell(32.5, 6, number_format($item->valor, 2, ',', '.'), 'R', 0, 'R');
+                $pdf->Cell(32.5, 6, '', 'R', 1, 'R');
+            } else {
+                $pdf->Cell(32.5, 6, '', 'R', 0, 'R');
+                $pdf->Cell(32.5, 6, number_format($item->valor, 2, ',', '.'), 'R', 1, 'R');
+            }
         }
+        $pdf->Cell(190, 0, '', 'T', 1);
 
         // --- Totais ---
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell(125, 7, 'Total de Proventos', 'LTR', 0);
-        $pdf->Cell(65, 7, number_format($holerite->total_proventos, 2, ',', '.'), 'LTR', 1, 'R');
+        $pdf->SetFont('Arial', '', 10);
+        $pdf->Cell(125, 7, 'Total de Proventos', 'LR', 0);
+        $pdf->Cell(65, 7, number_format($holerite->total_proventos, 2, ',', '.'), 'LR', 1, 'R');
         $pdf->Cell(125, 7, 'Total de Descontos', 'LR', 0);
         $pdf->Cell(65, 7, number_format($holerite->total_descontos, 2, ',', '.'), 'LR', 1, 'R');
         $pdf->SetFont('Arial', 'B', 10);
@@ -117,10 +157,11 @@ class HoleriteController extends Controller
         $pdf->Ln(10);
 
         // --- Assinatura ---
-        $pdf->Cell(190, 5, '________________________________________', 0, 1, 'C');
-        $pdf->Cell(190, 5, $holerite->nome_completo, 0, 1, 'C');
+        $pdf->Cell(190, 7, '________________________________________', 0, 1, 'C');
+        $pdf->Cell(190, 7, 'Assinatura do Colaborador', 0, 1, 'C');
 
-        $pdf->Output('I', 'holerite_' . $holerite->mes_referencia . '_' . $holerite->ano_referencia . '.pdf');
+        // 5. Envia o PDF para o navegador
+        $pdf->Output('I', 'holerite_' . $mes . '_' . $ano . '.pdf');
         exit;
     }
 }

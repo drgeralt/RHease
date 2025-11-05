@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Core;
 
 use App\Core\Database;
+use JetBrains\PhpStorm\NoReturn;
 use PDO;
 
 
@@ -61,5 +62,30 @@ class Controller
         }
 
         throw new \Exception("Model {$modelClass} não encontrado.");
+    }
+
+
+    /**
+     * Função auxiliar para padronizar e enviar respostas JSON.
+     * Idealmente, esta função estaria em um Core\Controller base.
+     */
+    #[NoReturn]
+    protected function jsonResponse(bool $success, string $mensagem, $data = null, int $statusCode = 200) {
+        header('Content-Type: application/json');
+        http_response_code($statusCode);
+
+        $response = ['success' => $success, 'mensagem' => $mensagem];
+        if ($data !== null) {
+            $response['data'] = $data;
+        }
+
+        echo json_encode($response);
+        exit;
+    }
+    function formatarValor($valor) {
+        if (is_numeric($valor) && $valor > 0) {
+            return 'R$ ' . number_format((float)$valor, 2, ',', '.');
+        }
+        return '';
     }
 }

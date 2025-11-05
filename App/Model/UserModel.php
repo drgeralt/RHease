@@ -12,7 +12,6 @@ class UserModel
 
     public function __construct()
     {
-        // Usa a classe Database da sua equipe para pegar a conexão
         $this->db_connection = Database::getInstance();
     }
 

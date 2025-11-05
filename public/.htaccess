@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Esta linha é crucial para projetos em subpastas no XAMPP
+    RewriteBase /RHease/public/
+
+    # Redireciona tudo que não for um ficheiro ou diretório real
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+</IfModule>

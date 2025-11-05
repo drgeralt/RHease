@@ -12,7 +12,10 @@
 </header>
 
 <main class="content-container">
-    <h2 style="color: #25621C; font-weight: 600;">Meus Holerites</h2>
+
+    <h2 style="color: #25621C; font-weight: 600;">
+        Meus Holerites - <?php echo (!empty($colaborador) && isset($colaborador['nome_completo'])) ? htmlspecialchars($colaborador['nome_completo']) : 'Colaborador'; ?>
+    </h2>
 
     <section>
         <h3>Histórico de Pagamentos</h3>
@@ -28,22 +31,27 @@
                 </thead>
                 <tbody>
                 <?php
-                // A variável $data['holerites'] virá do Controller
-                if (empty($data['holerites'])): ?>
+                // Usa a variável $holerites diretamente, como enviado pelo Controller.
+                if (empty($holerites)): ?>
                     <tr>
                         <td colspan="4" class="empty-message">Nenhum holerite encontrado.</td>
                     </tr>
                 <?php else:
-                    foreach ($data['holerites'] as $holerite): ?>
+                    // Acessa os dados de cada holerite.
+                    foreach ($holerites as $holerite): ?>
                         <tr>
-                            <td><?php echo str_pad($holerite->mes_referencia, 2, '0', STR_PAD_LEFT) . '/' . $holerite->ano_referencia; ?></td>
-
-                            <td><?php echo date('d/m/Y', strtotime($holerite->data_processamento)); ?></td>
-
-                            <td><?php echo number_format($holerite->salario_liquido, 2, ',', '.'); ?></td>
-
+                            <td><?php echo str_pad($holerite['mes_referencia'], 2, '0', STR_PAD_LEFT) . '/' . $holerite['ano_referencia']; ?></td>
+                            <td><?php echo date('d/m/Y', strtotime($holerite['data_processamento'])); ?></td>
+                            <td><?php echo 'R$ ' . number_format($holerite['salario_liquido'], 2, ',', '.'); ?></td>
                             <td>
-                                <a href="<?php echo BASE_URL; ?>/holerite/pdf/<?php echo $holerite->id_holerite; ?>" class="btn-action" target="_blank">Visualizar</a>
+                                <form action="<?php echo BASE_URL; ?>/holerite/gerarPDF" method="POST" target="_blank">
+                                    <input type="hidden" name="mes" value="<?php echo $holerite['mes_referencia']; ?>">
+                                    <input type="hidden" name="ano" value="<?php echo $holerite['ano_referencia']; ?>">
+
+                                    <input type="hidden" name="id_colaborador" value="<?php echo $colaborador['id_colaborador']; ?>">
+
+                                    <button type="button" class="btn-action" onclick="this.closest('form').submit();">Visualizar</button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach;

@@ -37,5 +37,17 @@ class CargoModel extends Model
             \PDO::FETCH_ASSOC
         );
     }
+    /**
+     * Busca um cargo pelo ID.
+     * @param int $id O ID do cargo.
+     * @return array|false Retorna um array com os dados ou false se não encontrar.
+     */
+    public function findById(int $id)
+    {
+        $sql = "SELECT * FROM cargo WHERE id_cargo = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
 }
