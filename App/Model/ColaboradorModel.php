@@ -22,6 +22,7 @@ class ColaboradorModel extends Model
                     c.nome_completo, 
                     c.email_pessoal, 
                     c.cpf, 
+                    c.salario_base, 
                     c.data_nascimento, 
                     ca.nome_cargo as cargo, 
                     s.nome_setor as setor, 
@@ -277,6 +278,7 @@ class ColaboradorModel extends Model
         $stmt->execute([':id' => $userId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
         return $result ?: null;
     }
 
@@ -352,6 +354,41 @@ class ColaboradorModel extends Model
         $stmt->execute([':id' => $userId]);
         return $stmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
     }
+
+    public function getTotalBeneficiosValor($idColaborador) {
+    $sql = "SELECT SUM(valor_especifico) AS total 
+            FROM colaborador_beneficio 
+            WHERE id_colaborador = :id 
+              AND valor_especifico IS NOT NULL";
+    
+    $stmt = $this->db_connection->prepare($sql);
+    $stmt->bindValue(':id', $idColaborador, \PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $row['total'] ?? 0;
+}
+    public function getTotalDescontos($id_colaborador) {
+    // Pega mês e ano atuais
+    $mes_atual = date('m');
+    $ano_atual = date('Y');
+
+    $sql = "SELECT total_descontos 
+            FROM holerites 
+            WHERE id_colaborador = :id_colaborador
+              AND mes_referencia = :mes
+              AND ano_referencia = :ano
+            LIMIT 1";
+
+    $stmt = $this->db_connection->prepare($sql);
+    $stmt->bindValue(':id_colaborador', $id_colaborador, PDO::PARAM_INT);
+    $stmt->bindValue(':mes', $mes_atual, PDO::PARAM_INT);
+    $stmt->bindValue(':ano', $ano_atual, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $resultado ? (float)$resultado['total_descontos'] : 0;
+}
 
     /**
      * Busca os itens detalhados (proventos e descontos) do último holerite de um colaborador.

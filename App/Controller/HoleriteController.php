@@ -25,7 +25,7 @@ class HoleriteController extends Controller
         }
 
         // 2. Pega o ID do colaborador logado a partir da sessão.
-        $idColaborador = $_SESSION['user_id'];
+        $idColaborador = $_SESSION['user_id'] ;//$_SESSION['user_id'];
 
         // 3. Busca os dados do colaborador e seus holerites usando o ID da sessão.
         $colaborador = $this->model->findColaboradorById($idColaborador);
@@ -40,6 +40,7 @@ class HoleriteController extends Controller
 
     public function gerarPDF()
     {
+        error_reporting(E_ALL & ~E_DEPRECATED);
         /*
         |--------------------------------------------------------------------------
         | VERIFICAÇÃO DE LOGIN (TEMPORARIAMENTE DESATIVADA PARA TESTES)

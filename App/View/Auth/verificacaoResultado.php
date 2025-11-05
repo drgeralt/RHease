@@ -15,8 +15,21 @@
 
         <?php if ($success): ?>
             <a href="<?= BASE_URL ?>/login" class="btn btn-primary">IR PARA LOGIN</a>
+
         <?php else: ?>
-            <a href="<?= BASE_URL ?>/cadastro" class="btn btn-secondary">TENTAR NOVAMENTE</a>
+
+            <?php
+            // Verificamos se a mensagem de erro contém a palavra "expirou"
+            $isExpired = (isset($message) && strpos(strtolower($message), 'expirou') !== false);
+            ?>
+
+            <?php if ($isExpired): ?>
+                <p style="margin-top:1rem;">Para reenviar o link de verificação, clique abaixo:</p>
+                <a href="<?= BASE_URL ?>/reenviar-verificacao" class="btn btn-secondary">REENVIAR E-MAIL</a>
+            <?php else: ?>
+                <a href="<?= BASE_URL ?>/cadastro" class="btn btn-secondary">TENTAR NOVAMENTE</a>
+            <?php endif; ?>
+
         <?php endif; ?>
     </div>
 </div>

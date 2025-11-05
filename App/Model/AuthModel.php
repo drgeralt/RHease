@@ -127,6 +127,68 @@ class AuthModel
         $stmt->execute([':id' => $user['id_colaborador']]);
         return ['success' => true, 'message' => 'Conta ativada com sucesso! Você já pode fazer login.'];
     }
+/**
+* Reenvia o e-mail de verificação para contas pendentes.
+*/
+    public function reenviarVerificacao(string $email): array
+    {
+        if (empty($email)) {
+            return ['status' => 'error', 'message' => 'Por favor, insira seu e-mail.'];
+        }
+
+        try {
+            // 1. Encontra o usuário pelo e-mail
+            $sql = "SELECT id_colaborador, status_conta FROM colaborador WHERE email_pessoal = :email OR email_profissional = :email";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':email' => $email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // 2. Por segurança, não informamos se o e-mail não foi encontrado
+            if (!$user) {
+                return ['status' => 'success', 'message' => 'Se uma conta pendente existir com este e-mail, um novo link foi enviado.'];
+            }
+
+            // 3. Verifica se a conta JÁ está ativa
+            if ($user['status_conta'] === 'ativo') {
+                return ['status' => 'error', 'message' => 'Esta conta já foi ativada. Você pode fazer login.'];
+            }
+
+            // 4. Se a conta está pendente, gera um NOVO token e expiração
+            if ($user['status_conta'] === 'pendente_verificacao') {
+                $token = bin2hex(random_bytes(32));
+                $tokenHash = hash('sha256', $token); // O hash vai para o banco
+                $expires = new \DateTime('now + 1 hour');
+                $expiresTimestamp = $expires->format('Y-m-d H:i:s');
+
+                // 5. Atualiza o usuário com o NOVO token
+                $sql = "UPDATE colaborador 
+                        SET token_verificacao = :token, token_expiracao = :expires 
+                        WHERE id_colaborador = :id";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([
+                    ':token' => $tokenHash,
+                    ':expires' => $expiresTimestamp,
+                    ':id' => $user['id_colaborador']
+                ]);
+
+                // 6. Reenvia o e-mail de verificação (usando o método que já existe)
+                $this->sendVerificationEmail($email, $token); // O token real vai no e-mail
+            }
+
+            // 7. Retorna sucesso
+            return ['status' => 'success', 'message' => 'Se uma conta pendente existir com este e-mail, um novo link foi enviado.'];
+
+        } catch (PDOException $e) {
+            error_log("Database Error (reenviarVerificacao): " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Ocorreu um erro no banco de dados.'];
+        } catch (Exception $e) { // Captura o erro do PHPMailer
+            error_log("Mail Error (reenviarVerificacao): " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Ocorreu um erro ao enviar o e-mail.'];
+        } catch (\Throwable $t) {
+            error_log("General Error (reenviarVerificacao): " . $t->getMessage());
+            return ['status' => 'error', 'message' => 'Ocorreu um erro inesperado.'];
+        }
+    }
 
     /**
      * Processa a tentativa de login do usuário, incluindo proteção contra força bruta.

@@ -32,9 +32,24 @@ class DashboardController extends Controller {
         } else {
             // --- Dados Gerais ---
             $dados_colaborador = $this->colaboradorModel->getDadosColaborador($userId);
+            // Se não veio salário base do model, busca direto da tabela colaborador
+            if (empty($dados_colaborador['salario_base'])) {
+                $pdo = Database::getInstance();
+                $stmt = $pdo->prepare("SELECT salario_base FROM colaborador WHERE id_colaborador = :id");
+                $stmt->bindValue(':id', $userId, \PDO::PARAM_INT);
+                $stmt->execute();
+                $salarioDireto = $stmt->fetchColumn();
+
+                if ($salarioDireto !== false) {
+                    $dados_colaborador['salario_base'] = $salarioDireto;
+                }
+            }
             $ultimo_ponto = $this->colaboradorModel->getUltimoPonto($userId);
             $beneficios_count = $this->colaboradorModel->getBeneficiosAtivosCount($userId);
             $salario_liquido = $this->colaboradorModel->getUltimoSalarioLiquido($userId);
+            $beneficios_valor = $this->colaboradorModel->getTotalBeneficiosValor($userId);
+            $descontos_valor = $this->colaboradorModel->getTotalDescontos($userId);
+
 
             // --- Lógica para Gráfico de Salário ---
             $itens_holerite = $this->colaboradorModel->getItensUltimoHolerite($userId);
@@ -42,16 +57,25 @@ class DashboardController extends Controller {
             $beneficios_grafico = 0;
             $descontos_grafico = 0;
 
-            foreach ($itens_holerite as $item) {
-                if (isset($item['descricao']) && $item['tipo'] === 'provento') {
-                    if (stripos($item['descricao'], 'Salário Base') !== false) {
-                        $salario_base_grafico += (float)$item['valor'];
-                    } else {
-                        $beneficios_grafico += (float)$item['valor'];
+            if (!empty($itens_holerite)) {
+                foreach ($itens_holerite as $item) {
+                    if (isset($item['descricao']) && $item['tipo'] === 'provento') {
+                        if (stripos($item['descricao'], 'Salário Base') !== false) {
+                            $salario_base_grafico += (float)$item['valor'];
+                        } else {
+                            $beneficios_grafico += (float)$item['valor'];
+                        }
+                    } elseif (isset($item['tipo']) && $item['tipo'] === 'desconto') {
+                        $descontos_grafico += (float)$item['valor'];
                     }
-                } elseif (isset($item['tipo']) && $item['tipo'] === 'desconto') {
-                    $descontos_grafico += (float)$item['valor'];
                 }
+            }
+
+            // Se não houver itens de holerite, usa o salário_base do colaborador
+            if ($salario_base_grafico == 0 && empty($itens_holerite)) {
+                $salario_base_grafico = (float)($dados_colaborador['salario_base'] ?? 0);
+                $beneficios_grafico = 0;
+                $descontos_grafico = 0;
             }
 
             $total_bruto_grafico = $salario_base_grafico + $beneficios_grafico;
@@ -110,6 +134,7 @@ class DashboardController extends Controller {
             $viewData = array_merge((array)$dados_colaborador, [
                 'ultimo_ponto' => $ultimo_ponto,
                 'beneficios_count' => $beneficios_count,
+                'beneficios_valor' => $beneficios_valor,
                 'salario_liquido' => $salario_liquido,
                 'horas_semana' => round($total_horas_semana_grafico),
                 'salario_chart_style' => $salario_chart_style,
