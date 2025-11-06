@@ -53,7 +53,12 @@
                 </div>
             </section>
 
-            <button type="submit" class="submit-button">Enviar Candidatura</button>
+            <div style="display: flex; gap: 15px; align-items: center; justify-content: flex-start; margin-top: 30px; margin-left: 20px;">
+                <button type="button" onclick="window.history.back()" class="back-button">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+                <button type="submit" class="submit-button">Enviar Candidatura</button>
+            </div>
 
         </form>
     </main>

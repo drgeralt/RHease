@@ -104,12 +104,13 @@ $conn->close();
     <div class="container">
         <div class="sidebar">
             <ul class="menu">
-                <li><a href="index.html"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
-                <li><a href="dados.html"><i class="bi bi-person-vcard-fill"></i> Dados Cadastrais</a></li>
-                <li><a href="frequencia.html"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
-                <li><a href="salario.html"><i class="bi bi-wallet-fill"></i> Salário</a></li>
-                <li class="active"><a href="#"><i class="bi bi-shield-fill-check"></i> Meus Benefícios</a></li>
-                <li><a href="contato.html"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
+            <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
+                <li><a href="<?= BASE_URL ?>/dados"><i class="bi bi-person-vcard-fill"></i> Dados cadastrais</a></li>
+                <li><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
+                <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
+                <li><a href="<?= BASE_URL ?>/meus_beneficios"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
+                <li><a href="<?= BASE_URL ?>/vagas/listar"><i class="bi bi-briefcase-fill"></i> Gestão de Vagas</a></li>
+                <li><a href="<?= BASE_URL ?>/contato"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
             </ul>
         </div>
 
@@ -181,10 +182,10 @@ $conn->close();
             </p>
         </div>
     </div>
-    <script>
-        document.querySelector('.menu-toggle').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
-        });
-    </script>
+
+<script>
+    const BASE_URL = "<?php echo BASE_URL; ?>";
+</script>
+<script src="<?php echo BASE_URL; ?>/js/sidebar-toggle.js"></script>
 </body>
 </html>
