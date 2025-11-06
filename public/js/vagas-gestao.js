@@ -1,5 +1,5 @@
-document.addEventListener('DOMContentLoaded', function() {
-    
+document.addEventListener('DOMContentLoaded', function () {
+
     // --- Carregamento Inicial ---
     carregarVagas();
 
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modalEdicaoCancelBtn.addEventListener('click', fecharModalEdicao);
     }
     if (formEditar) {
-        formEditar.addEventListener('submit', function(event) {
+        formEditar.addEventListener('submit', function (event) {
             event.preventDefault();
             salvarEdicao();
         });
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modalCriacaoCancelBtn.addEventListener('click', fecharModalCriacao);
     }
     if (formCriar) {
-        formCriar.addEventListener('submit', function(event) {
+        formCriar.addEventListener('submit', function (event) {
             event.preventDefault();
             salvarCriacao();
         });
@@ -62,18 +62,47 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function carregarVagas() {
-    // ... (Esta função está 100% CORRETA, sem necessidade de mudanças) ...
     const tbody = document.getElementById('tabela-vagas-corpo');
     if (!tbody) { console.error("Erro: 'tabela-vagas-corpo' não encontrado."); return; }
     tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Carregando...</td></tr>';
     try {
         const response = await fetch(`${BASE_URL}/api/vagas/listar`);
-        const vagas = await response.json();
-        tbody.innerHTML = ''; 
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+        }
+        
+        const text = await response.text();
+        console.log("Resposta do servidor:", text);
+        
+        if (!text || text.trim() === '') {
+            throw new Error('Resposta vazia do servidor');
+        }
+        
+        const resultado = JSON.parse(text);
+        
+        // Verifica se houve erro (formato padronizado)
+        if (resultado.success === false) {
+            console.error("Erro do servidor:", resultado);
+            const errorMsg = resultado.mensagem || 'Erro desconhecido';
+            const errorDetails = resultado.data?.detalhes || '';
+            throw new Error(errorDetails || errorMsg);
+        }
+        
+        // Pega o array de vagas do campo 'data'
+        const vagas = resultado.data || [];
+        console.log("Vagas carregadas:", vagas);
+        tbody.innerHTML = '';
+        
+        if (!Array.isArray(vagas)) {
+            throw new Error('Resposta inválida: esperado um array de vagas');
+        }
+        
         if (vagas.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhuma vaga encontrada.</td></tr>';
             return;
         }
+
         vagas.forEach(vaga => {
             const titulo = vaga.titulo || '';
             const depto = vaga.departamento || '';
@@ -96,22 +125,22 @@ async function carregarVagas() {
         });
     } catch (error) {
         console.error('Erro ao carregar vagas:', error);
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Falha ao carregar dados.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Falha ao carregar dados. ${error.message || error}</td></tr>`;
     }
 }
 
 async function excluirVaga(id, titulo) {
-    // ... (Esta função está 100% CORRETA, sem necessidade de mudanças) ...
     if (!confirm(`Tem certeza que deseja excluir a vaga "${titulo}"?`)) {
         return;
     }
     try {
         const response = await fetch(`${BASE_URL}/api/vagas/excluir?id=${id}`);
         const resultado = await response.json();
-        if (resultado.sucesso) {
+        
+        if (resultado.success) {
             document.getElementById(`vaga-${id}`).remove();
         } else {
-            alert('Erro ao excluir: ' + (resultado.erro || 'Erro desconhecido'));
+            alert('Erro ao excluir: ' + (resultado.mensagem || 'Erro desconhecido'));
         }
     } catch (error) {
         alert('Erro de conexão ao tentar excluir a vaga.');
@@ -119,7 +148,6 @@ async function excluirVaga(id, titulo) {
 }
 
 async function abrirModalCandidatos(idVaga) {
-    // ... (Esta função está 100% CORRETA, sem necessidade de mudanças) ...
     const modalBackdrop = document.getElementById('modal-backdrop');
     const modalCandidatos = document.getElementById('modal-candidatos');
     const tituloEl = document.getElementById('modal-titulo-vaga');
@@ -130,10 +158,15 @@ async function abrirModalCandidatos(idVaga) {
     tbodyEl.innerHTML = '<tr><td colspan="4" style="text-align: center;">Buscando candidatos...</td></tr>';
     try {
         const response = await fetch(`${BASE_URL}/api/vagas/candidatos?id=${idVaga}`);
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.erro || 'Falha ao buscar dados.');
+        const resultado = await response.json();
+        
+        if (!response.ok || resultado.success === false) {
+            throw new Error(resultado.mensagem || 'Falha ao buscar dados.');
+        }
+        
+        const data = resultado.data;
         tituloEl.textContent = `Candidatos para: ${data.vaga.titulo_vaga}`;
-        tbodyEl.innerHTML = ''; 
+        tbodyEl.innerHTML = '';
         if (data.candidatos.length === 0) {
             tbodyEl.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum candidato encontrado.</td></tr>';
             return;
@@ -166,12 +199,11 @@ async function abrirModalCandidatos(idVaga) {
 function fecharModalCandidatos() {
     const modalCandidatos = document.getElementById('modal-candidatos');
     const modalBackdrop = document.getElementById('modal-backdrop');
-    if(modalCandidatos) modalCandidatos.style.display = 'none';
-    if(modalBackdrop) modalBackdrop.style.display = 'none';
+    if (modalCandidatos) modalCandidatos.style.display = 'none';
+    if (modalBackdrop) modalBackdrop.style.display = 'none';
 }
 
 async function abrirModalEdicao(idVaga) {
-    // ... (Esta função está 100% CORRETA, sem necessidade de mudanças) ...
     const modalBackdrop = document.getElementById('modal-backdrop');
     const modalEdicao = document.getElementById('modal-edicao-vaga');
     const messageDiv = document.getElementById('api-message-edit');
@@ -180,9 +212,13 @@ async function abrirModalEdicao(idVaga) {
     modalEdicao.style.display = 'block';
     try {
         const response = await fetch(`${BASE_URL}/api/vagas/editar?id=${idVaga}`);
-        if (!response.ok) throw new Error('Falha ao buscar dados da vaga.');
-        const vaga = await response.json();
-        if (vaga.erro) throw new Error(vaga.erro);
+        const resultado = await response.json();
+        
+        if (!response.ok || resultado.success === false) {
+            throw new Error(resultado.mensagem || 'Falha ao buscar dados da vaga.');
+        }
+        
+        const vaga = resultado.data;
         document.getElementById('edit-id-vaga').value = vaga.id_vaga;
         document.getElementById('modal-edicao-titulo').textContent = `Editar Vaga: ${vaga.titulo_vaga}`;
         document.getElementById('edit-titulo').value = vaga.titulo_vaga;
@@ -202,12 +238,11 @@ async function abrirModalEdicao(idVaga) {
 function fecharModalEdicao() {
     const modalEdicao = document.getElementById('modal-edicao-vaga');
     const modalBackdrop = document.getElementById('modal-backdrop');
-    if(modalEdicao) modalEdicao.style.display = 'none';
-    if(modalBackdrop) modalBackdrop.style.display = 'none';
+    if (modalEdicao) modalEdicao.style.display = 'none';
+    if (modalBackdrop) modalBackdrop.style.display = 'none';
 }
 
 async function salvarEdicao() {
-    // ... (Esta função está 100% CORRETA, sem necessidade de mudanças) ...
     const form = document.getElementById('form-editar-vaga');
     const submitButton = document.getElementById('btn-salvar-edicao');
     const messageDiv = document.getElementById('api-message-edit');
@@ -218,13 +253,15 @@ async function salvarEdicao() {
     try {
         const response = await fetch(`${BASE_URL}/api/vagas/atualizar`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify(dadosVaga)
         });
         const resultado = await response.json();
-        if (!response.ok || !resultado.sucesso) {
-            throw new Error(resultado.erro || 'Ocorreu um erro ao salvar.');
+        
+        if (!response.ok || resultado.success === false) {
+            throw new Error(resultado.mensagem || 'Ocorreu um erro ao salvar.');
         }
+        
         fecharModalEdicao();
         carregarVagas();
     } catch (error) {
@@ -240,10 +277,10 @@ async function salvarEdicao() {
 function abrirModalCriacao() {
     // 1. Limpa o formulário de valores antigos
     document.getElementById('form-criar-vaga').reset();
-    
+
     // 2. Esconde mensagens de erro/sucesso antigas
     document.getElementById('api-message-create').style.display = 'none';
-    
+
     // 3. Mostra o modal
     document.getElementById('modal-backdrop').style.display = 'block';
     document.getElementById('modal-criacao-vaga').style.display = 'block';
@@ -258,7 +295,7 @@ async function salvarCriacao() {
     const form = document.getElementById('form-criar-vaga');
     const submitButton = document.getElementById('btn-salvar-criacao');
     const messageDiv = document.getElementById('api-message-create');
-    
+
     submitButton.disabled = true;
     submitButton.textContent = 'Salvando...';
 
@@ -266,32 +303,32 @@ async function salvarCriacao() {
     const dadosVaga = Object.fromEntries(formData.entries());
 
     try {
-        // Envia os dados para a API de "salvar"
         const response = await fetch(`${BASE_URL}/api/vagas/salvar`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify(dadosVaga)
         });
 
         const resultado = await response.json();
-        if (!response.ok || !resultado.sucesso) {
-            let erroMsg = resultado.erro || 'Ocorreu um erro ao salvar.';
-            if (resultado.erros) {
-                erroMsg = Object.values(resultado.erros).join('<br>');
+        
+        if (!response.ok || resultado.success === false) {
+            let erroMsg = resultado.mensagem || 'Ocorreu um erro ao salvar.';
+            // Verifica se há erros de validação
+            if (resultado.data && resultado.data.erros) {
+                erroMsg = Object.values(resultado.data.erros).join('<br>');
             }
             throw new Error(erroMsg);
         }
 
-        // Sucesso! Fecha o modal e recarrega a tabela principal
+        // Sucesso! Fecha o modal e recarrega a tabela
         fecharModalCriacao();
-        carregarVagas(); // Atualiza a tabela com a nova vaga
+        carregarVagas();
 
     } catch (error) {
         messageDiv.innerHTML = error.message;
         messageDiv.className = 'msg-erro';
         messageDiv.style.display = 'block';
     } finally {
-        // Reabilita o botão
         submitButton.disabled = false;
         submitButton.textContent = 'Salvar Vaga';
     }
@@ -300,7 +337,7 @@ async function salvarCriacao() {
 // Função auxiliar para escapar HTML
 function escapeHTML(str) {
     if (!str) return '';
-    return str.replace(/[&<>"']/g, function(m) {
-        return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m];
+    return str.replace(/[&<>"']/g, function (m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
     });
 }
