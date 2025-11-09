@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
          colors="true"
-         verbose="true"
          stopOnFailure="false"
-         cacheDirectory=".phpunit.cache">
+         cacheDirectory=".phpunit.cache"
+         displayDetailsOnTestsThatTriggerWarnings="true">
 
     <testsuites>
         <testsuite name="Unit Tests">
@@ -34,6 +34,8 @@
 
     <php>
         <env name="APP_ENV" value="testing"/>
+        <const name="BASE_URL" value="http://localhost/rhease"/>
+        <const name="BASE_PATH" value="C:/Users/Matheus/PhpstormProjects/RHease"/>
         <ini name="display_errors" value="1"/>
         <ini name="error_reporting" value="-1"/>
     </php>
