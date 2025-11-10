@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Oct 01, 2025 at 01:49 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: 127.0.0.1
+-- Tempo de geração: 20/10/2025 às 04:52
+-- Versão do servidor: 10.4.32-MariaDB
+-- Versão do PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `rhease`
+-- Banco de dados: `rhease`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `avaliacao_desempenho`
+-- Estrutura para tabela `avaliacao_desempenho`
 --
 
 CREATE TABLE `avaliacao_desempenho` (
@@ -38,7 +38,7 @@ CREATE TABLE `avaliacao_desempenho` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `beneficios_catalogo`
+-- Estrutura para tabela `beneficios_catalogo`
 --
 
 CREATE TABLE `beneficios_catalogo` (
@@ -46,13 +46,26 @@ CREATE TABLE `beneficios_catalogo` (
   `nome` varchar(100) NOT NULL,
   `categoria` varchar(50) DEFAULT NULL,
   `tipo_valor` enum('Fixo','Variável','Descritivo') NOT NULL,
+  `custo_padrao_empresa` decimal(10,2) DEFAULT NULL,
   `status` enum('Ativo','Inativo') NOT NULL DEFAULT 'Ativo'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `beneficios_catalogo`
+--
+
+INSERT INTO `beneficios_catalogo` (`id_beneficio`, `nome`, `categoria`, `tipo_valor`, `custo_padrao_empresa`, `status`) VALUES
+(1, 'YAYAYAYAY', 'Saúde', 'Fixo', 366.00, 'Ativo'),
+(2, '3wetrqwert', 'Mobilidade', 'Fixo', 1244.00, 'Ativo'),
+(5, 'dassf', 'Saúde', 'Fixo', NULL, 'Ativo'),
+(6, 'asdfsdgggg', 'Saúde', 'Fixo', NULL, 'Ativo'),
+(7, 'asdfsdgggg', 'Saúde', 'Fixo', 12234.00, 'Ativo'),
+(9, 'vale alimentação', 'Alimentação', 'Variável', NULL, 'Ativo');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `candidato`
+-- Estrutura para tabela `candidato`
 --
 
 CREATE TABLE `candidato` (
@@ -63,10 +76,23 @@ CREATE TABLE `candidato` (
   `curriculo` varchar(200) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Despejando dados para a tabela `candidato`
+--
+
+INSERT INTO `candidato` (`id_candidato`, `nome_completo`, `CPF`, `situacao`, `curriculo`) VALUES
+(1, 'Rhyan Nascimento de Sousa', '01794023151', 'em análise', '/uploads/curriculos/68e4410e7526b-Currículo Rhyan.pdf'),
+(2, 'Rhyan Nascimento de Sousa', '654.642.354-55', 'em análise', '/uploads/curriculos/68e46c88d613b-Currículo Rhyan.pdf'),
+(3, 'Gabriel Rodrigues', '76576556', 'em análise', '/uploads/curriculos/68e479e4967dd-downloadfile.PDF'),
+(4, 'Gabriel Rodrigues', '23123312', 'em análise', '/uploads/curriculos/68e47a6d3bff7-downloadfile.PDF'),
+(5, 'Rhyan Nascimento de Sousa', '98798878', 'em análise', '/uploads/curriculos/68e47ae8e5e72-Rhyan Nascimento de Sousa.pdf'),
+(6, 'Rhyan Nascimento de Sousa', '98787789956', 'em análise', '/uploads/curriculos/68e50a53ef859-Rhyan Nascimento de Sousa.pdf'),
+(7, 'Lean Albuquerque', '45612378912', 'em análise', '/uploads/curriculos/68e64e62b4162-Curriculo_novo.pdf');
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `candidaturas`
+-- Estrutura para tabela `candidaturas`
 --
 
 CREATE TABLE `candidaturas` (
@@ -79,10 +105,22 @@ CREATE TABLE `candidaturas` (
   `status_triagem` enum('Recebido','Em Análise','Aprovado para Entrevista','Rejeitado') NOT NULL DEFAULT 'Recebido'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Despejando dados para a tabela `candidaturas`
+--
+
+INSERT INTO `candidaturas` (`id_candidatura`, `id_vaga`, `id_candidato`, `data_candidatura`, `pontuacao_aderencia`, `justificativa_ia`, `status_triagem`) VALUES
+(1, 1, 1, '2025-10-06 22:22:06', NULL, NULL, 'Recebido'),
+(2, 4, 2, '2025-10-07 01:27:36', 3, 'O currículo apresenta uma desconexão significativa com os requisitos técnicos da vaga de Desenvolvedor Full Stack Pleno. O candidato não demonstra experiência formal em desenvolvimento de software nem proficiência nas tecnologias obrigatórias como JavaScript, React.js e Node.js. Embora esteja cursando Ciência da Computação e mencione linguagens como Python e Java, sua experiência profissional e habilidades listadas são focadas em gestão, atendimento e infraestrutura de redes, não aderindo ao perfil procurado.', 'Recebido'),
+(4, 4, 4, '2025-10-07 02:26:53', 0, 'Não foi fornecido nenhum currículo para análise. Para que eu possa avaliar a aderência do candidato à vaga de Desenvolvedor Full Stack Pleno – Projeto Orion, por favor, inclua o conteúdo do currículo. Sem essas informações, não é possível gerar um sumário ou calcular uma nota de correspondência.', 'Recebido'),
+(5, 4, 5, '2025-10-07 02:28:56', 44, 'Rhyan demonstra solidez em Python, Django e bancos de dados relacionais (PostgreSQL/MySQL), com experiência em desenvolvimento web e automação. Contudo, há uma lacuna significativa nos requisitos obrigatórios de frontend (React.js) e backend (Node.js/TypeScript), tecnologias centrais para esta vaga de Desenvolvedor Full Stack Pleno. Embora exiba competências desejáveis em Machine Learning e alguma experiência em gestão de sistemas, o perfil técnico primário do currículo não se alinha diretamente com o stack principal da vaga. Adicionalmente, seu resumo profissional sugere busca por estágio focado em IA, o que se distancia do escopo e nível da posição oferecida.', 'Recebido'),
+(6, 5, 6, '2025-10-07 12:40:51', 57, 'O candidato Rhyan Nascimento de Sousa demonstra uma base sólida em programação Python e SQL, essencial para a vaga de Cientista de Dados Júnior, com experiência prática em automação, desenvolvimento web e projetos de análise de dados que utilizam Pandas e conceitos de IA/PLN. Sua formação em Ciência da Computação, incluindo aprendizado de máquina, complementa os requisitos técnicos da posição. Embora possua conhecimento inferido em estatística e algumas técnicas de machine learning, há lacunas na menção explícita de bibliotecas fundamentais como NumPy, Matplotlib e Scikit-learn, além de ferramentas de BI como Tableau/Power BI. Contudo, seu perfil proativo e a experiência com manipulação de dados em desafios reais o tornam um candidato promissor, com um bom potencial de desenvolvimento na função.', 'Recebido'),
+(7, 5, 7, '2025-10-08 11:43:30', 78, 'Lean Albuquerque demonstra um perfil muito promissor para a vaga de Cientista de Dados Júnior, com sólida base em Python, SQL, lógica de programação e experiência prática em Machine Learning através de projetos e estágio. Sua formação em Ciência da Computação e capacidade de comunicação são pontos fortes alinhados aos requisitos. Embora algumas bibliotecas específicas (Pandas, NumPy, Matplotlib) e ferramentas de visualização não sejam explicitamente mencionadas, sua experiência com pré-processamento de dados e Scikit-learn sugere familiaridade. O candidato possui um bom alinhamento com as expectativas para uma posição de entrada, com potencial de crescimento significativo.', 'Recebido');
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cargo`
+-- Estrutura para tabela `cargo`
 --
 
 CREATE TABLE `cargo` (
@@ -91,17 +129,26 @@ CREATE TABLE `cargo` (
   `salario_base` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Despejando dados para a tabela `cargo`
+--
+
+INSERT INTO `cargo` (`id_cargo`, `nome_cargo`, `salario_base`) VALUES
+(23, 'calabreso', 0.00),
+(27, 'calabresouuu', 0.00),
+(28, 'calabres', 0.00);
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `colaborador`
+-- Estrutura para tabela `colaborador`
 --
 
 CREATE TABLE `colaborador` (
   `id_colaborador` int(11) NOT NULL,
-  `matricula` varchar(20) NOT NULL,
+  `matricula` varchar(20) DEFAULT NULL,
   `nome_completo` varchar(100) NOT NULL,
-  `email_pessoal` varchar(100) NOT NULL,
+  `email_pessoal` varchar(100) DEFAULT NULL,
   `email_profissional` varchar(100) NOT NULL,
   `senha` varchar(255) NOT NULL COMMENT 'ADICIONADO: Hashing com password_hash()',
   `perfil` enum('colaborador','gestor_rh','diretor') NOT NULL DEFAULT 'colaborador' COMMENT 'ADICIONADO: Para controle de acesso',
@@ -109,6 +156,8 @@ CREATE TABLE `colaborador` (
   `token_verificacao` varchar(255) DEFAULT NULL COMMENT 'ADICIONADO: Hash do token para verificação de e-mail',
   `token_recuperacao` varchar(255) DEFAULT NULL COMMENT 'ADICIONADO: Hash do token para recuperação de senha',
   `token_expiracao` datetime DEFAULT NULL COMMENT 'ADICIONADO: Expiração dos tokens',
+  `failed_login_attempts` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Contador de tentativas de login falhadas consecutivas',
+  `last_failed_login_at` timestamp NULL DEFAULT NULL COMMENT 'Timestamp da última tentativa de login falhada',
   `cpf` varchar(14) NOT NULL,
   `rg` varchar(15) DEFAULT NULL,
   `genero` enum('feminino','masculino','outro','prefiro nao informar') DEFAULT NULL,
@@ -120,13 +169,25 @@ CREATE TABLE `colaborador` (
   `numero_dependentes` int(11) DEFAULT 0 COMMENT 'ADICIONADO: Para cálculo de IRRF',
   `id_cargo` int(11) DEFAULT NULL,
   `id_setor` int(11) DEFAULT NULL,
+  `salario_base` decimal(10,2) NOT NULL DEFAULT 0.00,
   `id_endereco` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `colaborador`
+--
+
+INSERT INTO `colaborador` (`id_colaborador`, `matricula`, `nome_completo`, `email_pessoal`, `email_profissional`, `senha`, `perfil`, `status_conta`, `token_verificacao`, `token_recuperacao`, `token_expiracao`, `failed_login_attempts`, `last_failed_login_at`, `cpf`, `rg`, `genero`, `data_nascimento`, `telefone`, `data_admissao`, `situacao`, `tipo_contrato`, `numero_dependentes`, `id_cargo`, `id_setor`, `salario_base`, `id_endereco`) VALUES
+(1, 'skdjfks77', 'Jarineura Gomes Nascimento Chavesss', 'rhyannscanada@gmail.com', 'rhyannscanada@gmail.com', 'heheboi', 'colaborador', 'pendente_verificacao', NULL, NULL, NULL, 0, NULL, '654.642.354-55', '21355122', '', '1998-06-15', '(71) 99137-0403', '2000-04-05', 'ativo', 'CLT', 0, 23, 16, 0.00, 23),
+(12, 'skdjfks3827346', 'Jarineura Gomes Nascimento Chavez', 'rhyannscasdfnada@gmail.com', 's@gmail.cofdfsdm', 'heheboi', 'colaborador', 'pendente_verificacao', NULL, NULL, NULL, 0, NULL, '654.642.354-57', '21355126', '', '1998-06-15', '(71) 99137-0403', '2000-04-05', 'ativo', 'CLT', 0, 27, 17, 0.00, 28),
+(13, 'skdjfks382734648', 'Jarineura Gomes Nascimento Chavei', 'rhyannscasdfdfnada@gmail.com', 's@gmail.cofdfsdsfgm', 'heheboi', 'colaborador', 'pendente_verificacao', NULL, NULL, NULL, 0, NULL, '654.642.354-50', '21355123', '', '1998-06-15', '(71) 99137-0403', '2000-04-05', 'ativo', 'CLT', 0, 28, 18, 0.00, 29),
+(46, 'C1759891155', 'Rhyan Nascimento de Sousa', 'rhyannsousa@gmail.com', 'rhyannsousa@gmail.com', '$2y$10$9ie2djxm/5.Ozfnsh818X.WMo65RNPYXTU/lQlKsyWNrg0NEnwMP.', 'colaborador', 'pendente_verificacao', '579837882c9c0c9914c9f782155e56111a7a45edaeee4267e31a52719ed6629f', NULL, '2025-10-08 05:39:15', 0, NULL, '12332112232', NULL, '', '2025-10-04', '', '2025-10-08', 'ativo', 'CLT', 0, NULL, NULL, 0.00, NULL),
+(48, '', 'Matheus de Sousa', '', 'sousa.matheus13.sousa@gmail.com', '$2y$10$Zqcn3wGLfLkNJF.YSs6kMuM19cMLbtSWlcsyxh73Q1FOau.QJiPFq', 'colaborador', 'ativo', NULL, NULL, NULL, 1, '2025-10-20 02:52:10', '063.999.301-03', NULL, NULL, NULL, NULL, '2025-10-19', NULL, 'CLT', 0, NULL, NULL, 0.00, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `colaborador_beneficio`
+-- Estrutura para tabela `colaborador_beneficio`
 --
 
 CREATE TABLE `colaborador_beneficio` (
@@ -138,7 +199,7 @@ CREATE TABLE `colaborador_beneficio` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `contratacao`
+-- Estrutura para tabela `contratacao`
 --
 
 CREATE TABLE `contratacao` (
@@ -154,7 +215,7 @@ CREATE TABLE `contratacao` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `demissao`
+-- Estrutura para tabela `demissao`
 --
 
 CREATE TABLE `demissao` (
@@ -168,7 +229,7 @@ CREATE TABLE `demissao` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `endereco`
+-- Estrutura para tabela `endereco`
 --
 
 CREATE TABLE `endereco` (
@@ -181,10 +242,19 @@ CREATE TABLE `endereco` (
   `estado` char(2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Despejando dados para a tabela `endereco`
+--
+
+INSERT INTO `endereco` (`id_endereco`, `logradouro`, `CEP`, `numero`, `bairro`, `cidade`, `estado`) VALUES
+(23, 'Quadra ARSE 131 Rua 4', '77024-664', '131', 'Plano Diretor Sul', 'Palmas', 'TO'),
+(28, 'Quadra ARSE 131 Rua 4', '77024-664', '131', 'Plano Diretor Sul', 'Palmas', 'TO'),
+(29, 'Quadra ARSE 131 Rua 4', '77024-664', '131', 'Plano Diretor Sul', 'Palmas', 'TO');
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ferias`
+-- Estrutura para tabela `ferias`
 --
 
 CREATE TABLE `ferias` (
@@ -198,22 +268,31 @@ CREATE TABLE `ferias` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `folha_ponto`
+-- Estrutura para tabela `folha_ponto`
 --
 
 CREATE TABLE `folha_ponto` (
-  `id_registro` int(11) NOT NULL,
+  `id_registro_ponto` int(11) NOT NULL,
   `id_colaborador` int(11) NOT NULL,
-  `timestamp_batida` datetime NOT NULL COMMENT 'MODIFICADO: Armazena cada batida individualmente',
+  `data_hora_entrada` datetime DEFAULT NULL,
+  `data_hora_saida` datetime DEFAULT NULL,
   `geolocalizacao` varchar(50) DEFAULT NULL COMMENT 'ADICIONADO: String com "latitude,longitude"',
   `caminho_foto` varchar(255) DEFAULT NULL COMMENT 'ADICIONADO: Caminho para a foto de prova de vida',
   `ip_address` varchar(45) DEFAULT NULL COMMENT 'ADICIONADO: Para auditoria'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Despejando dados para a tabela `folha_ponto`
+--
+
+INSERT INTO `folha_ponto` (`id_registro_ponto`, `id_colaborador`, `data_hora_entrada`, `data_hora_saida`, `geolocalizacao`, `caminho_foto`, `ip_address`) VALUES
+(1, 1, '2025-10-08 02:38:41', '2025-10-08 04:45:42', NULL, NULL, NULL),
+(2, 1, '2025-10-08 13:30:12', '2025-10-08 13:47:57', NULL, NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `holerites`
+-- Estrutura para tabela `holerites`
 --
 
 CREATE TABLE `holerites` (
@@ -224,40 +303,168 @@ CREATE TABLE `holerites` (
   `total_proventos` decimal(10,2) NOT NULL,
   `total_descontos` decimal(10,2) NOT NULL,
   `salario_liquido` decimal(10,2) NOT NULL,
+  `base_calculo_inss` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `base_calculo_fgts` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `valor_fgts` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `base_calculo_irrf` decimal(10,2) NOT NULL DEFAULT 0.00,
   `data_processamento` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `holerites`
+--
+
+INSERT INTO `holerites` (`id_holerite`, `id_colaborador`, `mes_referencia`, `ano_referencia`, `total_proventos`, `total_descontos`, `salario_liquido`, `base_calculo_inss`, `base_calculo_fgts`, `valor_fgts`, `base_calculo_irrf`, `data_processamento`) VALUES
+(37, 13, 10, '2025', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2025-10-20 01:31:27'),
+(38, 1, 10, '2025', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2025-10-20 01:31:27'),
+(39, 12, 10, '2025', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2025-10-20 01:31:27'),
+(40, 46, 10, '2025', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2025-10-20 01:31:27'),
+(41, 13, 10, '2024', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2025-10-20 01:38:14'),
+(42, 1, 10, '2024', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2025-10-20 01:38:14'),
+(43, 12, 10, '2024', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2025-10-20 01:38:14'),
+(44, 46, 10, '2024', 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, '2025-10-20 01:38:14');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `holerite_itens`
+-- Estrutura para tabela `holerite_itens`
 --
 
 CREATE TABLE `holerite_itens` (
   `id_item` int(11) NOT NULL,
   `id_holerite` int(11) NOT NULL,
+  `codigo_evento` varchar(20) DEFAULT NULL,
   `descricao` varchar(100) NOT NULL COMMENT 'Ex: Salário Base, INSS, Horas Extras 50%',
   `tipo` enum('provento','desconto') NOT NULL,
   `valor` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Despejando dados para a tabela `holerite_itens`
+--
+
+INSERT INTO `holerite_itens` (`id_item`, `id_holerite`, `codigo_evento`, `descricao`, `tipo`, `valor`) VALUES
+(1, 1, '101', 'Salário Base', 'provento', 0.00),
+(2, 1, '501', 'INSS', 'desconto', 0.00),
+(3, 2, '101', 'Salário Base', 'provento', 0.00),
+(4, 2, '501', 'INSS', 'desconto', 0.00),
+(5, 3, '101', 'Salário Base', 'provento', 0.00),
+(6, 3, '501', 'INSS', 'desconto', 0.00),
+(7, 4, '101', 'Salário Base', 'provento', 0.00),
+(8, 4, '501', 'INSS', 'desconto', 0.00),
+(9, 5, '101', 'Salário Base', 'provento', 0.00),
+(10, 5, '501', 'INSS', 'desconto', 0.00),
+(11, 6, '101', 'Salário Base', 'provento', 0.00),
+(12, 6, '501', 'INSS', 'desconto', 0.00),
+(13, 7, '101', 'Salário Base', 'provento', 0.00),
+(14, 7, '501', 'INSS', 'desconto', 0.00),
+(15, 8, '101', 'Salário Base', 'provento', 0.00),
+(16, 8, '501', 'INSS', 'desconto', 0.00),
+(17, 9, '101', 'Salário Base', 'provento', 0.00),
+(18, 9, '501', 'INSS', 'desconto', 0.00),
+(19, 10, '101', 'Salário Base', 'provento', 0.00),
+(20, 10, '501', 'INSS', 'desconto', 0.00),
+(21, 11, '101', 'Salário Base', 'provento', 0.00),
+(22, 11, '501', 'INSS', 'desconto', 0.00),
+(23, 12, '101', 'Salário Base', 'provento', 0.00),
+(24, 12, '501', 'INSS', 'desconto', 0.00),
+(25, 13, '101', 'Salário Base', 'provento', 0.00),
+(26, 13, '501', 'INSS', 'desconto', 0.00),
+(27, 14, '101', 'Salário Base', 'provento', 0.00),
+(28, 14, '501', 'INSS', 'desconto', 0.00),
+(29, 15, '101', 'Salário Base', 'provento', 0.00),
+(30, 15, '501', 'INSS', 'desconto', 0.00),
+(31, 16, '101', 'Salário Base', 'provento', 0.00),
+(32, 16, '501', 'INSS', 'desconto', 0.00),
+(33, 17, '101', 'Salário Base', 'provento', 0.00),
+(34, 17, '501', 'INSS', 'desconto', 0.00),
+(35, 18, '101', 'Salário Base', 'provento', 0.00),
+(36, 18, '501', 'INSS', 'desconto', 0.00),
+(37, 19, '101', 'Salário Base', 'provento', 0.00),
+(38, 19, '501', 'INSS', 'desconto', 0.00),
+(39, 20, '101', 'Salário Base', 'provento', 0.00),
+(40, 20, '501', 'INSS', 'desconto', 0.00),
+(41, 21, '101', 'Salário Base', 'provento', 0.00),
+(42, 21, '501', 'INSS', 'desconto', 0.00),
+(43, 22, '101', 'Salário Base', 'provento', 0.00),
+(44, 22, '501', 'INSS', 'desconto', 0.00),
+(45, 23, '101', 'Salário Base', 'provento', 0.00),
+(46, 23, '501', 'INSS', 'desconto', 0.00),
+(47, 24, '101', 'Salário Base', 'provento', 0.00),
+(48, 24, '501', 'INSS', 'desconto', 0.00),
+(49, 25, '101', 'Salário Base', 'provento', 0.00),
+(50, 25, '501', 'INSS', 'desconto', 0.00),
+(51, 26, '101', 'Salário Base', 'provento', 0.00),
+(52, 26, '501', 'INSS', 'desconto', 0.00),
+(53, 27, '101', 'Salário Base', 'provento', 0.00),
+(54, 27, '501', 'INSS', 'desconto', 0.00),
+(55, 28, '101', 'Salário Base', 'provento', 0.00),
+(56, 28, '501', 'INSS', 'desconto', 0.00),
+(57, 29, '101', 'Salário Base', 'provento', 0.00),
+(58, 29, '501', 'INSS', 'desconto', 0.00),
+(59, 30, '101', 'Salário Base', 'provento', 0.00),
+(60, 30, '501', 'INSS', 'desconto', 0.00),
+(61, 31, '101', 'Salário Base', 'provento', 0.00),
+(62, 31, '501', 'INSS', 'desconto', 0.00),
+(63, 32, '101', 'Salário Base', 'provento', 0.00),
+(64, 32, '501', 'INSS', 'desconto', 0.00),
+(65, 33, '101', 'Salário Base', 'provento', 0.00),
+(66, 33, '501', 'INSS', 'desconto', 0.00),
+(67, 34, '101', 'Salário Base', 'provento', 0.00),
+(68, 34, '501', 'INSS', 'desconto', 0.00),
+(69, 35, '101', 'Salário Base', 'provento', 0.00),
+(70, 35, '501', 'INSS', 'desconto', 0.00),
+(71, 36, '101', 'Salário Base', 'provento', 0.00),
+(72, 36, '501', 'INSS', 'desconto', 0.00),
+(73, 37, '101', 'Salário Base', 'provento', 0.00),
+(74, 37, '501', 'INSS', 'desconto', 0.00),
+(75, 38, '101', 'Salário Base', 'provento', 0.00),
+(76, 38, '501', 'INSS', 'desconto', 0.00),
+(77, 39, '101', 'Salário Base', 'provento', 0.00),
+(78, 39, '501', 'INSS', 'desconto', 0.00),
+(79, 40, '101', 'Salário Base', 'provento', 0.00),
+(80, 40, '501', 'INSS', 'desconto', 0.00),
+(81, 41, '101', 'Salário Base', 'provento', 0.00),
+(82, 41, '501', 'INSS', 'desconto', 0.00),
+(83, 42, '101', 'Salário Base', 'provento', 0.00),
+(84, 42, '501', 'INSS', 'desconto', 0.00),
+(85, 43, '101', 'Salário Base', 'provento', 0.00),
+(86, 43, '501', 'INSS', 'desconto', 0.00),
+(87, 44, '101', 'Salário Base', 'provento', 0.00),
+(88, 44, '501', 'INSS', 'desconto', 0.00);
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `parametros_folha`
+-- Estrutura para tabela `parametros_folha`
 --
 
 CREATE TABLE `parametros_folha` (
   `id_parametro` int(11) NOT NULL,
   `nome` varchar(50) NOT NULL COMMENT 'Ex: INSS_FAIXA_1, DEDUCAO_DEPENDENTE_IRRF',
-  `valor` varchar(255) NOT NULL,
+  `valor` text DEFAULT NULL,
   `ano_vigencia` year(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `parametros_folha`
+--
+
+INSERT INTO `parametros_folha` (`id_parametro`, `nome`, `valor`, `ano_vigencia`) VALUES
+(1, 'INSS_FAIXA_1', '{\"aliquota\": 7.50, \"de\": 0.00, \"ate\": 1412.00, \"deduzir\": 0.00}', '2024'),
+(2, 'INSS_FAIXA_2', '{\"aliquota\": 9.00, \"de\": 1412.01, \"ate\": 2666.68, \"deduzir\": 21.18}', '2024'),
+(3, 'INSS_FAIXA_3', '{\"aliquota\": 12.00, \"de\": 2666.69, \"ate\": 4000.03, \"deduzir\": 101.18}', '2024'),
+(4, 'INSS_FAIXA_4', '{\"aliquota\": 14.00, \"de\": 4000.04, \"ate\": 7786.02, \"deduzir\": 181.18}', '2024'),
+(5, 'IRRF_FAIXA_1', '{\"aliquota\": 0.00, \"de\": 0.00, \"ate\": 2259.20, \"deduzir\": 0.00}', '2024'),
+(6, 'IRRF_FAIXA_2', '{\"aliquota\": 7.50, \"de\": 2259.21, \"ate\": 2826.65, \"deduzir\": 169.44}', '2024'),
+(7, 'IRRF_FAIXA_3', '{\"aliquota\": 15.00, \"de\": 2826.66, \"ate\": 3751.05, \"deduzir\": 381.44}', '2024'),
+(8, 'IRRF_FAIXA_4', '{\"aliquota\": 22.50, \"de\": 3751.06, \"ate\": 4664.68, \"deduzir\": 662.77}', '2024'),
+(9, 'IRRF_FAIXA_5', '{\"aliquota\": 27.50, \"de\": 4664.69, \"ate\": 999999.99, \"deduzir\": 896.00}', '2024');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `regras_beneficios`
+-- Estrutura para tabela `regras_beneficios`
 --
 
 CREATE TABLE `regras_beneficios` (
@@ -266,10 +473,21 @@ CREATE TABLE `regras_beneficios` (
   `id_beneficio` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Despejando dados para a tabela `regras_beneficios`
+--
+
+INSERT INTO `regras_beneficios` (`id_regra`, `tipo_contrato`, `id_beneficio`) VALUES
+(2, 'PJ', 1),
+(3, 'Estágio', 5),
+(4, 'Estágio', 1),
+(5, 'Temporário', 1),
+(6, 'CLT', 9);
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `setor`
+-- Estrutura para tabela `setor`
 --
 
 CREATE TABLE `setor` (
@@ -277,46 +495,75 @@ CREATE TABLE `setor` (
   `nome_setor` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Despejando dados para a tabela `setor`
+--
+
+INSERT INTO `setor` (`id_setor`, `nome_setor`) VALUES
+(16, 'toscanetto'),
+(17, 'toscanettouuu'),
+(18, 'toscanettouuus'),
+(19, 'Operacional'),
+(20, 'TI'),
+(21, 'Tecnologia da Informação – Desenvolvimento de Software'),
+(22, 'Business Intelligence (BI) e Analytics');
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `vaga`
+-- Estrutura para tabela `vaga`
 --
 
 CREATE TABLE `vaga` (
   `id_vaga` int(11) NOT NULL,
   `titulo_vaga` varchar(100) NOT NULL,
-  `requisitos` varchar(500) DEFAULT NULL,
+  `requisitos_necessarios` text DEFAULT NULL,
+  `requisitos_recomendados` text DEFAULT NULL,
+  `requisitos_desejados` text DEFAULT NULL,
+  `descricao_vaga` text DEFAULT NULL COMMENT 'Descrição completa sobre a vaga e a equipe',
   `situacao` enum('aberta','fechada','em processo') DEFAULT NULL,
   `id_setor` int(11) DEFAULT NULL,
-  `id_cargo` int(11) DEFAULT NULL
+  `id_cargo` int(11) DEFAULT NULL,
+  `data_criacao` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Indexes for dumped tables
+-- Despejando dados para a tabela `vaga`
+--
+
+INSERT INTO `vaga` (`id_vaga`, `titulo_vaga`, `requisitos_necessarios`, `requisitos_recomendados`, `requisitos_desejados`, `descricao_vaga`, `situacao`, `id_setor`, `id_cargo`, `data_criacao`) VALUES
+(1, 'Engenheiro de software', 'gitflow, github, java, sql', NULL, NULL, NULL, 'aberta', 19, NULL, '2025-10-06 20:59:56'),
+(2, 'Cientista de dados', 'SQL, Python, Flask, Django', NULL, NULL, NULL, 'aberta', 20, NULL, '2025-10-06 22:44:34'),
+(3, 'Arquiteto da Informação', 'design de interação, taxonomias', 'sistemas de organização de conteúdo, metadados', 'habilidades interpessoais (como comunicação clara, análise, resolução de problemas e colaboração com equipes de UX e desenvolvimento)', 'O seu trabalho visa criar uma experiência de usuário (UX) positiva através de sistemas de navegação claros, categorizações lógicas e hierarquias bem definidas, garantindo que os objetivos do negócio e do usuário sejam atendidos. ', 'aberta', 20, NULL, '2025-10-07 01:03:36'),
+(4, 'Desenvolvedor Full Stack Pleno – Projeto Orion', 'JavaScript/TypeScript, React.js, Node.js (Express ou NestJS), bancos de dados relacionais (PostgreSQL/MySQL), Git e GitHub/GitLab, arquitetura MVC e REST', 'Docker, CI/CD (GitHub Actions, GitLab CI, etc.), testes automatizados (Jest, Mocha, Cypress), GraphQL, Next.js, design de sistemas escaláveis e microserviços', 'Cloud (AWS, GCP ou Azure), DevOps e observabilidade (Prometheus, Grafana), projetos open source, Machine Learning aplicado a e-commerce', 'A equipe do Projeto Orion, iniciativa interna voltada à criação de soluções inteligentes para e-commerce, busca um Desenvolvedor Full Stack Pleno para atuar no desenvolvimento e manutenção de aplicações web escaláveis. O profissional participará de todo o ciclo de vida do produto, desde o planejamento até a implantação e monitoramento em produção, colaborando com times de UI/UX e Data Science.\r\n\r\n🛠️ Responsabilidades\r\n\r\nDesenvolver novas funcionalidades e manter aplicações existentes.\r\n\r\nIntegrar sistemas via APIs RESTful e GraphQL.\r\n\r\nEscrever código limpo, testável e bem documentado.\r\n\r\nParticipar de revisões de código e decisões arquiteturais.\r\n\r\nColaborar com designers e analistas de dados na melhoria contínua do produto.', 'aberta', 21, NULL, '2025-10-07 01:07:03'),
+(5, 'Cientista de Dados Júnior', 'Python,SQL para extração de dados,Pandas,NumPy,Matplotlib,Scikit-learn,Conhecimento em estatística fundamental,Lógica de programação,Capacidade de comunicação', 'Git para versionamento de código,Jupyter Notebooks,Tableau,Power BI,Noções de álgebra linear,Limpeza e pré-processamento de dados,Técnicas de machine learning supervisionado e não supervisionado', 'Computação em nuvem (AWS, Azure ou GCP),PySpark,TensorFlow ou PyTorch,Experiência com APIs REST,Docker,Familiaridade com metodologias ágeis', 'Estamos à procura de um Cientista de Dados Júnior curioso e motivado para se juntar à nossa equipe de Analytics. O candidato ideal terá uma base sólida em estatística, programação e um forte desejo de resolver problemas complexos através dos dados. Nesta posição, você colaborará com equipes multifuncionais para extrair, limpar e analisar grandes conjuntos de dados, desenvolvendo modelos de machine learning iniciais e criando visualizações que gerem insights valiosos para a tomada de decisões estratégicas. Esta é uma oportunidade fantástica para aprender com profissionais experientes e crescer na carreira de ciência de dados, aplicando seu conhecimento teórico em desafios reais do negócio.', 'aberta', 22, NULL, '2025-10-07 12:40:08'),
+(6, 'Engenheiro de software', 'gitflow, github, java, sql', 'Criatividade, Proatividade', '', 'desenvolver projetos e sistemas com php', 'aberta', 20, NULL, '2025-10-08 11:42:07');
+
+--
+-- Índices para tabelas despejadas
 --
 
 --
--- Indexes for table `avaliacao_desempenho`
+-- Índices de tabela `avaliacao_desempenho`
 --
 ALTER TABLE `avaliacao_desempenho`
   ADD PRIMARY KEY (`id_avaliacao`);
 
 --
--- Indexes for table `beneficios_catalogo`
+-- Índices de tabela `beneficios_catalogo`
 --
 ALTER TABLE `beneficios_catalogo`
   ADD PRIMARY KEY (`id_beneficio`);
 
 --
--- Indexes for table `candidato`
+-- Índices de tabela `candidato`
 --
 ALTER TABLE `candidato`
   ADD PRIMARY KEY (`id_candidato`),
   ADD UNIQUE KEY `CPF` (`CPF`);
 
 --
--- Indexes for table `candidaturas`
+-- Índices de tabela `candidaturas`
 --
 ALTER TABLE `candidaturas`
   ADD PRIMARY KEY (`id_candidatura`),
@@ -324,13 +571,13 @@ ALTER TABLE `candidaturas`
   ADD KEY `fk_candidaturas_candidato` (`id_candidato`);
 
 --
--- Indexes for table `cargo`
+-- Índices de tabela `cargo`
 --
 ALTER TABLE `cargo`
   ADD PRIMARY KEY (`id_cargo`);
 
 --
--- Indexes for table `colaborador`
+-- Índices de tabela `colaborador`
 --
 ALTER TABLE `colaborador`
   ADD PRIMARY KEY (`id_colaborador`),
@@ -342,78 +589,78 @@ ALTER TABLE `colaborador`
   ADD KEY `fk_colaborador_endereco` (`id_endereco`);
 
 --
--- Indexes for table `colaborador_beneficio`
+-- Índices de tabela `colaborador_beneficio`
 --
 ALTER TABLE `colaborador_beneficio`
   ADD PRIMARY KEY (`id_colaborador`,`id_beneficio`),
   ADD KEY `fk_cb_beneficio` (`id_beneficio`);
 
 --
--- Indexes for table `contratacao`
+-- Índices de tabela `contratacao`
 --
 ALTER TABLE `contratacao`
   ADD PRIMARY KEY (`id_contratacao`);
 
 --
--- Indexes for table `demissao`
+-- Índices de tabela `demissao`
 --
 ALTER TABLE `demissao`
   ADD PRIMARY KEY (`id_demissao`);
 
 --
--- Indexes for table `endereco`
+-- Índices de tabela `endereco`
 --
 ALTER TABLE `endereco`
   ADD PRIMARY KEY (`id_endereco`);
 
 --
--- Indexes for table `ferias`
+-- Índices de tabela `ferias`
 --
 ALTER TABLE `ferias`
   ADD PRIMARY KEY (`id_ferias`);
 
 --
--- Indexes for table `folha_ponto`
+-- Índices de tabela `folha_ponto`
 --
 ALTER TABLE `folha_ponto`
-  ADD PRIMARY KEY (`id_registro`),
+  ADD PRIMARY KEY (`id_registro_ponto`),
   ADD KEY `fk_folha_ponto_colaborador` (`id_colaborador`);
 
 --
--- Indexes for table `holerites`
+-- Índices de tabela `holerites`
 --
 ALTER TABLE `holerites`
   ADD PRIMARY KEY (`id_holerite`),
   ADD KEY `fk_holerites_colaborador` (`id_colaborador`);
 
 --
--- Indexes for table `holerite_itens`
+-- Índices de tabela `holerite_itens`
 --
 ALTER TABLE `holerite_itens`
   ADD PRIMARY KEY (`id_item`),
   ADD KEY `fk_holerite_itens_holerite` (`id_holerite`);
 
 --
--- Indexes for table `parametros_folha`
+-- Índices de tabela `parametros_folha`
 --
 ALTER TABLE `parametros_folha`
   ADD PRIMARY KEY (`id_parametro`);
 
 --
--- Indexes for table `regras_beneficios`
+-- Índices de tabela `regras_beneficios`
 --
 ALTER TABLE `regras_beneficios`
   ADD PRIMARY KEY (`id_regra`),
   ADD KEY `fk_regras_beneficios_catalogo` (`id_beneficio`);
 
 --
--- Indexes for table `setor`
+-- Índices de tabela `setor`
 --
 ALTER TABLE `setor`
   ADD PRIMARY KEY (`id_setor`);
 
 --
--- Indexes for table `vaga`
+-- Índices de tabela `vaga`
 --
 ALTER TABLE `vaga`
   ADD PRIMARY KEY (`id_vaga`),
@@ -421,143 +668,143 @@ ALTER TABLE `vaga`
   ADD KEY `fk_vaga_cargo` (`id_cargo`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT para tabelas despejadas
 --
 
 --
--- AUTO_INCREMENT for table `avaliacao_desempenho`
+-- AUTO_INCREMENT de tabela `avaliacao_desempenho`
 --
 ALTER TABLE `avaliacao_desempenho`
   MODIFY `id_avaliacao` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `beneficios_catalogo`
+-- AUTO_INCREMENT de tabela `beneficios_catalogo`
 --
 ALTER TABLE `beneficios_catalogo`
-  MODIFY `id_beneficio` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_beneficio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT for table `candidato`
+-- AUTO_INCREMENT de tabela `candidato`
 --
 ALTER TABLE `candidato`
-  MODIFY `id_candidato` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_candidato` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `candidaturas`
+-- AUTO_INCREMENT de tabela `candidaturas`
 --
 ALTER TABLE `candidaturas`
-  MODIFY `id_candidatura` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_candidatura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `cargo`
+-- AUTO_INCREMENT de tabela `cargo`
 --
 ALTER TABLE `cargo`
-  MODIFY `id_cargo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_cargo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
--- AUTO_INCREMENT for table `colaborador`
+-- AUTO_INCREMENT de tabela `colaborador`
 --
 ALTER TABLE `colaborador`
-  MODIFY `id_colaborador` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_colaborador` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
--- AUTO_INCREMENT for table `contratacao`
+-- AUTO_INCREMENT de tabela `contratacao`
 --
 ALTER TABLE `contratacao`
   MODIFY `id_contratacao` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `demissao`
+-- AUTO_INCREMENT de tabela `demissao`
 --
 ALTER TABLE `demissao`
   MODIFY `id_demissao` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `endereco`
+-- AUTO_INCREMENT de tabela `endereco`
 --
 ALTER TABLE `endereco`
-  MODIFY `id_endereco` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_endereco` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
--- AUTO_INCREMENT for table `ferias`
+-- AUTO_INCREMENT de tabela `ferias`
 --
 ALTER TABLE `ferias`
   MODIFY `id_ferias` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `folha_ponto`
+-- AUTO_INCREMENT de tabela `folha_ponto`
 --
 ALTER TABLE `folha_ponto`
-  MODIFY `id_registro` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_registro_ponto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT for table `holerites`
+-- AUTO_INCREMENT de tabela `holerites`
 --
 ALTER TABLE `holerites`
-  MODIFY `id_holerite` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_holerite` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
--- AUTO_INCREMENT for table `holerite_itens`
+-- AUTO_INCREMENT de tabela `holerite_itens`
 --
 ALTER TABLE `holerite_itens`
-  MODIFY `id_item` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_item` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
--- AUTO_INCREMENT for table `parametros_folha`
+-- AUTO_INCREMENT de tabela `parametros_folha`
 --
 ALTER TABLE `parametros_folha`
-  MODIFY `id_parametro` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_parametro` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT for table `regras_beneficios`
+-- AUTO_INCREMENT de tabela `regras_beneficios`
 --
 ALTER TABLE `regras_beneficios`
-  MODIFY `id_regra` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_regra` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT for table `setor`
+-- AUTO_INCREMENT de tabela `setor`
 --
 ALTER TABLE `setor`
-  MODIFY `id_setor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_setor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
--- AUTO_INCREMENT for table `vaga`
+-- AUTO_INCREMENT de tabela `vaga`
 --
 ALTER TABLE `vaga`
-  MODIFY `id_vaga` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_vaga` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- Constraints for dumped tables
+-- Restrições para tabelas despejadas
 --
 
 --
--- Constraints for table `candidaturas`
+-- Restrições para tabelas `candidaturas`
 --
 ALTER TABLE `candidaturas`
   ADD CONSTRAINT `fk_candidaturas_candidato_1` FOREIGN KEY (`id_candidato`) REFERENCES `candidato` (`id_candidato`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_candidaturas_vaga_1` FOREIGN KEY (`id_vaga`) REFERENCES `vaga` (`id_vaga`) ON DELETE CASCADE;
 
 --
--- Constraints for table `colaborador_beneficio`
+-- Restrições para tabelas `colaborador_beneficio`
 --
 ALTER TABLE `colaborador_beneficio`
   ADD CONSTRAINT `fk_cb_beneficio_1` FOREIGN KEY (`id_beneficio`) REFERENCES `beneficios_catalogo` (`id_beneficio`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_cb_colaborador_1` FOREIGN KEY (`id_colaborador`) REFERENCES `colaborador` (`id_colaborador`) ON DELETE CASCADE;
 
 --
--- Constraints for table `folha_ponto`
+-- Restrições para tabelas `folha_ponto`
 --
 ALTER TABLE `folha_ponto`
   ADD CONSTRAINT `fk_folha_ponto_colaborador_1` FOREIGN KEY (`id_colaborador`) REFERENCES `colaborador` (`id_colaborador`) ON DELETE CASCADE;
 
 --
--- Constraints for table `regras_beneficios`
+-- Restrições para tabelas `regras_beneficios`
 --
 ALTER TABLE `regras_beneficios`
   ADD CONSTRAINT `fk_regras_beneficios_catalogo_1` FOREIGN KEY (`id_beneficio`) REFERENCES `beneficios_catalogo` (`id_beneficio`) ON DELETE CASCADE;
 
 --
--- Constraints for table `vaga`
+-- Restrições para tabelas `vaga`
 --
 ALTER TABLE `vaga`
   ADD CONSTRAINT `fk_vaga_cargo` FOREIGN KEY (`id_cargo`) REFERENCES `cargo` (`id_cargo`),

@@ -90,26 +90,31 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meus Benefícios - RH Ease</title>
+    <title>RHease - Meus Benefícios</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/beneficiostyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
 </head>
 <body>
     <header>
-        <i class="bi bi-list menu-toggle"></i>
-        <img id="logo" src="img/rhease-ease 1.png" alt="RHease" width="130">
+        <i class="menu-toggle bi bi-list"></i>
+        <img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo RH ease" class="logo">
     </header>
 
     <div class="container">
         <div class="sidebar">
             <ul class="menu">
-                <li><a href="index.html"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
-                <li><a href="dados.html"><i class="bi bi-person-vcard-fill"></i> Dados Cadastrais</a></li>
-                <li><a href="frequencia.html"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
-                <li><a href="salario.html"><i class="bi bi-wallet-fill"></i> Salário</a></li>
-                <li class="active"><a href="#"><i class="bi bi-shield-fill-check"></i> Meus Benefícios</a></li>
-                <li><a href="contato.html"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
+            <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
+                <li><a href="<?= BASE_URL ?>/dados"><i class="bi bi-person-vcard-fill"></i> Dados cadastrais</a></li>
+                <li><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
+                <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
+                <li><a href="<?= BASE_URL ?>/beneficios"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
+                <li><a href="<?= BASE_URL ?>/vagas/listar"><i class="bi bi-briefcase-fill"></i> Gestão de Vagas</a></li>
+                <li><a href="<?= BASE_URL ?>/contato"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
             </ul>
         </div>
 
@@ -181,10 +186,10 @@ $conn->close();
             </p>
         </div>
     </div>
-    <script>
-        document.querySelector('.menu-toggle').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
-        });
-    </script>
+
+<script>
+    const BASE_URL = "<?php echo BASE_URL; ?>";
+</script>
+<script src="<?php echo BASE_URL; ?>/js/sidebar-toggle.js"></script>
 </body>
 </html>

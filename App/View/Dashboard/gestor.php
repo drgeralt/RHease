@@ -21,12 +21,13 @@
     <div class="container">
         <div class="sidebar">
             <ul class="menu">
-                <li class="active"><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
-                <li><a href="<?= BASE_URL ?>/colaboradores"><i class="bi bi-person-vcard-fill"></i> Colaboradores</a></li>
-                <li><a href="<?= BASE_URL ?>/ponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
-                <li><a href="<?= BASE_URL ?>/folha/processar"><i class="bi bi-wallet-fill"></i> Folha de Pagamento</a></li>
+                <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
+                <li><a href="<?= BASE_URL ?>/dados"><i class="bi bi-person-vcard-fill"></i> Dados cadastrais</a></li>
+                <li><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
+                <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
                 <li><a href="<?= BASE_URL ?>/beneficios"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
                 <li><a href="<?= BASE_URL ?>/vagas/listar"><i class="bi bi-briefcase-fill"></i> Gestão de Vagas</a></li>
+                <li><a href="<?= BASE_URL ?>/contato"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
             </ul>
         </div>
 
@@ -112,5 +113,10 @@
             </section>
         </div>
     </div>
+
+<script>
+    const BASE_URL = "<?php echo BASE_URL; ?>";
+</script>
+<script src="<?php echo BASE_URL; ?>/js/sidebar-toggle.js"></script>
 </body>
 </html>

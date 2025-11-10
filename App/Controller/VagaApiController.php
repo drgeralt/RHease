@@ -8,23 +8,36 @@ use PDOException;
 
 class VagaApiController extends Controller
 {
-    private function jsonResponse(mixed $data, int $statusCode = 200): void
-    {
-        header('Content-Type: application/json; charset=UTF-8');
-        http_response_code($statusCode);
-        echo json_encode($data);
-        exit;
-    }
-
     // [API] GET /api/vagas/listar 
     public function listarVagas(): void 
     {
         try {
             $vagaModel = $this->model('GestaoVagas');
             $vagas = $vagaModel->listarVagas();
-            $this->jsonResponse($vagas);
+            
+            // Usa o método padronizado da classe pai
+            $this->jsonResponse(true, 'Vagas carregadas com sucesso', $vagas);
+            
         } catch (PDOException $e) {
-            $this->jsonResponse(['erro' => 'Erro ao consultar o banco de dados.'], 500);
+            // Log do erro para debug
+            error_log("ERRO NO BANCO - listarVagas: " . $e->getMessage());
+            error_log("Código do erro: " . $e->getCode());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            
+            $this->jsonResponse(
+                false, 
+                'Erro ao consultar o banco de dados.', 
+                ['detalhes' => $e->getMessage(), 'codigo' => $e->getCode()], 
+                500
+            );
+        } catch (\Exception $e) {
+            error_log("ERRO GERAL - listarVagas: " . $e->getMessage());
+            $this->jsonResponse(
+                false, 
+                'Erro ao processar requisição.', 
+                ['detalhes' => $e->getMessage()], 
+                500
+            );
         }
     }
 
@@ -33,7 +46,7 @@ class VagaApiController extends Controller
     {
         $dados = json_decode(file_get_contents('php://input'), true);
         
-        $erros = []; // Adicione sua lógica de validação aqui...
+        $erros = [];
         $titulo = trim($dados['titulo'] ?? '');
         $departamento = trim($dados['departamento'] ?? '');
 
@@ -42,7 +55,7 @@ class VagaApiController extends Controller
         }
 
         if (!empty($erros)) {
-            $this->jsonResponse(['sucesso' => false, 'erros' => $erros], 422);
+            $this->jsonResponse(false, 'Dados inválidos', ['erros' => $erros], 422);
             return;
         }
 
@@ -64,10 +77,10 @@ class VagaApiController extends Controller
             $vagaModel = $this->model('NovaVaga');
             $novoId = $vagaModel->criarVaga($dadosVaga);
 
-            $this->jsonResponse(['sucesso' => true, 'id_vaga' => $novoId], 201);
+            $this->jsonResponse(true, 'Vaga criada com sucesso', ['id_vaga' => $novoId], 201);
 
         } catch (PDOException $e) {
-            $this->jsonResponse(['sucesso' => false, 'erro' => 'Erro ao salvar a vaga no banco.'], 500);
+            $this->jsonResponse(false, 'Erro ao salvar a vaga no banco.', null, 500);
         }
     }
 
@@ -76,7 +89,7 @@ class VagaApiController extends Controller
     {
         $idVaga = (int)($_GET['id'] ?? 0);
         if ($idVaga === 0) {
-            $this->jsonResponse(['erro' => 'ID da vaga não fornecido.'], 400);
+            $this->jsonResponse(false, 'ID da vaga não fornecido.', null, 400);
             return;
         }
 
@@ -84,12 +97,12 @@ class VagaApiController extends Controller
             $vagaModel = $this->model('GestaoVagas');
             $vaga = $vagaModel->buscarPorId($idVaga);
             if (!$vaga) {
-                $this->jsonResponse(['erro' => 'Vaga não encontrada.'], 404);
+                $this->jsonResponse(false, 'Vaga não encontrada.', null, 404);
                 return;
             }
-            $this->jsonResponse($vaga);
+            $this->jsonResponse(true, 'Vaga encontrada', $vaga);
         } catch (PDOException $e) {
-            $this->jsonResponse(['erro' => 'Erro ao consultar o banco de dados.'], 500);
+            $this->jsonResponse(false, 'Erro ao consultar o banco de dados.', null, 500);
         }
     }
 
@@ -103,7 +116,7 @@ class VagaApiController extends Controller
         $departamento = trim($dados['departamento'] ?? '');
 
         if ($idVaga === 0 || $titulo === '' || $departamento === '') {
-            $this->jsonResponse(['sucesso' => false, 'erro' => 'Dados inválidos.'], 422);
+            $this->jsonResponse(false, 'Dados inválidos', null, 422);
             return;
         }
 
@@ -124,9 +137,9 @@ class VagaApiController extends Controller
             $vagaModel = $this->model('GestaoVagas');
             $vagaModel->atualizarVaga($idVaga, $dadosVaga);
 
-            $this->jsonResponse(['sucesso' => true, 'mensagem' => 'Vaga atualizada.']);
+            $this->jsonResponse(true, 'Vaga atualizada com sucesso');
         } catch (PDOException $e) {
-            $this->jsonResponse(['sucesso' => false, 'erro' => 'Erro ao atualizar a vaga no banco.'], 500);
+            $this->jsonResponse(false, 'Erro ao atualizar a vaga no banco.', null, 500);
         }
     }
 
@@ -135,25 +148,24 @@ class VagaApiController extends Controller
     {
         $idVaga = (int)($_GET['id'] ?? 0);
         if ($idVaga === 0) {
-            $this->jsonResponse(['erro' => 'ID da vaga não fornecido.'], 400);
+            $this->jsonResponse(false, 'ID da vaga não fornecido.', null, 400);
             return;
         }
         try {
             $vagaModel = $this->model('GestaoVagas');
             $vagaModel->excluirVaga($idVaga);
-            $this->jsonResponse(['sucesso' => true, 'mensagem' => 'Vaga excluída.']);
+            $this->jsonResponse(true, 'Vaga excluída com sucesso');
         } catch (PDOException $e) {
-            $this->jsonResponse(['sucesso' => false, 'erro' => 'Erro ao excluir a vaga.'], 500);
+            $this->jsonResponse(false, 'Erro ao excluir a vaga.', null, 500);
         }
     }
 
     // [API] GET /api/vagas/candidatos?id=... 
     public function verCandidatos()
     {
-        // MUDANÇA: Agora usa GET pois é uma requisição de busca
         $idVaga = (int)($_GET['id'] ?? 0); 
         if ($idVaga === 0) {
-            $this->jsonResponse(['erro' => 'ID da vaga não fornecido.'], 400);
+            $this->jsonResponse(false, 'ID da vaga não fornecido.', null, 400);
             return;
         }
 
@@ -165,17 +177,17 @@ class VagaApiController extends Controller
             $candidatos = $candidaturaModel->buscarPorVaga($idVaga);
 
             if (!$vaga) {
-                $this->jsonResponse(['erro' => 'Vaga não encontrada.'], 404);
+                $this->jsonResponse(false, 'Vaga não encontrada.', null, 404);
                 return;
             }
             
-            $this->jsonResponse([
+            $this->jsonResponse(true, 'Candidatos encontrados', [
                 'vaga' => $vaga,
                 'candidatos' => $candidatos
             ]);
 
         } catch (PDOException $e) {
-            $this->jsonResponse(['erro' => 'Erro ao consultar o banco de dados.'], 500);
+            $this->jsonResponse(false, 'Erro ao consultar o banco de dados.', null, 500);
         }
     }
 }
