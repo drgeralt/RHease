@@ -68,6 +68,17 @@ header .logo {
 .container {
     display: flex;
     min-height: calc(100vh - 50px); 
+    transition: all 0.3s ease;
+}
+
+/* Container quando sidebar está escondida */
+.container:has(.sidebar.hidden) {
+    justify-content: center;
+}
+
+.container:has(.sidebar.hidden) .content {
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 /* Sidebar e Menu */
@@ -79,6 +90,17 @@ header .logo {
     flex-direction: column;
     flex-shrink: 0; 
     border-right: 1px solid #ddd;
+    position: relative;
+    transition: transform 0.3s ease, left 0.3s ease;
+}
+
+/* Estado de escondido da sidebar (em todas as resoluções) */
+.sidebar.hidden {
+    transform: translateX(-100%);
+    width: 0;
+    padding: 0;
+    border: none;
+    overflow: hidden;
 }
 .menu {
     list-style: none;
@@ -128,6 +150,7 @@ header .logo {
     flex: 1; 
     padding: 30px;
     background: var(--background-color);
+    transition: all 0.3s ease;
 }
 .page-title-content {
     font-size: 28px;
@@ -334,7 +357,7 @@ header .logo {
     margin-right: 5px;
 }
 /* Cores do gráfico de horas */
-.hours-legend .dot-segunda { background-color: #5D6063; }
+.hours-legend .dot-segunda { background-color: #ff7213ff; }
 .hours-legend .dot-terca { background-color: #489D3B; }
 .hours-legend .dot-quarta { background-color: #3B5A9D; }
 .hours-legend .dot-quinta { background-color: #D02C2C; }

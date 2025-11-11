@@ -238,15 +238,39 @@ select {
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.2s ease;
-    margin-top: 30px;
-    display: block; /* Para ocupar a largura total do container */
-    margin-left: auto; /* Alinhar à direita no container */
-    margin-right: 20px; /* Espaçamento da borda */
-    width: fit-content; /* Para o botão não esticar demais */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .submit-button:hover {
     background-color: #218838;
     transform: translateY(-1px); /* Efeito de elevação sutil */
+}
+
+/* --- Botão "Voltar" --- */
+.back-button {
+    background-color: #6c757d; /* Cor cinza */
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.back-button:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px); /* Efeito de elevação sutil */
+}
+
+.back-button i {
+    font-size: 0.9em;
 }

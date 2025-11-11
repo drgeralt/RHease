@@ -3,90 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Gestão de Vagas</title>
+    <title>RHease - Gestão de Vagas</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/gestaoVagas.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* Adicionado para garantir que os formulários de ação fiquem na mesma linha */
-        .actions form {
-            display: inline-block;
-            margin: 0 2px;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
 </head>
 <body>
-<div class="app-container">
-    <header class="header">
-        <div class="header-left">
-            <button class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="logo">
-                <img src="<?php echo BASE_URL; ?>/img/rhease-ease 1.png" alt="RH ease" class="logo-img">
-            </div>
-        </div>
-        <div class="header-right">
-            <div class="user-info">
-                <img src="<?php echo BASE_URL; ?>/img/user.png" alt=" usuario">
-                <span class="user-name">Vitoria Leal</span>
-            </div>
-        </div>
-
+    <header>
+        <i class="menu-toggle bi bi-list "></i>
+        <img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo RH ease" class="logo">
     </header>
-
-    <div class="main-container">
-        <!-- sidebar -->
-
-        <div class="sidebar-container">
-            <aside class="sidebar">
-                <nav class="sidebar-nav">
-                    <ul class="nav-list">
-                        <li class="nav-item">
-                            <a href="<?php echo BASE_URL; ?>/inicio"class="nav-link">
-                                <i class="fas fa-chart-bar"></i>
-                                <span>Painel</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-database"></i>
-                                <span>Dados cadastrais</span>
-                            </a>
-                        </li>
-                        <li class="nav-item active">
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-users"></i>
-                                <span>Recrutamento</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?php echo BASE_URL; ?>/folha/processar" class="nav-link">
-                                <i class="fas fa-credit-card"></i>
-                                <span>Pagamento</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?php echo BASE_URL; ?>/beneficios" class="nav-link">
-                                <i class="fas fa-gift"></i>
-                                <span>Benefícios</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-clock"></i>
-                                <span>Frequência</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="menu">
+            <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
+                <li><a href="<?= BASE_URL ?>/dados"><i class="bi bi-person-vcard-fill"></i> Dados cadastrais</a></li>
+                <li><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
+                <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
+                <li><a href="<?= BASE_URL ?>/beneficios"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
+                <li><a href="<?= BASE_URL ?>/vagas/listar"><i class="bi bi-briefcase-fill"></i> Gestão de Vagas</a></li>
+                <li><a href="<?= BASE_URL ?>/contato"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
+            </ul>
         </div>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="page-header">
-                <h1 class="page-title">Gestão de Vagas</h1>
-            </div>
+        <div class="content">
+            <h2 class="page-title-content">Gestão de Vagas</h2>
 
             <section class="content-section">
                 <div class="section-header">
@@ -138,19 +83,9 @@
                             <td>Vale Transporte, Vale Refeição</td>
                             <td class="actions">
                                 <div class="action-icons">
-                                    <a href="<?php echo BASE_URL; ?>/vagas/editar?id=<?php echo $vaga['id_vaga']; ?>" class="icon-btn icon-edit" title="Editar Vaga">
+                                    <button class="icon-btn icon-edit" title="Editar Regra">
                                         <i class="fas fa-edit"></i>
-                                    </a>
-
-                                    <a href="<?php echo BASE_URL; ?>/vagas/excluir?id=<?php echo $vaga['id_vaga']; ?>" class="icon-btn icon-delete" title="Excluir Vaga" onclick="return confirm('Tem certeza que deseja excluir esta vaga? Esta ação não pode ser desfeita.');">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </a>
-
-                                    <form action="<?php echo BASE_URL; ?>/vagas/candidatos" method="POST">
-                                        <input type="hidden" name="id" value="<?php echo $vaga['id_vaga']; ?>">
-                                        <button type="submit" class="icon-btn icon-view" title="Ver Candidatos">
-                                            <i class="fas fa-search"></i> </button>
-                                    </form>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -158,13 +93,13 @@
                     </table>
                 </div>
             </section>
-        </main>
+        </div>
     </div>
-</div>
 
 <script>
     const BASE_URL = "<?php echo BASE_URL; ?>";
 </script>
+<script src="<?php echo BASE_URL; ?>/js/sidebar-toggle.js"></script>
 <script src="<?php echo BASE_URL; ?>/js/vagas-gestao.js"></script>
 
 <div id="modal-backdrop" class="modal-backdrop"></div>

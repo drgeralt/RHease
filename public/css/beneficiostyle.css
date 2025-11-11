@@ -315,6 +315,31 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 /* ESTILO PARA CHECKBOXES DO MODAL DE REGRAS */
+/* Estilo geral para todos os checkboxes nos modais e formulários */
+input[type="checkbox"] {
+    width: 1.1em;
+    height: 1.1em;
+    cursor: pointer;
+    vertical-align: middle;
+    accent-color: #489D3B;
+}
+
+/* Estilo para labels que contêm checkboxes */
+#listaBeneficiosRegra label,
+#listaBeneficiosColaborador label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+#listaBeneficiosRegra label input[type="checkbox"],
+#listaBeneficiosColaborador label input[type="checkbox"] {
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
 .checkbox-group {
     padding: 10px 0;
     border: 1px solid #eee;
@@ -334,10 +359,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .checkbox-item input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
     margin-right: 10px;
-    cursor: pointer;
 }
 
 .checkbox-item label {
