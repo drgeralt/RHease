@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         stopOnFailure="false"
+         cacheDirectory=".phpunit.cache"
+         displayDetailsOnTestsThatTriggerWarnings="true">
+
+    <testsuites>
+        <testsuite name="Unit Tests">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration Tests">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage>
+        <report>
+            <html outputDirectory="coverage/html"/>
+            <text outputFile="php://stdout" showOnlySummary="true"/>
+        </report>
+    </coverage>
+
+    <source>
+        <include>
+            <directory suffix=".php">App</directory>
+        </include>
+        <exclude>
+            <directory>App/View</directory>
+        </exclude>
+    </source>
+
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <const name="BASE_URL" value="http://localhost/rhease"/>
+        <const name="BASE_PATH" value="C:/Users/Matheus/PhpstormProjects/RHease"/>
+        <ini name="display_errors" value="1"/>
+        <ini name="error_reporting" value="-1"/>
+    </php>
+</phpunit>
