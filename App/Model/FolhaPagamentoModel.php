@@ -21,6 +21,48 @@ class FolhaPagamentoModel extends Model
     }
 
     /**
+     * ✅ NOVO MÉTODO: Retorna a conexão PDO para uso em transações.
+     * Este método é necessário para que o Service possa iniciar transações.
+     *
+     * @return PDO A conexão com o banco de dados.
+     */
+    public function getConnection(): PDO
+    {
+        return $this->db_connection;
+    }
+
+    /**
+     * Verifica se já existe um holerite processado para um colaborador
+     * em um mês/ano específico.
+     * Usado pelo Service para evitar duplicados.
+     *
+     * @param int $colaboradorId
+     * @param int $mes
+     * @param int $ano
+     * @return mixed Retorna os dados do holerite (objeto/array) se encontrado, ou false se não.
+     */
+    public function buscarHoleritePorColaboradorMes(int $colaboradorId, int $mes, int $ano)
+    {
+        $sql = "SELECT id_holerite 
+                FROM holerites 
+                WHERE id_colaborador = :id_colaborador 
+                  AND mes_referencia = :mes 
+                  AND ano_referencia = :ano 
+                LIMIT 1";
+
+        $stmt = $this->db_connection->prepare($sql);
+        $stmt->execute([
+            ':id_colaborador' => $colaboradorId,
+            ':mes' => $mes,
+            ':ano' => $ano
+        ]);
+
+        // fetch() retorna false se nada for encontrado,
+        // o que funciona perfeitamente no 'if' do Service
+        return $stmt->fetch();
+    }
+
+    /**
      * Salva o registro principal do holerite na tabela 'holerites'.
      *
      * @param int $colaboradorId ID do colaborador.

@@ -5,15 +5,30 @@ namespace App\Controller;
 
 use App\Core\Controller;
 use App\Service\Implementations\FolhaPagamentoService;
-
+use App\Model\FolhaPagamentoModel;
+use App\Model\ColaboradorModel;
+use App\Model\ParametrosFolhaModel;
+use App\Service\Implementations\PontoService;
 class FolhaPagamentoController extends Controller
 {
     private FolhaPagamentoService $folhaPagamentoService;
     public function __construct()
     {
         parent::__construct();
-        // A conexão ($this->db_connection) é passada para o serviço.
-        $this->folhaPagamentoService = new FolhaPagamentoService($this->db_connection);
+
+        // 1. Crie todas as dependências (os Models)
+        $folhaPagamentoModel = new \App\Model\FolhaPagamentoModel($this->db_connection);
+        $colaboradorModel = new \App\Model\ColaboradorModel($this->db_connection);
+        $parametrosModel = new \App\Model\ParametrosFolhaModel($this->db_connection);
+        $pontoService = new \App\Service\Implementations\PontoService($this->db_connection);
+
+        // 2. Injete-os no Service
+        $this->folhaPagamentoService = new FolhaPagamentoService(
+            $folhaPagamentoModel,
+            $colaboradorModel,
+            $parametrosModel,
+            $pontoService
+        );
     }
     /**
      * Exibe a página para o RH processar a folha de pagamento.
@@ -30,9 +45,8 @@ class FolhaPagamentoController extends Controller
      */
     public function processar()
     {
-        $ano = filter_input(INPUT_POST, 'ano', FILTER_VALIDATE_INT);
-        $mes = filter_input(INPUT_POST, 'mes', FILTER_VALIDATE_INT);
-
+        $ano = (int)($_POST['ano'] ?? 0);
+        $mes = (int)($_POST['mes'] ?? 0);
         if (!$ano || !$mes || $mes < 1 || $mes > 12) {
             $this->view('FolhaPagamento/processarFolha', [
                 'erro' => 'Por favor, insira um ano e mês válidos.'
@@ -54,7 +68,7 @@ class FolhaPagamentoController extends Controller
                 'sucesso' => $mensagem
             ]);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Captura qualquer erro geral que o serviço possa lançar
             $this->view('FolhaPagamento/processarFolha', [
                 'erro' => 'Ocorreu um erro: ' . $e->getMessage()
