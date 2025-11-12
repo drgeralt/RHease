@@ -2,7 +2,7 @@
 
 namespace Tests\Integration;
 
-use Tests\TestCasePonto;
+use Tests\TestCase;
 
 /**
  * Testes de integração com a API Facial (DeepFace)
@@ -10,7 +10,7 @@ use Tests\TestCasePonto;
  * IMPORTANTE: Estes testes requerem que a API Python esteja rodando!
  * Execute: python app.py
  */
-class FacialApiIntegrationTestPonto extends TestCasePonto
+class FacialApiIntegrationTest extends TestCase
 {
     private $apiUrl;
     private $apiAvailable = false;
