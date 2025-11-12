@@ -66,12 +66,20 @@ abstract class TestCase extends BaseTestCase
     protected function cleanupDatabase()
     {
         $conn = $this->getConnection();
-        // Adicione todas as tabelas que você usa nos testes
         $conn->exec("SET FOREIGN_KEY_CHECKS = 0;");
+
+        // Adicione todas as tabelas que seus testes manipulam
         $conn->exec("TRUNCATE TABLE folha_ponto;");
         $conn->exec("TRUNCATE TABLE colaborador;");
-        // $conn->exec("TRUNCATE TABLE cargos;"); // Exemplo
-        // $conn->exec("TRUNCATE TABLE departamentos;"); // Exemplo
+        $conn->exec("TRUNCATE TABLE cargo;");
+        $conn->exec("TRUNCATE TABLE setor;");
+        $conn->exec("TRUNCATE TABLE beneficios_catalogo;");
+        $conn->exec("TRUNCATE TABLE colaborador_beneficio;");
+        $conn->exec("TRUNCATE TABLE regras_beneficios;");
+        $conn->exec("TRUNCATE TABLE vaga;");
+        $conn->exec("TRUNCATE TABLE candidato;");
+        $conn->exec("TRUNCATE TABLE candidaturas;");
+
         $conn->exec("SET FOREIGN_KEY_CHECKS = 1;");
     }
 
@@ -132,12 +140,16 @@ abstract class TestCase extends BaseTestCase
             'caminho_foto' => 'storage/test.jpg',
             'ip_address' => '127.0.0.1'
         ];
-        $data = array_merge($defaults, $overrides);
+        // Adiciona o id_colaborador aos dados
+        $data = array_merge($defaults, $overrides, ['id_colaborador' => $colaboradorId]);
 
+        // CORREÇÃO: Use um placeholder para id_colaborador
         $stmt = $conn->prepare(
             "INSERT INTO folha_ponto (id_colaborador, data_hora_entrada, data_hora_saida, geolocalizacao, caminho_foto, ip_address)
-             VALUES ($colaboradorId, :data_hora_entrada, :data_hora_saida, :geolocalizacao, :caminho_foto, :ip_address)"
+         VALUES (:id_colaborador, :data_hora_entrada, :data_hora_saida, :geolocalizacao, :caminho_foto, :ip_address)"
         );
+
+        // Agora o $data contém todas as chaves necessárias
         $stmt->execute($data);
 
         $id = $conn->lastInsertId();

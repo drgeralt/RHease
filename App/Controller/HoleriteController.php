@@ -5,15 +5,16 @@ namespace App\Controller;
 
 use App\Core\Controller;
 use App\Model\HoleriteModel;
+use PDO;
 //require_once(BASE_PATH . '/vendor/setasign/fpdf/fpdf.php');
 class HoleriteController extends Controller
 {
-    private HoleriteModel $model;
+    protected HoleriteModel $model;
 
-    public function __construct()
+    public function __construct(HoleriteModel $holeriteModel, PDO $pdo)
     {
-        parent::__construct(); // Chama o construtor do Controller pai
-        $this->model = new HoleriteModel($this->db_connection); // Passa a conexão!
+        parent::__construct($pdo);
+        $this->model = $holeriteModel;
     }
 
     public function index()
