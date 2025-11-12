@@ -7,33 +7,33 @@ use App\Model\ColaboradorModel;
 use App\Model\FolhaPagamentoModel;
 use App\Model\ParametrosFolhaModel;
 use App\Service\Contracts\PontoServiceInterface;
-use App\Service\Implementations\PontoService;
 use PDO;
 use Exception;
 
 class FolhaPagamentoService
 {
-    private PDO $db;
     private FolhaPagamentoModel $folhaPagamentoModel;
     private ColaboradorModel $colaboradorModel;
     private ParametrosFolhaModel $parametrosModel;
     private PontoServiceInterface $pontoService;
-    // Propriedades para armazenar os parâmetros de cálculo
+    private PDO $db; // ✅ ADICIONADO
+
     private array $tabelaInss = [];
     private array $tabelaIrrf = [];
 
-    /**
-     * @param PDO $pdo A conexão com o banco de dados.
-     */
-    public function __construct(PDO $pdo)
-    {
-        $this->db = $pdo;
-        $this->folhaPagamentoModel = new FolhaPagamentoModel($this->db);
-        $this->colaboradorModel = new ColaboradorModel($this->db);
-        $this->parametrosModel = new ParametrosFolhaModel($this->db);
+    public function __construct(
+        FolhaPagamentoModel $folhaPagamentoModel,
+        ColaboradorModel $colaboradorModel,
+        ParametrosFolhaModel $parametrosModel,
+        PontoServiceInterface $pontoService
+    ) {
+        $this->folhaPagamentoModel = $folhaPagamentoModel;
+        $this->colaboradorModel = $colaboradorModel;
+        $this->parametrosModel = $parametrosModel;
+        $this->pontoService = $pontoService;
 
-        // Instancia o PontoService (que agora funciona)
-        $this->pontoService = new PontoService($this->db);
+        // ✅ CORRIGIDO: Obter a conexão PDO do Model
+        $this->db = $this->folhaPagamentoModel->getConnection();
 
         $this->carregarParametros();
     }
@@ -42,7 +42,6 @@ class FolhaPagamentoService
     {
         $faixasInss = $this->parametrosModel->findFaixasPorPrefixo('INSS_FAIXA_');
         foreach ($faixasInss as $faixa) {
-            // ✅ CORRIGIDO: Acessando 'valor' como uma propriedade de objeto.
             $dadosJson = json_decode($faixa->valor, true);
             $this->tabelaInss[] = [
                 'aliquota' => (float) ($dadosJson['aliquota'] ?? 0),
@@ -54,7 +53,6 @@ class FolhaPagamentoService
 
         $faixasIrrf = $this->parametrosModel->findFaixasPorPrefixo('IRRF_FAIXA_');
         foreach ($faixasIrrf as $faixa) {
-            // ✅ CORRIGIDO: Acessando 'valor' como uma propriedade de objeto.
             $dadosJson = json_decode($faixa->valor, true);
             $this->tabelaIrrf[] = [
                 'aliquota' => (float) ($dadosJson['aliquota'] ?? 0),
@@ -74,7 +72,7 @@ class FolhaPagamentoService
 
     public function processarFolha(int $ano, int $mes): array
     {
-        // ✅ Busca colaboradores ativos (getAll já traz salario_base agora!)
+        // ✅ Busca colaboradores ativos usando getAll()
         $colaboradores = $this->colaboradorModel->getAll();
 
         if (empty($colaboradores)) {
@@ -83,25 +81,23 @@ class FolhaPagamentoService
 
         $resultados = ['sucesso' => [], 'falha' => []];
 
+        // ✅ CORRIGIDO: Agora $this->db existe
         $this->db->beginTransaction();
+
         try {
             foreach ($colaboradores as $colaborador) {
                 $colaboradorId = (int) ($colaborador['id_colaborador'] ?? 0);
 
-                // ✅ REMOVIDAS AS LINHAS PROBLEMÁTICAS!
-                // O salario_base agora vem diretamente do getAll()
-
                 // Validação: verifica se o salário existe e é maior que zero
                 if (!isset($colaborador['salario_base']) || $colaborador['salario_base'] <= 0) {
                     error_log("⚠️ Colaborador {$colaborador['nome_completo']} (ID: {$colaboradorId}) sem salário definido!");
-                    $resultados['falha'][] = [
-                        'colaborador' => $colaborador['nome_completo'],
-                        'motivo' => 'Salário base não definido (R$ 0,00)'
-                    ];
-                    continue; // Pula este colaborador
+                    $resultados['falha'][$colaboradorId] =
+                        "Colaborador {$colaborador['nome_completo']} (ID: {$colaboradorId}) - " .
+                        "Motivo: Salário base não definido (R$ 0,00)";
+                    continue;
                 }
 
-                // 🔍 LOG para debug - veja os salários sendo processados
+                // 🔍 LOG para debug
                 error_log("✅ Processando: {$colaborador['nome_completo']} | Salário: R$ " .
                     number_format($colaborador['salario_base'], 2, ',', '.'));
 
@@ -112,7 +108,7 @@ class FolhaPagamentoService
                     $ano
                 );
 
-                // Limpa holerites anteriores do mesmo período
+                // ✅ Limpa holerites anteriores do mesmo período (permite reprocessamento)
                 $this->folhaPagamentoModel->limparHoleriteAnterior($colaboradorId, $ano, $mes);
 
                 // Calcula os valores do holerite
@@ -146,7 +142,6 @@ class FolhaPagamentoService
 
         return $resultados;
     }
-
 
     private function calcularValores(array $colaborador, float $totalHorasAusencia): array
     {
@@ -210,7 +205,7 @@ class FolhaPagamentoService
             'base_fgts' => $salarioBase,
             'valor_fgts' => $salarioBase * 0.08,
             'base_irrf' => $baseIrrf,
-            'itens_holerite' => $itensHolerite // ← Chave correta esperada pelo Model
+            'itens_holerite' => $itensHolerite
         ];
     }
 }

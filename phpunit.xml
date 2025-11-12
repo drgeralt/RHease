@@ -1,17 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
          colors="true"
-         cacheDirectory=".phpunit.cache">
+         stopOnFailure="false">
+
     <testsuites>
-        <testsuite name="GestaoVagas">
-            <directory>tests/Unit/Model</directory>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Controller">
             <directory>tests/Unit/Controller</directory>
         </testsuite>
+        <testsuite name="Model">
+            <directory>tests/Unit/Model</directory>
+        </testsuite>
+        <testsuite name="Service">
+            <directory>tests/Unit/Service</directory>
+        </testsuite>
     </testsuites>
+
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">App/Controller</directory>
+            <directory suffix=".php">App/Model</directory>
+        </include>
+        <exclude>
+            <directory>App/View</directory>
+            <directory>vendor</directory>
+        </exclude>
+        <report>
+            <html outputDirectory="coverage"/>
+            <text outputFile="php://stdout" showUncoveredFiles="false"/>
+        </report>
+    </coverage>
+
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="DB_HOST" value="localhost"/>
+        <env name="DB_DATABASE" value="rhease_test"/>
+        <env name="DB_USERNAME" value="root"/>
+        <env name="DB_PASSWORD" value=""/>
+        <env name="FACIAL_API_URL" value="http://localhost:5000/facial-api"/>
+        <ini name="display_errors" value="1"/>
+        <ini name="error_reporting" value="-1"/>
+        <ini name="memory_limit" value="-1"/>
     </php>
-</phpunit>
 
+    <logging>
+        <testdoxHtml outputFile="tests/report/testdox.html"/>
+        <testdoxText outputFile="tests/report/testdox.txt"/>
+    </logging>
+</phpunit>

@@ -5,7 +5,7 @@ namespace App\Controller;
 
 use App\Core\Controller;
 use App\Model\HoleriteModel;
-require_once(BASE_PATH . '/vendor/setasign/fpdf/fpdf.php');
+//require_once(BASE_PATH . '/vendor/setasign/fpdf/fpdf.php');
 class HoleriteController extends Controller
 {
     private HoleriteModel $model;
@@ -21,7 +21,7 @@ class HoleriteController extends Controller
         // 1. Verifica se o usuário está logado. Se não, redireciona para o login.
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . BASE_URL . '/login');
-            exit;
+            return; // Muito melhor!
         }
 
         // 2. Pega o ID do colaborador logado a partir da sessão.
@@ -59,20 +59,23 @@ class HoleriteController extends Controller
         //     exit();
         // }
 
-        // ✅ ADIÇÃO PARA TESTE: Simulamos um colaborador logado com ID = 1.
-        // Você pode alterar este número para testar outros colaboradores.
-        $idColaborador = filter_input(INPUT_POST, 'id_colaborador', FILTER_VALIDATE_INT);
-        $mes = filter_input(INPUT_POST, 'mes', FILTER_VALIDATE_INT);
-        $ano = filter_input(INPUT_POST, 'ano', FILTER_VALIDATE_INT);
+        // Lendo diretamente do array $_POST que podemos controlar no teste.
+        // O (int) e o ?? 0 simulam o FILTER_VALIDATE_INT.
+        $idColaborador = (int)($_POST['id_colaborador'] ?? 0);
+        $mes = (int)($_POST['mes'] ?? 0);
+        $ano = (int)($_POST['ano'] ?? 0);
+
         // As verificações agora são úteis e funcionam como deveriam.
         if (!$idColaborador || !$mes || !$ano) {
-            die('Dados insuficientes para gerar o holerite. ID do colaborador, mês e ano são obrigatórios.');
+            // Use a exceção exata que estamos esperando no teste!
+            throw new \InvalidArgumentException('Dados insuficientes para gerar o holerite. ID do colaborador, mês e ano são obrigatórios.');
         }
 
         $holerite = $this->model->findHoleritePorColaboradorEMes($idColaborador, $mes, $ano);
 
         if (!$holerite) {
-            die("Holerite não encontrado para o colaborador e período informados.");
+            // Vamos trocar este também, por uma exceção genérica
+            throw new \Exception("Holerite não encontrado para o colaborador e período informados.");
         }
 
         $itens = $this->model->findItensByHoleriteId($holerite->id_holerite);
@@ -162,6 +165,6 @@ class HoleriteController extends Controller
 
         // 5. Envia o PDF para o navegador
         $pdf->Output('I', 'holerite_' . $mes . '_' . $ano . '.pdf');
-        exit;
+        return;
     }
 }
