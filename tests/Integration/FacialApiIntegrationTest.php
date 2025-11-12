@@ -228,7 +228,7 @@ class FacialApiIntegrationTest extends TestCase
         curl_close($ch);
 
         if ($error) {
-            $this->assertStringContainsString('timeout', strtolower($error));
+            $this->assertStringContainsString('time out', strtolower($error));
         }
 
         $this->assertTrue(true); // Passou sem crash
