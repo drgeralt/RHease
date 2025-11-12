@@ -6,11 +6,22 @@ use App\Core\Database;
 use App\Model\ColaboradorModel;
 use App\Model\PontoModel;
 use Exception;
-
+use PDO;
 class PontoController
 {
-    private $facialApiUrl = 'http://localhost:5000/facial-api';
+    protected $facialApiUrl = 'http://localhost:5000/facial-api';
+    protected $pontoModel;
+    protected $colaboradorModel;
 
+    public function __construct(
+        PontoModel $pontoModel,
+        ColaboradorModel $colaboradorModel,
+        PDO $pdo
+    ) {
+        parent::__construct($pdo);
+        $this->pontoModel = $pontoModel;
+        $this->colaboradorModel = $colaboradorModel;
+    }
     /**
      * Carrega e exibe a página principal de registo de ponto.
      */

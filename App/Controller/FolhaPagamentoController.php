@@ -9,26 +9,15 @@ use App\Model\FolhaPagamentoModel;
 use App\Model\ColaboradorModel;
 use App\Model\ParametrosFolhaModel;
 use App\Service\Implementations\PontoService;
+use PDO;
+
 class FolhaPagamentoController extends Controller
 {
-    private FolhaPagamentoService $folhaPagamentoService;
-    public function __construct()
+    protected FolhaPagamentoService $folhaPagamentoService;
+    public function __construct(FolhaPagamentoService $folhaPagamentoService, PDO $pdo)
     {
-        parent::__construct();
-
-        // 1. Crie todas as dependências (os Models)
-        $folhaPagamentoModel = new \App\Model\FolhaPagamentoModel($this->db_connection);
-        $colaboradorModel = new \App\Model\ColaboradorModel($this->db_connection);
-        $parametrosModel = new \App\Model\ParametrosFolhaModel($this->db_connection);
-        $pontoService = new \App\Service\Implementations\PontoService($this->db_connection);
-
-        // 2. Injete-os no Service
-        $this->folhaPagamentoService = new FolhaPagamentoService(
-            $folhaPagamentoModel,
-            $colaboradorModel,
-            $parametrosModel,
-            $pontoService
-        );
+        parent::__construct($pdo);
+        $this->folhaPagamentoService = $folhaPagamentoService;
     }
     /**
      * Exibe a página para o RH processar a folha de pagamento.

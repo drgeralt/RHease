@@ -1,9 +1,8 @@
 <?php
-namespace Tests;
+namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
 use App\Model\DashboardModel;
-use PDO;
+use PHPUnit\Framework\TestCase;
 
 /**
 * Execute: vendor/bin/phpunit tests/DashboardModelTest.php

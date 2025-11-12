@@ -1,8 +1,8 @@
 <?php
-namespace Tests;
+namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
 use App\Model\BeneficioModel;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Teste Unitário para BeneficioModel

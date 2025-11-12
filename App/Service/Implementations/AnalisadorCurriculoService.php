@@ -10,14 +10,13 @@ class AnalisadorCurriculoService
 {
     private Client $geminiClient;
 
-    public function __construct(string $apiKey)
+    public function __construct(Client $geminiClient)
     {
-        $this->geminiClient = new Client($apiKey);
+        $this->geminiClient = $geminiClient;
     }
 
     public function analisar(string $textoCurriculo, array $dadosVaga): array
     {
-        // 1. Construção do contexto (inalterado)
         $titulo = $dadosVaga['titulo_vaga'] ?? 'Não especificado';
         $descricao = $dadosVaga['descricao_vaga'] ?? 'Não especificada.';
         $reqNecessarios = $dadosVaga['requisitos_necessarios'] ?? 'Não especificados.';
@@ -51,8 +50,6 @@ Você é um analista de RH especialista. Analise o currículo em relação à va
 
             $jsonString = $response->text();
 
-            // --- CORREÇÃO FINAL: Limpa a resposta da API ---
-            // Remove o invólucro de Markdown (```json ... ```) que a IA por vezes adiciona.
             $startPos = strpos($jsonString, '{');
             $endPos = strrpos($jsonString, '}');
 
@@ -60,10 +57,8 @@ Você é um analista de RH especialista. Analise o currículo em relação à va
                 $cleanJsonString = substr($jsonString, $startPos, $endPos - $startPos + 1);
                 $resultado = json_decode($cleanJsonString, true);
             } else {
-                // Se não encontrar os delimitadores, tenta decodificar a string original
                 $resultado = json_decode($jsonString, true);
             }
-            // --- FIM DA CORREÇÃO ---
 
             if (json_last_error() !== JSON_ERROR_NONE || !isset($resultado['sumario']) || !isset($resultado['nota'])) {
                 return ['sucesso' => false, 'erro' => "A API retornou um formato JSON inválido: " . $jsonString];

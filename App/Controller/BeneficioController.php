@@ -3,12 +3,14 @@ namespace App\Controller;
 
 use App\Model\BeneficioModel;
 use App\Core\Controller;
+use PDO;
 
 class BeneficioController extends Controller {
-    private $model;
+    protected BeneficioModel $model;
 
-    public function __construct() {
-        $this->model = new BeneficioModel();
+    public function __construct(BeneficioModel $beneficioModel, PDO $pdo) {
+        parent::__construct($pdo);
+        $this->model = $beneficioModel;
     }
 
     /**

@@ -1,20 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Core\Database;
+use App\Core\Model;
 use PDO;
 use PDOException;
 
-class UserModel
+class UserModel extends Model
 {
-    private PDO $db_connection;
-
-    public function __construct()
-    {
-        $this->db_connection = Database::getInstance();
-    }
-
     private function validatePassword(string $password): bool
     {
         if (strlen($password) < 8) return false;
@@ -41,7 +35,7 @@ class UserModel
         }
 
         $params = [
-            ':matricula' => 'C' . time(), // Matrícula gerada aleatoriamente
+            ':matricula' => 'C' . time(),
             ':nome_completo' => $nome,
             ':email_profissional' => $email,
             ':senha' => password_hash($senha, PASSWORD_DEFAULT),
@@ -70,12 +64,10 @@ class UserModel
         $stmt->execute([':token' => $token]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Se não encontrou o token ou a conta já está ativa
         if (!$user) {
             return ['success' => false, 'message' => 'Link de verificação inválido ou a conta já foi ativada.'];
         }
 
-        // Verifica se o token expirou
         $expiracao = new \DateTime($user['token_expiracao']);
         $agora = new \DateTime();
 
@@ -83,7 +75,6 @@ class UserModel
             return ['success' => false, 'message' => 'Seu link de verificação expirou. Por favor, solicite um novo.'];
         }
 
-        // Se tudo estiver certo, ativa a conta e limpa o token
         $sqlUpdate = "UPDATE colaborador SET status_conta = 'ativo', token_verificacao = NULL, token_expiracao = NULL WHERE id_colaborador = :id";
         $stmtUpdate = $this->db_connection->prepare($sqlUpdate);
         $stmtUpdate->execute([':id' => $user['id_colaborador']]);

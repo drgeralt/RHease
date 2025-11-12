@@ -1,17 +1,44 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controller;
 
 use App\Core\Controller;
-use App\Core\Database;
 use App\Model\CargoModel;
 use App\Model\ColaboradorModel;
 use App\Model\EnderecoModel;
 use App\Model\SetorModel;
 use PDOException;
+use PDO;
 
 class ColaboradorController extends Controller
 {
+    protected ColaboradorModel $colaboradorModel;
+    protected EnderecoModel $enderecoModel;
+    protected CargoModel $cargoModel;
+    protected SetorModel $setorModel;
+    protected PDO $pdo;
+
+    public function __construct(
+        ColaboradorModel $colaboradorModel,
+        EnderecoModel $enderecoModel,
+        CargoModel $cargoModel,
+        SetorModel $setorModel,
+        PDO $pdo
+    ) {
+        parent::__construct($pdo);
+        $this->colaboradorModel = $colaboradorModel;
+        $this->enderecoModel = $enderecoModel;
+        $this->cargoModel = $cargoModel;
+        $this->setorModel = $setorModel;
+        $this->pdo = $pdo;
+    }
+
+    public function novo(): void
+    {
+        $this->view('Colaborador/cadastroColaborador');
+    }
+
     public function criar(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -20,23 +47,16 @@ class ColaboradorController extends Controller
         }
 
         $post = $_POST;
-        $pdo = Database::getInstance();
-
-        $pdo->beginTransaction();
+        $this->pdo->beginTransaction();
 
         try {
-            // 1. Cria ou encontra Endereço, Cargo e Setor
-            $enderecoModel = new EnderecoModel($pdo);
-            $idEndereco = $enderecoModel->create($post);
+            $idEndereco = $this->enderecoModel->create($post);
 
-            $cargoModel = new CargoModel($pdo);
             $salario = (float)str_replace(['.', ','], ['', '.'], $post['salario'] ?? 0);
-            $idCargo = $cargoModel->findOrCreateByName($post['cargo'], $salario);
+            $idCargo = $this->cargoModel->findOrCreateByName($post['cargo'], $salario);
 
-            $setorModel = new SetorModel($pdo);
-            $idSetor = $setorModel->findOrCreateByName($post['setor']);
+            $idSetor = $this->setorModel->findOrCreateByName($post['setor']);
 
-            // 2. Monta o array de dados APENAS para a tabela 'colaborador'
             $dadosColaborador = [
                 'matricula' => $post['matricula'] ?? null,
                 'nome_completo' => $post['nome_completo'] ?? '',
@@ -49,62 +69,43 @@ class ColaboradorController extends Controller
                 'telefone' => $post['telefone'] ?? '',
                 'data_admissao' => $post['data_admissao'] ?? null,
                 'tipo_contrato' => $post['tipo_contrato'] ?? 'CLT',
-                'situacao' => 'ativo', // Define 'ativo' como padrão
+                'situacao' => 'ativo',
                 'id_cargo' => $idCargo,
                 'id_setor' => $idSetor,
                 'id_endereco' => $idEndereco,
             ];
 
-            // 3. Cria o colaborador
-            $colaboradorModel = new ColaboradorModel($pdo);
-            $colaboradorModel->create($dadosColaborador);
+            $this->colaboradorModel->create($dadosColaborador);
 
-            // Se tudo deu certo, confirma as operações no banco
-            $pdo->commit();
-
-            // Redireciona para a lista de colaboradores após o sucesso
+            $this->pdo->commit();
             header('Location: ' . BASE_URL . '/colaboradores');
             exit;
 
         } catch (PDOException $e) {
-            // Se algo deu errado, desfaz tudo
-            $pdo->rollBack();
-            // Em um ambiente de produção, logue o erro em vez de usar 'die'
+            $this->pdo->rollBack();
             die("Erro ao salvar colaborador: " . $e->getMessage());
         }
     }
-    public function novo(): void
-    {
-        $this->view('Colaborador/cadastroColaborador');
-    }
+
     public function listar()
     {
-        // 1. Obtém a conexão com a base de dados
-        $db = Database::getInstance();
+        $todosOsColaboradores = $this->colaboradorModel->listarColaboradores();
 
-        // 2. Instancia o model, passando a conexão
-        $colaboradorModel = new ColaboradorModel($db);
-
-        // 3. Usa o model para buscar a lista de todos os colaboradores
-        $todosOsColaboradores = $colaboradorModel->listarColaboradores();
-
-        // 4. CORREÇÃO: Envia os dados para a view.
-        // A chave 'colaboradores' torna-se a variável $colaboradores na sua view.
         return $this->view('Colaborador/tabelaColaborador', [
             'colaboradores' => $todosOsColaboradores
         ]);
     }
+
     public function editar()
     {
         $id = (int)($_POST['id'] ?? 0);
+
         if ($id === 0) {
             header('Location: ' . BASE_URL . '/colaboradores');
             exit;
         }
 
-        $db = Database::getInstance();
-        $colaboradorModel = new ColaboradorModel($db);
-        $dadosCompletos = $colaboradorModel->buscarPorId($id);
+        $dadosCompletos = $this->colaboradorModel->buscarPorId($id);
 
         if (!$dadosCompletos) {
             header('Location: ' . BASE_URL . '/colaboradores');
@@ -114,7 +115,6 @@ class ColaboradorController extends Controller
         return $this->view('Colaborador/editarColaborador', $dadosCompletos);
     }
 
-
     public function atualizar()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -122,7 +122,6 @@ class ColaboradorController extends Controller
             exit;
         }
 
-        // Coleta todos os dados do formulário em um array estruturado
         $dados = [
             'id_colaborador' => (int)($_POST['id_colaborador'] ?? 0),
             'nome_completo' => $_POST['nome'] ?? '',
@@ -136,32 +135,28 @@ class ColaboradorController extends Controller
             'tipo_contrato' => $_POST['tipo_contrato'] ?? 'CLT',
 
             'endereco' => [
-                'CEP' => $_POST['CEP'] ?? '',
-                'logradouro' => $_POST['logradouro'] ?? '',
-                'numero' => $_POST['numero'] ?? '',
-                'bairro' => $_POST['bairro'] ?? '',
-                'cidade' => $_POST['cidade'] ?? '',
-                'estado' => $_POST['estado'] ?? '',
+                'CEP' => isset($_POST['CEP']) ? $_POST['CEP'] : '',
+                'logradouro' => isset($_POST['logradouro']) ? $_POST['logradouro'] : '',
+                'numero' => isset($_POST['numero']) ? $_POST['numero'] : '',
+                'bairro' => isset($_POST['bairro']) ? $_POST['bairro'] : '',
+                'cidade' => isset($_POST['cidade']) ? $_POST['cidade'] : '',
+                'estado' => isset($_POST['estado']) ? $_POST['estado'] : '',
             ],
             'cargo' => [
-                'nome_cargo' => $_POST['cargo'] ?? '',
-                'salario_base' => (float)str_replace(',', '.', $_POST['salario'] ?? 0),
+                'nome_cargo' => isset($_POST['cargo']) ? $_POST['cargo'] : '',
+                'salario_base' => (float)str_replace(',', '.', isset($_POST['salario']) ? $_POST['salario'] : 0),
             ],
             'setor' => [
-                'nome_setor' => $_POST['departamento'] ?? '',
+                'nome_setor' => isset($_POST['departamento']) ? $_POST['departamento'] : '',
             ],
         ];
 
         if ($dados['id_colaborador'] === 0) {
-            // Lidar com erro de ID inválido
             header('Location: ' . BASE_URL . '/colaboradores?error=invalid_id');
             exit;
         }
 
-        $db = Database::getInstance();
-        $colaboradorModel = new ColaboradorModel($db);
-
-        $sucesso = $colaboradorModel->atualizarColaborador($dados);
+        $sucesso = $this->colaboradorModel->atualizarColaborador($dados);
 
         if ($sucesso) {
             header('Location: ' . BASE_URL . '/colaboradores?success=updated');
@@ -170,6 +165,7 @@ class ColaboradorController extends Controller
         }
         exit;
     }
+
     public function toggleStatus()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -179,24 +175,18 @@ class ColaboradorController extends Controller
 
         $id = (int)($_POST['id'] ?? 0);
         if ($id === 0) {
-            // Redireciona com erro se o ID for inválido
             header('Location: ' . BASE_URL . '/colaboradores?error=invalid_id');
             exit;
         }
 
-        $db = Database::getInstance();
-        $colaboradorModel = new ColaboradorModel($db);
-
-        // Invoca o método no model para alterar o status
-        $sucesso = $colaboradorModel->toggleStatus($id);
+        $sucesso = $this->colaboradorModel->toggleStatus($id);
 
         if (!$sucesso) {
-            // Redireciona com erro se a atualização falhar
+            // CORREÇÃO AQUI: O caminho estava errado.
             header('Location: ' . BASE_URL . '/colaboradores?error=toggle_failed');
             exit;
         }
 
-        // Redireciona de volta para a lista após o sucesso
         header('Location: ' . BASE_URL . '/colaboradores');
         exit;
     }
