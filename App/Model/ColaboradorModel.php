@@ -22,7 +22,7 @@ class ColaboradorModel extends Model
                     c.nome_completo, 
                     c.email_pessoal, 
                     c.cpf, 
-                    c.salario_base, 
+                    ca.salario_base, 
                     c.data_nascimento, 
                     ca.nome_cargo as cargo, 
                     s.nome_setor as setor, 
@@ -413,5 +413,28 @@ class ColaboradorModel extends Model
         $stmt_itens->execute([':id_holerite' => $id_holerite]);
         
         return $stmt_itens->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+    public function buscarTodosAtivos(): array
+    {
+        // O Service precisa de:
+        // id_colaborador, nome_completo, salario_base, cpf, e carga_horaria_mensal
+
+        $sql = "SELECT 
+                    c.id_colaborador, 
+                    c.nome_completo, 
+                    c.salario_base, 
+                    c.cpf,
+                    ca.carga_horaria_mensal 
+                FROM colaborador c
+                LEFT JOIN cargo ca ON c.id_cargo = ca.id_cargo
+                WHERE c.situacao = 'ativo'"; // <-- O filtro crucial!
+
+        $stmt = $this->db_connection->prepare($sql);
+        $stmt->execute();
+
+        // IMPORTANTE: O seu Service
+        // e o seu Teste esperam OBJETOS,
+        // por isso usamos FETCH_OBJ.
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 }

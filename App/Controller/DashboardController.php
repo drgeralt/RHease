@@ -5,15 +5,20 @@ use App\Core\Controller;
 use App\Model\DashboardModel;
 use App\Model\ColaboradorModel;
 use App\Core\Database;
+use PDO;
 
 class DashboardController extends Controller {
-    private $dashboardModel;
-    private $colaboradorModel;
+    protected $dashboardModel;
+    protected $colaboradorModel;
 
-    public function __construct() {
-        $pdo = Database::getInstance();
-        $this->dashboardModel = new DashboardModel();
-        $this->colaboradorModel = new ColaboradorModel($pdo);
+    public function __construct(
+        DashboardModel $dashboardModel,
+        ColaboradorModel $colaboradorModel,
+        PDO $pdo
+    ) {
+        parent::__construct($pdo);
+        $this->dashboardModel = $dashboardModel;
+        $this->colaboradorModel = $colaboradorModel;
     }
 
     public function index() {

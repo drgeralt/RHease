@@ -1,17 +1,24 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controller;
 
 use App\Core\Controller;
 use App\Model\AuthModel;
+use PDO; // Importe o PDO
 
 class AuthController extends Controller
 {
-    private AuthModel $authModel;
+    protected AuthModel $authModel;
 
-    public function __construct()
+    /**
+     * O construtor agora recebe suas dependências
+     * e as passa para a classe pai (Controller).
+     */
+    public function __construct(AuthModel $authModel, PDO $pdo)
     {
-        $this->authModel = new AuthModel();
+        parent::__construct($pdo);
+        $this->authModel = $authModel;
     }
 
     /**
@@ -39,16 +46,15 @@ class AuthController extends Controller
     }
 
     /**
-     * Processa os dados do formulário de registro.
+     * Processa os dados do formulário de registro (API JSON).
      */
     public function register(): void
     {
         $data = $_POST;
+        // Usa o Model injetado
         $result = $this->authModel->registerUser($data);
 
-        header('Content-Type: application/json');
-        echo json_encode($result);
-        exit();
+        $this->jsonResponse(true, $result['message'], $result); // Usa o jsonResponse herdado
     }
 
     /**
@@ -57,7 +63,9 @@ class AuthController extends Controller
     public function verifyAccount(): void
     {
         $token = $_GET['token'] ?? null;
+        // Usa o Model injetado
         $result = $this->authModel->activateAccount($token);
+
         $this->view('Auth/verificacaoResultado', $result);
     }
 
@@ -73,32 +81,28 @@ class AuthController extends Controller
 
         $email = $_POST['email_profissional'] ?? '';
         $senha = $_POST['senha'] ?? '';
+
+        // Usa o Model injetado
         $result = $this->authModel->loginUser($email, $senha);
 
         if ($result['status'] === 'success') {
-            // Previne ataques de fixação de sessão
             session_regenerate_id(true);
             $_SESSION['user_logged_in'] = true;
             $_SESSION['user_id'] = $result['user_id'];
-
-            // --- LÓGICA DE REDIRECIONAMENTO CORRIGIDA ---
-            // 1. Armazene o perfil do usuário na sessão (boa prática)
             $_SESSION['user_perfil'] = $result['user_perfil'];
 
-            // 2. Verifique o perfil para decidir para onde ir
             if ($_SESSION['user_perfil'] === 'gestor_rh' || $_SESSION['user_perfil'] === 'diretor') {
-                // Se for gestor ou diretor, vai para o dashboard principal
                 header('Location: ' . BASE_URL . '/inicio');
             } else {
+                // Redireciona colaborador para o dashboard de colaborador
                 header('Location: ' . BASE_URL . '/inicio');
             }
             exit();
-            // --- FIM DA CORREÇÃO ---
         } else {
-            // Se falhar, exibe a página de login com a mensagem de erro.
             $this->view('Auth/login', ['error' => $result['message']]);
         }
     }
+
     /**
      * Mostra o formulário para solicitar a recuperação de senha.
      */
@@ -108,11 +112,12 @@ class AuthController extends Controller
     }
 
     /**
-     * Lida com o pedido de recuperação de senha, chamando o Model.
+     * Lida com o pedido de recuperação de senha.
      */
     public function handleForgotPasswordRequest(): void
     {
         $email = $_POST['email'] ?? '';
+        // Usa o Model injetado
         $result = $this->authModel->generatePasswordResetToken($email);
 
         if ($result['status'] === 'success') {
@@ -123,18 +128,17 @@ class AuthController extends Controller
     }
 
     /**
-     * Mostra o formulário para redefinir a senha, se o token for válido.
+     * Mostra o formulário para redefinir a senha.
      */
     public function showResetPasswordForm(): void
     {
         $token = $_GET['token'] ?? '';
 
-        // Verifica se o token é válido antes de mostrar a página
+        // Usa o Model injetado
         if ($this->authModel->isPasswordResetTokenValid($token)) {
             $this->view('Auth/redefinirSenha', ['token' => $token]);
         } else {
-            // Se o token for inválido ou expirado, mostra uma mensagem de erro
-            $this->view('Auth/esqueceuSenha', ['error' => 'O link de redefinição de senha é inválido ou expirou.']);
+            $this->view('Auth/esqueceuSenha', ['error' => 'O link de redefinição é inválido ou expirou.']);
         }
     }
 
@@ -146,6 +150,7 @@ class AuthController extends Controller
         $token = $_POST['token'] ?? '';
         $novaSenha = $_POST['nova_senha'] ?? '';
         $confirmarSenha = $_POST['confirmar_senha'] ?? '';
+
         if ($novaSenha !== $confirmarSenha) {
             $this->view('Auth/redefinirSenha', [
                 'token' => $token,
@@ -154,16 +159,14 @@ class AuthController extends Controller
             return;
         }
 
+        // Usa o Model injetado
         $result = $this->authModel->resetPassword($token, $novaSenha);
 
         if ($result['status'] === 'success') {
-            // Redireciona para o login com uma mensagem de sucesso
-            // (Usaremos a sessão para passar a mensagem)
             $_SESSION['success_message'] = $result['message'];
             header('Location: ' . BASE_URL . '/login');
             exit();
         } else {
-            // Mostra o erro na própria página de redefinição
             $this->view('Auth/redefinirSenha', [
                 'token' => $token,
                 'error' => $result['message']

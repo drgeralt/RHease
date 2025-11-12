@@ -5,7 +5,6 @@ namespace App\Model;
 
 use App\Core\Model;
 use PDO;
-use App\Core\Database;
 
 class CandidaturaModel extends Model
 {
@@ -72,16 +71,9 @@ class CandidaturaModel extends Model
             ':id_candidatura' => $idCandidatura
         ]);
     }
-    /**
-     * Cria um novo registro de candidatura na tabela 'candidaturas'.
-     *
-     * @param int $idVaga O ID da vaga.
-     * @param int $idCandidato O ID do candidato.
-     * @return bool Retorna true em caso de sucesso, false em caso de falha.
-     */
+
     public function criar(int $idVaga, int $idCandidato): bool
     {
-        // Usando a tabela 'candidaturas' conforme planejamos
         $sql = "INSERT INTO candidaturas (id_vaga, id_candidato) VALUES (:id_vaga, :id_candidato)";
         $stmt = $this->db_connection->prepare($sql);
 
@@ -91,13 +83,6 @@ class CandidaturaModel extends Model
         ]);
     }
 
-    /**
-     * Verifica se um candidato já se aplicou para uma determinada vaga.
-     *
-     * @param int $idVaga
-     * @param int $idCandidato
-     * @return bool Retorna true se a candidatura já existe, false caso contrário.
-     */
     public function verificarExistente(int $idVaga, int $idCandidato): bool
     {
         $sql = "SELECT COUNT(*) FROM candidaturas WHERE id_vaga = :id_vaga AND id_candidato = :id_candidato";
@@ -111,8 +96,6 @@ class CandidaturaModel extends Model
     }
     public function buscarPorVaga(int $idVaga): array
     {
-        // CORREÇÃO: A consulta agora junta 'candidaturas' (alias c) com 'candidato' (alias cand)
-        // e seleciona as colunas corretas de cada tabela.
         $sql = "SELECT 
                 c.id_candidatura,
                 c.pontuacao_aderencia,

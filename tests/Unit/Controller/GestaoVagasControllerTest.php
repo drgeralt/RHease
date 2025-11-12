@@ -1,135 +1,119 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Tests\Unit\Controller;
 
-use App\Controller\GestaoVagasController;
 use PHPUnit\Framework\TestCase;
+use App\Controller\GestaoVagasController;
+use App\Model\GestaoVagasModel;
+use App\Model\CandidaturaModel;
+use PDO;
 
-/**
- * Testes Unitários para GestaoVagasController
- * 
- * COMO FUNCIONA:
- * ==============
- * 
- * O Controller é responsável por renderizar views (páginas).
- * Para testar, usamos mocks parciais que interceptam apenas o método view(),
- * permitindo verificar se a view correta foi chamada sem realmente renderizar HTML.
- * 
- * OPERAÇÕES TESTADAS:
- * ===================
- * - listarVagas(): Renderiza a view de listagem de vagas
- * - criar(): Renderiza a view de criação de nova vaga
- * - editar(): Renderiza a view de edição de vaga
- * - verCandidatos(): Renderiza a view de lista de candidatos
- */
+class TestableGestaoVagasController extends GestaoVagasController
+{
+    public $viewChamada;
+    public $viewData;
+
+    public function __construct(
+        GestaoVagasModel $vagasModel,
+        CandidaturaModel $candidaturaModel,
+        PDO $pdo
+    ) {
+        $this->vagasModel = $vagasModel;
+        $this->candidaturaModel = $candidaturaModel;
+        $this->pdo = $pdo;
+    }
+
+    public function view($view, $data = []): void
+    {
+        $this->viewChamada = $view;
+        $this->viewData = $data;
+    }
+
+    protected function header(string $location): void {}
+    protected function exit(): void {}
+}
+
 class GestaoVagasControllerTest extends TestCase
 {
-    private GestaoVagasController $controller;
+    private $vagasModelMock;
+    private $candidaturaModelMock;
+    private $pdoMock;
+    private $controller;
 
-    /**
-     * setUp() é executado ANTES de cada teste
-     * 
-     * Criamos um mock parcial do controller que intercepta apenas o método view()
-     * Isso permite testar se a view correta foi chamada sem renderizar HTML real
-     */
     protected function setUp(): void
     {
         parent::setUp();
-        
-        // Criar mock parcial do controller
-        // onlyMethods(['view']) significa que apenas o método 'view' será mockado
-        // Os outros métodos (listarVagas, criar, etc.) serão executados normalmente
-        $this->controller = $this->getMockBuilder(GestaoVagasController::class)
-            ->onlyMethods(['view'])
-            ->getMock();
+
+        $this->vagasModelMock = $this->createMock(GestaoVagasModel::class);
+        $this->candidaturaModelMock = $this->createMock(CandidaturaModel::class);
+        $this->pdoMock = $this->createMock(PDO::class);
+
+        $this->controller = new TestableGestaoVagasController(
+            $this->vagasModelMock,
+            $this->candidaturaModelMock,
+            $this->pdoMock
+        );
     }
 
-    /**
-     * TESTE 1: listarVagas()
-     * 
-     * OBJETIVO: Verificar se o método chama a view correta para listar vagas
-     * 
-     * COMO TESTA:
-     * 1. Configuramos o mock para esperar uma chamada ao método view()
-     * 2. Especificamos qual view deve ser chamada ('vaga/gestaoVagas')
-     * 3. Executamos o método listarVagas()
-     * 4. O mock verifica automaticamente se a view correta foi chamada
-     */
-    public function testListarVagasChamaViewCorreta(): void
+    public function testListarVagasChamaViewCorretaComDados(): void
     {
-        // ARRANGE & ASSERT: Configurar expectativa do mock
-        // Espera que o método view() seja chamado 1 vez com o parâmetro 'vaga/gestaoVagas'
-        $this->controller
-            ->expects($this->once())  // Deve ser chamado exatamente 1 vez
-            ->method('view')
-            ->with('vaga/gestaoVagas');  // Com este parâmetro específico
+        $dadosVagasFalsas = [['id_vaga' => 1, 'titulo_vaga' => 'Vaga Teste']];
 
-        // ACT: Executar o método sendo testado
+        $this->vagasModelMock
+            ->expects($this->once())
+            ->method('listarVagas')
+            ->willReturn($dadosVagasFalsas);
+
         $this->controller->listarVagas();
-        
-        // Se chegou aqui sem erro, o teste passou!
-        // O mock já verificou se view() foi chamado corretamente
+
+        $this->assertEquals('vaga/gestaoVagas', $this->controller->viewChamada);
+        $this->assertArrayHasKey('vagas', $this->controller->viewData);
+        $this->assertEquals($dadosVagasFalsas, $this->controller->viewData['vagas']);
     }
 
-    /**
-     * TESTE 2: criar()
-     * 
-     * OBJETIVO: Verificar se o método chama a view de criação de vaga
-     */
     public function testCriarChamaViewDeNovaVaga(): void
     {
-        // ARRANGE & ASSERT
-        $this->controller
-            ->expects($this->once())
-            ->method('view')
-            ->with('vaga/novaVaga');  // View esperada para criar nova vaga
-
-        // ACT
         $this->controller->criar();
+        $this->assertEquals('vaga/novaVaga', $this->controller->viewChamada);
     }
 
-    /**
-     * TESTE 3: editar()
-     * 
-     * OBJETIVO: Verificar se o método chama a view de edição de vaga
-     */
     public function testEditarChamaViewDeEdicao(): void
     {
-        // ARRANGE & ASSERT
-        $this->controller
-            ->expects($this->once())
-            ->method('view')
-            ->with('vaga/editarVaga');  // View esperada para editar vaga
-
-        // ACT
         $this->controller->editar();
+        $this->assertEquals('vaga/editarVaga', $this->controller->viewChamada);
     }
 
-    /**
-     * TESTE 4: verCandidatos()
-     * 
-     * OBJETIVO: Verificar se o método chama a view de lista de candidatos
-     */
-    public function testVerCandidatosChamaViewDeListaCandidatos(): void
+    public function testVerCandidatosChamaViewCorretaComDados(): void
     {
-        // ARRANGE & ASSERT
-        $this->controller
-            ->expects($this->once())
-            ->method('view')
-            ->with('Candidatura/lista_candidatos');  // View esperada para ver candidatos
+        $_GET['id'] = 1;
+        $dadosVagaFalsa = ['id_vaga' => 1, 'titulo_vaga' => 'Vaga Teste'];
+        $dadosCandidatosFalsos = [['id_candidato' => 10, 'nome_completo' => 'Candidato Teste']];
 
-        // ACT
+        $this->vagasModelMock
+            ->expects($this->once())
+            ->method('buscarPorId')
+            ->with(1)
+            ->willReturn($dadosVagaFalsa);
+
+        $this->candidaturaModelMock
+            ->expects($this->once())
+            ->method('buscarPorVaga')
+            ->with(1)
+            ->willReturn($dadosCandidatosFalsos);
+
         $this->controller->verCandidatos();
+
+        $this->assertEquals('Candidatura/lista_candidatos', $this->controller->viewChamada);
+        $this->assertArrayHasKey('vaga', $this->controller->viewData);
+        $this->assertArrayHasKey('candidatos', $this->controller->viewData);
+        $this->assertEquals($dadosVagaFalsa, $this->controller->viewData['vaga']);
+        $this->assertEquals($dadosCandidatosFalsos, $this->controller->viewData['candidatos']);
     }
 
-    /**
-     * tearDown() é executado DEPOIS de cada teste
-     */
     protected function tearDown(): void
     {
         parent::tearDown();
+        unset($_GET['id']);
     }
 }
-

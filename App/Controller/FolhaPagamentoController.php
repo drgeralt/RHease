@@ -5,15 +5,19 @@ namespace App\Controller;
 
 use App\Core\Controller;
 use App\Service\Implementations\FolhaPagamentoService;
+use App\Model\FolhaPagamentoModel;
+use App\Model\ColaboradorModel;
+use App\Model\ParametrosFolhaModel;
+use App\Service\Implementations\PontoService;
+use PDO;
 
 class FolhaPagamentoController extends Controller
 {
-    private FolhaPagamentoService $folhaPagamentoService;
-    public function __construct()
+    protected FolhaPagamentoService $folhaPagamentoService;
+    public function __construct(FolhaPagamentoService $folhaPagamentoService, PDO $pdo)
     {
-        parent::__construct();
-        // A conexão ($this->db_connection) é passada para o serviço.
-        $this->folhaPagamentoService = new FolhaPagamentoService($this->db_connection);
+        parent::__construct($pdo);
+        $this->folhaPagamentoService = $folhaPagamentoService;
     }
     /**
      * Exibe a página para o RH processar a folha de pagamento.
@@ -30,9 +34,8 @@ class FolhaPagamentoController extends Controller
      */
     public function processar()
     {
-        $ano = filter_input(INPUT_POST, 'ano', FILTER_VALIDATE_INT);
-        $mes = filter_input(INPUT_POST, 'mes', FILTER_VALIDATE_INT);
-
+        $ano = (int)($_POST['ano'] ?? 0);
+        $mes = (int)($_POST['mes'] ?? 0);
         if (!$ano || !$mes || $mes < 1 || $mes > 12) {
             $this->view('FolhaPagamento/processarFolha', [
                 'erro' => 'Por favor, insira um ano e mês válidos.'
@@ -54,7 +57,7 @@ class FolhaPagamentoController extends Controller
                 'sucesso' => $mensagem
             ]);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Captura qualquer erro geral que o serviço possa lançar
             $this->view('FolhaPagamento/processarFolha', [
                 'erro' => 'Ocorreu um erro: ' . $e->getMessage()
