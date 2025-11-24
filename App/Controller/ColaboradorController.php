@@ -34,15 +34,42 @@ class ColaboradorController extends Controller
         $this->pdo = $pdo;
     }
 
-    public function novo(): void
+    public function listar()
     {
-        $this->view('Colaborador/cadastroColaborador');
+        $todosOsColaboradores = $this->colaboradorModel->listarColaboradores();
+        // Passa a BASE_URL para a view, caso não esteja definida globalmente
+        return $this->view('Colaborador/tabelaColaborador', [
+            'colaboradores' => $todosOsColaboradores
+        ]);
+    }
+
+    // Método usado pelo AJAX para preencher o Modal de Edição
+    public function buscarDados(): void
+    {
+        header('Content-Type: application/json');
+
+        $id = (int)($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(['erro' => true, 'msg' => 'ID inválido']);
+            exit;
+        }
+
+        $dados = $this->colaboradorModel->buscarPorId($id);
+
+        if (!$dados) {
+            echo json_encode(['erro' => true, 'msg' => 'Colaborador não encontrado']);
+            exit;
+        }
+
+        echo json_encode($dados);
+        exit;
     }
 
     public function criar(): void
     {
+        // Se for criar via AJAX (opcional, mantendo compatibilidade com form submit padrão)
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . '/colaboradores/adicionar');
+            header('Location: ' . BASE_URL . '/colaboradores');
             exit;
         }
 
@@ -52,10 +79,14 @@ class ColaboradorController extends Controller
         try {
             $idEndereco = $this->enderecoModel->create($post);
 
-            $salario = (float)str_replace(['.', ','], ['', '.'], $post['salario'] ?? 0);
+            // Sanitização de dinheiro (R$ 3.500,00 -> 3500.00)
+            $salario = (float)str_replace(['R$', '.', ','], ['', '', '.'], $post['salario'] ?? 0);
+
             $idCargo = $this->cargoModel->findOrCreateByName($post['cargo'], $salario);
 
-            $idSetor = $this->setorModel->findOrCreateByName($post['setor']);
+            // Aceita tanto 'setor' quanto 'departamento' do post
+            $nomeSetor = $post['setor'] ?? $post['departamento'] ?? '';
+            $idSetor = $this->setorModel->findOrCreateByName($nomeSetor);
 
             $dadosColaborador = [
                 'matricula' => $post['matricula'] ?? null,
@@ -78,56 +109,36 @@ class ColaboradorController extends Controller
             $this->colaboradorModel->create($dadosColaborador);
 
             $this->pdo->commit();
-            header('Location: ' . BASE_URL . '/colaboradores');
+
+            // Redireciona para atualizar a lista (ou poderia retornar JSON se mudarmos o JS de criar)
+            header('Location: ' . BASE_URL . '/colaboradores?success=created');
             exit;
 
         } catch (PDOException $e) {
             $this->pdo->rollBack();
-            die("Erro ao salvar colaborador: " . $e->getMessage());
+            die("Erro ao salvar: " . $e->getMessage());
         }
     }
 
-    public function listar()
-    {
-        $todosOsColaboradores = $this->colaboradorModel->listarColaboradores();
-
-        return $this->view('Colaborador/tabelaColaborador', [
-            'colaboradores' => $todosOsColaboradores
-        ]);
-    }
-
-    public function editar()
-    {
-        $id = (int)($_POST['id'] ?? 0);
-
-        if ($id === 0) {
-            header('Location: ' . BASE_URL . '/colaboradores');
-            exit;
-        }
-
-        $dadosCompletos = $this->colaboradorModel->buscarPorId($id);
-
-        if (!$dadosCompletos) {
-            header('Location: ' . BASE_URL . '/colaboradores');
-            exit;
-        }
-
-        return $this->view('Colaborador/editarColaborador', $dadosCompletos);
-    }
-
-    public function atualizar()
+    // CORREÇÃO CRÍTICA: Retorna JSON e trata formatação de dados
+    public function atualizar(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . '/colaboradores');
+            echo json_encode(['erro' => true, 'msg' => 'Método inválido']);
             exit;
         }
 
+        // Sanitização de dinheiro para evitar erro no banco decimal(10,2)
+        $salarioInput = $_POST['salario'] ?? '0';
+        $salarioLimpo = (float)str_replace(['R$', '.', ' ', ','], ['', '', '', '.'], $salarioInput);
+
+        // Mapeamento correto dos dados vindos do Modal
         $dados = [
             'id_colaborador' => (int)($_POST['id_colaborador'] ?? 0),
-            'nome_completo' => $_POST['nome'] ?? '',
+            'nome_completo' => $_POST['nome_completo'] ?? '', // Atenção: JS envia 'nome_completo'
             'data_nascimento' => $_POST['data_nascimento'] ?? null,
             'genero' => $_POST['genero'] ?? null,
-            'email_pessoal' => $_POST['email'] ?? '',
+            'email_pessoal' => $_POST['email_pessoal'] ?? '',
             'email_profissional' => $_POST['email_corporativo'] ?? '',
             'telefone' => $_POST['telefone'] ?? '',
             'situacao' => $_POST['situacao'] ?? 'ativo',
@@ -135,23 +146,25 @@ class ColaboradorController extends Controller
             'tipo_contrato' => $_POST['tipo_contrato'] ?? 'CLT',
 
             'endereco' => [
-                'CEP' => isset($_POST['CEP']) ? $_POST['CEP'] : '',
-                'logradouro' => isset($_POST['logradouro']) ? $_POST['logradouro'] : '',
-                'numero' => isset($_POST['numero']) ? $_POST['numero'] : '',
-                'bairro' => isset($_POST['bairro']) ? $_POST['bairro'] : '',
-                'cidade' => isset($_POST['cidade']) ? $_POST['cidade'] : '',
-                'estado' => isset($_POST['estado']) ? $_POST['estado'] : '',
+                'CEP' => $_POST['CEP'] ?? '',
+                'logradouro' => $_POST['logradouro'] ?? '',
+                'numero' => $_POST['numero'] ?? '',
+                'bairro' => $_POST['bairro'] ?? '',
+                'cidade' => $_POST['cidade'] ?? '',
+                'estado' => $_POST['estado'] ?? '',
             ],
             'cargo' => [
-                'nome_cargo' => isset($_POST['cargo']) ? $_POST['cargo'] : '',
-                'salario_base' => (float)str_replace(',', '.', isset($_POST['salario']) ? $_POST['salario'] : 0),
+                'nome_cargo' => $_POST['cargo'] ?? '',
+                'salario_base' => $salarioLimpo,
             ],
             'setor' => [
-                'nome_setor' => isset($_POST['departamento']) ? $_POST['departamento'] : '',
+                'nome_setor' => $_POST['departamento'] ?? $_POST['setor'] ?? '',
             ],
         ];
 
         if ($dados['id_colaborador'] === 0) {
+            // Se o Javascript enviou via POST normal (fallback), redireciona.
+            // Se foi AJAX, deveria tratar JSON. Vamos assumir fallback para HTML form submit
             header('Location: ' . BASE_URL . '/colaboradores?error=invalid_id');
             exit;
         }
@@ -159,35 +172,49 @@ class ColaboradorController extends Controller
         $sucesso = $this->colaboradorModel->atualizarColaborador($dados);
 
         if ($sucesso) {
+            // Sucesso
             header('Location: ' . BASE_URL . '/colaboradores?success=updated');
         } else {
+            // Falha
             header('Location: ' . BASE_URL . '/colaboradores?error=update_failed');
         }
         exit;
     }
 
-    public function toggleStatus()
+    // CORREÇÃO CRÍTICA: Retorna JSON para o AJAX não recarregar a página
+    public function toggleStatus(): void
     {
+        header('Content-Type: application/json');
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . '/colaboradores');
+            echo json_encode(['erro' => true, 'msg' => 'Método inválido']);
             exit;
         }
 
         $id = (int)($_POST['id'] ?? 0);
+
         if ($id === 0) {
-            header('Location: ' . BASE_URL . '/colaboradores?error=invalid_id');
+            echo json_encode(['erro' => true, 'msg' => 'ID inválido']);
             exit;
         }
 
-        $sucesso = $this->colaboradorModel->toggleStatus($id);
+        try {
+            $sucesso = $this->colaboradorModel->toggleStatus($id);
 
-        if (!$sucesso) {
-            // CORREÇÃO AQUI: O caminho estava errado.
-            header('Location: ' . BASE_URL . '/colaboradores?error=toggle_failed');
-            exit;
+            if ($sucesso) {
+                echo json_encode(['erro' => false, 'msg' => 'Status alterado com sucesso']);
+            } else {
+                echo json_encode(['erro' => true, 'msg' => 'Erro ao atualizar no banco de dados']);
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['erro' => true, 'msg' => 'Erro interno: ' . $e->getMessage()]);
         }
-
-        header('Location: ' . BASE_URL . '/colaboradores');
         exit;
+    }
+
+    // Método auxiliar necessário para a view funcionar se você a chamar diretamente
+    public function novo(): void
+    {
+        $this->view('Colaborador/tabelaColaborador', ['colaboradores' => []]);
     }
 }

@@ -80,10 +80,18 @@ $router->addRoute('GET', '/inicio', Controller\DashboardController::class, 'inde
 $router->addRoute('GET', '/colaboradores/adicionar', Controller\ColaboradorController::class, 'novo');
 $router->addRoute('POST', '/colaboradores/criar', Controller\ColaboradorController::class, 'criar');
 $router->addRoute('GET', '/colaboradores', Controller\ColaboradorController::class, 'listar');
+$router->addRoute('GET', '/colaboradores/buscarDados', Controller\ColaboradorController::class, 'buscarDados');
+$router->addRoute('POST', '/colaboradores/atualizar', Controller\ColaboradorController::class, 'atualizar');
+$router->addRoute('POST', '/colaboradores/toggleStatus', Controller\ColaboradorController::class, 'toggleStatus');
 
 // --- Rota de Ponto ---
 $router->addRoute('GET', '/registrarponto', Controller\PontoController::class, 'index');
 $router->addRoute('POST', '/registrarponto/salvar', Controller\PontoController::class, 'registrar');
+$router->addRoute('POST', '/ponto/registrar-face-api', Controller\PontoController::class, 'registrarFace');
+
+// --- Rotas de Gestão Facial ---
+$router->addRoute('GET', '/gestao-facial', Controller\GestaoFacialController::class, 'index');
+$router->addRoute('POST', '/gestao-facial/resetar', Controller\GestaoFacialController::class, 'resetar');
 
 // --- Rotas de Gestão de Vagas (Admin) ---
 $router->addRoute('GET', '/vagas/listar', Controller\GestaoVagasController::class, 'listarVagas');
@@ -240,6 +248,12 @@ try {
                 'verify_account' => 'verifyAccount'
             ];
             $action = $actionMap[$action] ?? 'showLogin';
+            break;
+        case Controller\GestaoFacialController::class:
+            $controller = new $controllerName(
+                new Model\ColaboradorModel($pdo), // 1º Argumento: O Model
+                $pdo                              // 2º Argumento: A Conexão PDO
+            );
             break;
 
         default:

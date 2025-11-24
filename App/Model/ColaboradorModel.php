@@ -211,7 +211,8 @@ class ColaboradorModel extends Model
             return false;
         }
 
-        $novoStatus = ($statusAtual === 'ativo') ? 'inativo' : 'ativo';
+        // CORREÇÃO: strtolower garante que 'Ativo' e 'ativo' sejam tratados iguais
+        $novoStatus = (strtolower($statusAtual) === 'ativo') ? 'inativo' : 'ativo';
 
         $stmt = $this->db_connection->prepare("UPDATE colaborador SET situacao = :novoStatus WHERE id_colaborador = :id");
 
@@ -436,5 +437,50 @@ class ColaboradorModel extends Model
         // e o seu Teste esperam OBJETOS,
         // por isso usamos FETCH_OBJ.
         return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+    // Adicione dentro da class ColaboradorModel
+
+    public function listarStatusFaces(): array
+    {
+        $sql = "SELECT 
+                id_colaborador, 
+                nome_completo, 
+                matricula, 
+                situacao,
+                face_registered_at 
+            FROM colaborador 
+            WHERE situacao = 'ativo'
+            ORDER BY nome_completo ASC";
+
+        $stmt = $this->db_connection->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function resetarFace(int $id): bool
+    {
+        // Define como NULL para forçar o recadastro
+        $sql = "UPDATE colaborador SET face_registered_at = NULL WHERE id_colaborador = :id";
+        $stmt = $this->db_connection->prepare($sql);
+        return $stmt->execute([':id' => $id]);
+    }
+
+    public function confirmarCadastroFace(int $id): bool
+    {
+        // Marca como cadastrado agora
+        $sql = "UPDATE colaborador SET face_registered_at = NOW() WHERE id_colaborador = :id";
+        $stmt = $this->db_connection->prepare($sql);
+        return $stmt->execute([':id' => $id]);
+    }
+
+    public function precisaCadastrarFace(int $id): bool
+    {
+        $sql = "SELECT face_registered_at FROM colaborador WHERE id_colaborador = :id";
+        $stmt = $this->db_connection->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        $resultado = $stmt->fetchColumn();
+
+        // Se for NULL ou false, precisa cadastrar
+        return empty($resultado);
     }
 }

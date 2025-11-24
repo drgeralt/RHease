@@ -5,12 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RHease - Painel</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboard.css">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
+
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
+
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboard.css">
 </head>
 <body>
     <header>
@@ -22,8 +25,9 @@
         <div class="sidebar">
             <ul class="menu">
                 <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
-                <li><a href="<?= BASE_URL ?>/dados"><i class="bi bi-person-vcard-fill"></i> Dados cadastrais</a></li>
+                <li><a href="<?= BASE_URL ?>/colaboradores"><i class="bi bi-person-vcard-fill"></i> Colaboradores</a></li>
                 <li><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
+                <li><a href="<?= BASE_URL ?>/gestao-facial"><i class="bi bi-person-bounding-box"></i> Biometria Facial</a></li>
                 <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
                 <li><a href="<?= BASE_URL ?>/beneficios"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
                 <li><a href="<?= BASE_URL ?>/vagas/listar"><i class="bi bi-briefcase-fill"></i> Gestão de Vagas</a></li>
@@ -59,45 +63,65 @@
 
                 <div class="chart-card-colaborador">
                     <h2 class="chart-title">Tipos de contrato</h2>
-                    <div class="chart-content">
-                        <?php
+                    <div class="chart-content"> <?php
                         $distribuicao = $dashboard_data['distribuicao_contratos'] ?? [];
                         $total_colaboradores = $dashboard_data['total_colaboradores_ativos'] ?? 0;
+
+                        // Cores HEX fixas (Garante que Gráfico e Legenda sejam iguais)
+                        $mapaCores = [
+                                'CLT' => '#d32f2f',       // Vermelho
+                                'PJ' => '#489D3B',        // Verde
+                                'ESTÁGIO' => '#1976d2',   // Azul
+                                'ESTAGIO' => '#1976d2',
+                                'TEMPORÁRIO' => '#757575',// Cinza
+                                'TEMPORARIO' => '#757575'
+                        ];
+
                         $gradient_parts = [];
                         $start_percent = 0;
-                        $css_color_vars = ['CLT' => '--chart-clt', 'PJ' => '--chart-pj', 'Estágio' => '--chart-estagio', 'Temporário' => '--chart-temporario'];
 
-                        
+                        // --- Lógica do Gráfico ---
                         if ($total_colaboradores > 0) {
-                            foreach ($distribuicao as $tipo => $total) {
-                                $color_var = $css_color_vars[$tipo] ?? '--text-color-light';
-                                $percentage = ($total / $total_colaboradores) * 100;
-                                $end_percent = $start_percent + $percentage;
-                                $gradient_parts[] = "var({$color_var}) {$start_percent}% {$end_percent}%";
-                                $start_percent = $end_percent;
-                            }
-                        }
+                            foreach ($distribuicao as $tipo => $qtd) {
+                                if ($qtd > 0) {
+                                    $tipoNormalizado = mb_strtoupper(trim($tipo));
+                                    $cor = $mapaCores[$tipoNormalizado] ?? '#ccc';
 
-                        if (empty($gradient_parts)) {
-                            $conic_gradient_style = 'background: #e0e0e0;';
+                                    $percent = ($qtd / $total_colaboradores) * 100;
+                                    $end_percent = $start_percent + $percent;
+
+                                    $start_str = number_format($start_percent, 2, '.', '');
+                                    $end_str = number_format($end_percent, 2, '.', '');
+
+                                    $gradient_parts[] = "$cor $start_str% $end_str%";
+                                    $start_percent = $end_percent;
+                                }
+                            }
+                            $style_grafico = 'background: conic-gradient(' . implode(', ', $gradient_parts) . ');';
                         } else {
-                            $conic_gradient_style = 'background: conic-gradient(' . implode(', ', $gradient_parts) . ');';
+                            $style_grafico = 'background: #e0e0e0;';
                         }
                         ?>
-                        <div class="donut-chart-mock" style="<?= $conic_gradient_style ?>">
-                            <span class="donut-center-value"><?= htmlspecialchars($total_colaboradores) ?></span>
+
+                        <div class="donut-chart-mock" style="<?= $style_grafico ?>">
+                            <span class="donut-center-value"><?= $total_colaboradores ?></span>
                         </div>
 
                         <div class="chart-legend">
                             <ul>
-                                <?php
-                                $coresContrato = ['CLT' => 'clt', 'PJ' => 'pj', 'Estágio' => 'estagio', 'Temporário' => 'temporario'];
-                                ?>
-                                <?php foreach ($distribuicao as $tipo => $total): ?>
-                                <li class="<?= $coresContrato[$tipo] ?? '' ?>">
-                                    <span class="dot"></span>
-                                    <?= htmlspecialchars($tipo) ?> (<?= $total ?>)
-                                </li>
+                                <?php foreach ($distribuicao as $tipo => $qtd):
+                                    if($qtd == 0) continue;
+
+                                    $tipoNormalizado = mb_strtoupper(trim($tipo));
+                                    $corLegenda = $mapaCores[$tipoNormalizado] ?? '#ccc';
+                                    ?>
+                                    <li>
+                                        <span class="dot" style="background-color: <?= $corLegenda ?>;"></span>
+
+                                        <span class="legend-number"><?= $qtd ?></span>
+
+                                        <span class="legend-text"><?= htmlspecialchars($tipo) ?></span>
+                                    </li>
                                 <?php endforeach; ?>
                             </ul>
                         </div>
