@@ -1,0 +1,41 @@
+/* ============================================================
+   ESTILOS ESPECÍFICOS: GESTÃO FACIAL
+   ============================================================ */
+
+/* Badges de Status */
+.badge-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.badge-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+/* Botão de Resetar Face */
+.btn-reset {
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+    background: transparent;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-reset:hover {
+    background: var(--danger-color);
+    color: white;
+}

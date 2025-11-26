@@ -1,8 +1,34 @@
 <?php
-// ... (MANTENHA TODO O SEU PHP INICIAL AQUI: $nome_completo, cálculos, etc) ...
+// 1. Lógica de Dados do Dashboard (Mantida)
 $nome_completo = $nome_completo ?? 'Colaborador';
 $ultimo_ponto_hora = isset($ultimo_ponto['data_hora_entrada']) ? date('H:i', strtotime($ultimo_ponto['data_hora_entrada'])) : '--:--';
-// ... etc ...
+$salario_base_formatado = number_format($salario_base ?? 0, 2, ',', '.');
+$beneficios_count = $beneficios_count ?? 0;
+$horas_semana = round($horas_semana ?? 0);
+
+// Cálculos de Gráfico
+$salario_base = (float)$salario_base;
+$beneficios_valor = (float)($beneficios_valor ?? 0);
+$descontos_valor = $descontos_valor ?? 0;
+$salario_liquido = ($salario_base + $beneficios_valor) - $descontos_valor;
+$salario_liquido_formatado = number_format($salario_liquido, 2, ',', '.');
+
+$total = max($salario_base + $beneficios_valor + $descontos_valor, 1);
+$porc_base = round(($salario_base / $total) * 100);
+$porc_beneficios = round(($beneficios_valor / $total) * 100);
+
+// Estilo do gráfico de Salário
+$salario_chart_style = "
+    background: conic-gradient(
+        #25621C 0% {$porc_base}%,
+        #489D3B {$porc_base}% " . ($porc_base + $porc_beneficios) . "%,
+        #D32F2F " . ($porc_base + $porc_beneficios) . "% 100%
+    );
+";
+
+// 2. Lógica de Permissão (Para exibir o seletor de empresa se for gestor)
+$perfilUsuario = $_SESSION['user_perfil'] ?? 'colaborador';
+$isGestor = in_array($perfilUsuario, ['gestor_rh', 'diretor', 'admin']);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -11,42 +37,49 @@ $ultimo_ponto_hora = isset($ultimo_ponto['data_hora_entrada']) ? date('H:i', str
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RHease - Painel de <?= htmlspecialchars($nome_completo) ?></title>
 
+    <!-- Fontes -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
+    <!-- Estilos -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
-
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboard.css">
-
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/dashboardColaborador.css">
 </head>
 
 <body>
 
 <header>
-    <i class="bi bi-list menu-toggle"></i>
-    <div class="logo"><img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo RH Ease" class="logo" style="padding:0;"></div>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <i class="menu-toggle bi bi-list"></i>
+        <div class="logo"><img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo" style="height:40px;"></div>
+    </div>
+
+    <?php if ($isGestor): ?>
+        <!-- Seletor de Empresa (Apenas se for Gestor visualizando) -->
+        <div class="header-right">
+            <div class="empresa-selector" onclick="abrirModalEmpresas()">
+                <i class="bi bi-building"></i>
+                <span id="nomeEmpresaAtiva">Carregando...</span>
+                <i class="bi bi-chevron-down small"></i>
+            </div>
+        </div>
+    <?php endif; ?>
 </header>
 
-<div class="container">
-    <div class="sidebar">
-        <ul class="menu">
-            <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
-            <li><a href="<?= BASE_URL ?>/dados"><i class="bi bi-person-vcard-fill"></i> Dados cadastrais</a></li>
-            <li><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
-            <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
-            <li><a href="<?= BASE_URL ?>/beneficios"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
-            <li><a href="<?= BASE_URL ?>/vagas/listar"><i class="bi bi-briefcase-fill"></i> Gestão de Vagas</a></li>
-            <li><a href="<?= BASE_URL ?>/contato"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
-        </ul>
-    </div>
+<div class="app-container">
+
+    <!-- SIDEBAR CENTRALIZADA -->
+    <?php include BASE_PATH . '/App/View/Common/sidebar.php'; ?>
 
     <div class="content">
         <h2 class="page-title-content">Painel de <?= htmlspecialchars($nome_completo) ?></h2>
 
         <section class="dashboard-grid">
-
             <div class="metric-card-small">
                 <div class="icon-wrapper-large"><i class="fas fa-clock"></i></div>
                 <p class="metric-value-large metric-value-main"><?= $ultimo_ponto_hora ?></p>
@@ -90,7 +123,7 @@ $ultimo_ponto_hora = isset($ultimo_ponto['data_hora_entrada']) ? date('H:i', str
             <div class="chart-card-colaborador">
                 <h2 class="chart-title">Horas trabalhadas</h2>
                 <div class="chart-content">
-                    <?php if ($horas_chart_data_present): ?>
+                    <?php if (!empty($horas_chart_data_present)): ?>
                         <div class="hours-donut" style="<?= $horas_chart_style ?>">
                             <div class="hours-donut-center">
                                 <span class="hours-chart-value"><?= $horas_semana ?></span>
@@ -114,14 +147,55 @@ $ultimo_ponto_hora = isset($ultimo_ponto['data_hora_entrada']) ? date('H:i', str
                     </div>
                 </div>
             </div>
-
         </section>
     </div>
 </div>
 
+<?php if ($isGestor): ?>
+    <!-- MODAL EMPRESAS -->
+    <div id="modalEmpresas" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Perfil da Empresa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Selecionar Filial/Perfil Ativo:</label>
+                    <div id="listaEmpresas" class="list-group mb-4"></div>
+                    <hr>
+                    <h6>Editar/Criar Perfil</h6>
+                    <form id="formEmpresa">
+                        <input type="hidden" id="empresaId" name="id">
+                        <div class="row g-2">
+                            <div class="col-12"><input type="text" name="razao_social" class="form-control" placeholder="Razão Social" required></div>
+                            <div class="col-6"><input type="text" name="cnpj" class="form-control" placeholder="CNPJ" required></div>
+                            <div class="col-6"><input type="text" name="cidade_uf" class="form-control" placeholder="Cidade - UF"></div>
+                            <div class="col-12"><input type="text" name="endereco" class="form-control" placeholder="Endereço Completo"></div>
+                        </div>
+                        <div class="mt-2 text-end">
+                            <button type="button" onclick="limparFormEmpresa()" class="btn btn-sm btn-outline-secondary">Novo</button>
+                            <button type="submit" class="btn btn-sm btn-success">Salvar Dados</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <script>
     const BASE_URL = "<?php echo BASE_URL; ?>";
 </script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script src="<?php echo BASE_URL; ?>/js/sidebar-toggle.js"></script>
+
+<?php if ($isGestor): ?>
+    <script src="<?php echo BASE_URL; ?>/js/empresa.js"></script>
+<?php endif; ?>
+
 </body>
 </html>

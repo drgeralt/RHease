@@ -72,7 +72,6 @@ class FolhaPagamentoService
 
     public function processarFolha(int $ano, int $mes): array
     {
-        // ✅ Busca colaboradores ativos usando getAll()
         $colaboradores = $this->colaboradorModel->getAll();
 
         if (empty($colaboradores)) {
@@ -81,63 +80,70 @@ class FolhaPagamentoService
 
         $resultados = ['sucesso' => [], 'falha' => []];
 
-        // ✅ CORRIGIDO: Agora $this->db existe
         $this->db->beginTransaction();
 
         try {
             foreach ($colaboradores as $colaborador) {
                 $colaboradorId = (int) ($colaborador['id_colaborador'] ?? 0);
+                $nomeColaborador = $colaborador['nome_completo'] ?? 'Colaborador #' . $colaboradorId;
 
-                // Validação: verifica se o salário existe e é maior que zero
+                // --- VALIDAÇÃO DE SALÁRIO ---
                 if (!isset($colaborador['salario_base']) || $colaborador['salario_base'] <= 0) {
-                    error_log("⚠️ Colaborador {$colaborador['nome_completo']} (ID: {$colaboradorId}) sem salário definido!");
-                    $resultados['falha'][$colaboradorId] =
-                        "Colaborador {$colaborador['nome_completo']} (ID: {$colaboradorId}) - " .
-                        "Motivo: Salário base não definido (R$ 0,00)";
+                    error_log("Colaborador {$nomeColaborador} sem salário definido");
+
+                    // CORREÇÃO 1: Enviando array estruturado para a Falha
+                    $resultados['falha'][] = [
+                        'id_colaborador' => $colaboradorId,
+                        'nome' => $nomeColaborador,
+                        'erro' => "Salário base não definido ou inválido (R$ 0,00)."
+                    ];
                     continue;
                 }
 
-                // 🔍 LOG para debug
-                error_log("✅ Processando: {$colaborador['nome_completo']} | Salário: R$ " .
-                    number_format($colaborador['salario_base'], 2, ',', '.'));
 
-                // Busca horas de ausência do mês
-                $totalHorasAusencia = $this->pontoService->calcularTotalAusenciasEmHoras(
-                    $colaboradorId,
-                    $mes,
-                    $ano
-                );
+                try {
 
-                // ✅ Limpa holerites anteriores do mesmo período (permite reprocessamento)
-                $this->folhaPagamentoModel->limparHoleriteAnterior($colaboradorId, $ano, $mes);
+                    $totalHorasAusencia = $this->pontoService->calcularTotalAusenciasEmHoras(
+                        $colaboradorId, $mes, $ano
+                    );
 
-                // Calcula os valores do holerite
-                $dadosCalculados = $this->calcularValores($colaborador, $totalHorasAusencia);
 
-                // Salva o holerite principal
-                $holeriteId = $this->folhaPagamentoModel->salvarHolerite(
-                    $colaboradorId,
-                    $ano,
-                    $mes,
-                    $dadosCalculados
-                );
+                    $this->folhaPagamentoModel->limparHoleriteAnterior($colaboradorId, $ano, $mes);
 
-                // Salva os itens detalhados (proventos e descontos)
-                $this->folhaPagamentoModel->salvarItens(
-                    (int)$holeriteId,
-                    $dadosCalculados['itens_holerite']
-                );
 
-                $resultados['sucesso'][] = $colaborador['nome_completo'];
+                    $dadosCalculados = $this->calcularValores($colaborador, $totalHorasAusencia);
+
+
+                    $holeriteId = $this->folhaPagamentoModel->salvarHolerite(
+                        $colaboradorId, $ano, $mes, $dadosCalculados
+                    );
+
+                    $this->folhaPagamentoModel->salvarItens(
+                        (int)$holeriteId,
+                        $dadosCalculados['itens_holerite']
+                    );
+                    $resultados['sucesso'][] = [
+                        'id_colaborador' => $colaboradorId,
+                        'nome' => $nomeColaborador,
+                        'salario_liquido' => $dadosCalculados['salario_liquido']
+                    ];
+
+                } catch (Exception $eInt) {
+                    $resultados['falha'][] = [
+                        'id_colaborador' => $colaboradorId,
+                        'nome' => $nomeColaborador,
+                        'erro' => "Erro interno de cálculo: " . $eInt->getMessage()
+                    ];
+                }
             }
 
             $this->db->commit();
-            error_log("✅ Folha processada com sucesso! Total: " . count($resultados['sucesso']) . " colaboradores.");
+            error_log("Folha processada. Sucessos: " . count($resultados['sucesso']));
 
         } catch (Exception $e) {
             $this->db->rollBack();
-            error_log("❌ ERRO ao processar folha: " . $e->getMessage());
-            throw new Exception("Falha ao processar a folha: " . $e->getMessage());
+            error_log("ERRO CRÍTICO: " . $e->getMessage());
+            throw new Exception("Falha geral ao processar a folha: " . $e->getMessage());
         }
 
         return $resultados;

@@ -1,3 +1,8 @@
+<?php
+// 1. Lógica de Permissão
+$perfilUsuario = $_SESSION['user_perfil'] ?? 'colaborador';
+$isGestor = in_array($perfilUsuario, ['gestor_rh', 'diretor', 'admin']);
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -5,43 +10,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão de Colaboradores</title>
 
+    <!-- Bootstrap e Fontes -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Estilos -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
-
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/colaboradores.css">
 </head>
 <body>
 
 <header>
-    <i class="bi bi-list menu-toggle"></i>
-    <div class="logo"><img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo RH Ease" class="logo" style="padding:0;"></div>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <i class="menu-toggle bi bi-list"></i>
+        <div class="logo"><img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo" style="height:40px;"></div>
+    </div>
+
+    <?php if ($isGestor): ?>
+        <!-- SELETOR DE EMPRESA -->
+        <div class="header-right">
+            <div class="empresa-selector" onclick="abrirModalEmpresas()">
+                <i class="bi bi-building"></i>
+                <span id="nomeEmpresaAtiva">Carregando...</span>
+                <i class="bi bi-chevron-down small"></i>
+            </div>
+        </div>
+    <?php endif; ?>
 </header>
 
-<div class="container"> <div class="sidebar">
-        <ul class="menu">
-            <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
-            <li><a href="<?= BASE_URL ?>/colaboradores"><i class="bi bi-person-vcard-fill"></i> Colaboradores</a></li>
-            <li><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
-            <li><a href="<?= BASE_URL ?>/gestao-facial"><i class="bi bi-person-bounding-box"></i> Biometria Facial</a></li>
-            <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
-            <li><a href="<?= BASE_URL ?>/beneficios"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
-            <li><a href="<?= BASE_URL ?>/vagas/listar"><i class="bi bi-briefcase-fill"></i> Gestão de Vagas</a></li>
-            <li><a href="<?= BASE_URL ?>/contato"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
-        </ul>
-    </div>
+<div class="app-container">
+
+    <!-- SIDEBAR CENTRALIZADA -->
+    <?php include BASE_PATH . '/App/View/Common/sidebar.php'; ?>
 
     <div class="content">
         <div class="header-tabela">
-            <h2>Colaboradores</h2>
+            <h2 class="page-title-content" style="margin-bottom:0;">Colaboradores</h2>
             <button type="button" class="btn-adicionar" onclick="abrirModalCriar()">
                 <i class="bi bi-plus-lg"></i> Novo Colaborador
             </button>
         </div>
 
-        <div class="tabela-container p-3"> <div class="row mb-3">
+        <div class="tabela-container p-3">
+            <!-- Barra de Pesquisa -->
+            <div class="row mb-3">
                 <div class="col-md-6">
                     <div class="input-group">
                         <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
@@ -52,7 +65,8 @@
 
             <div class="table-responsive">
                 <table class="table table-hover align-middle" id="tabelaColaboradores">
-                    <thead> <tr>
+                    <thead>
+                    <tr>
                         <th>Matrícula</th>
                         <th>Nome</th>
                         <th>Cargo</th>
@@ -96,6 +110,7 @@
     </div>
 </div>
 
+<!-- ================= MODAL COLABORADOR ================= -->
 <div class="modal fade" id="modalColaborador" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
@@ -121,7 +136,7 @@
                     </ul>
 
                     <div class="tab-content" id="myTabContent">
-
+                        <!-- 1. PESSOAL -->
                         <div class="tab-pane fade show active" id="tab-pessoal" role="tabpanel">
                             <div class="row g-3">
                                 <div class="col-md-6 form-group">
@@ -161,6 +176,7 @@
                             </div>
                         </div>
 
+                        <!-- 2. ENDEREÇO -->
                         <div class="tab-pane fade" id="tab-endereco" role="tabpanel">
                             <div class="row g-3">
                                 <div class="col-md-3 form-group">
@@ -196,6 +212,7 @@
                             </div>
                         </div>
 
+                        <!-- 3. PROFISSIONAL -->
                         <div class="tab-pane fade" id="tab-profissional" role="tabpanel">
                             <div class="row g-3">
                                 <div class="col-md-3 form-group">
@@ -242,7 +259,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div> </form>
+                    </div>
+                </form>
             </div>
 
             <div class="modal-footer">
@@ -253,12 +271,13 @@
     </div>
 </div>
 
+<!-- ================= MODAL STATUS ================= -->
 <div class="modal fade" id="modalStatus" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Alterar Status</h3>
-                <span class="close-btn" data-bs-dismiss="modal">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <p>Você deseja realmente <strong id="acao_status"></strong> o colaborador <strong id="nome_colaborador_status"></strong>?</p>
@@ -274,10 +293,54 @@
     </div>
 </div>
 
+<?php if ($isGestor): ?>
+    <!-- ================= MODAL EMPRESAS ================= -->
+    <div id="modalEmpresas" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Perfil da Empresa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Selecionar Filial/Perfil Ativo:</label>
+                    <div id="listaEmpresas" class="list-group mb-4"></div>
+                    <hr>
+                    <h6>Editar/Criar Perfil</h6>
+                    <form id="formEmpresa">
+                        <input type="hidden" id="empresaId" name="id">
+                        <div class="row g-2">
+                            <div class="col-12"><input type="text" name="razao_social" class="form-control" placeholder="Razão Social" required></div>
+                            <div class="col-6"><input type="text" name="cnpj" class="form-control" placeholder="CNPJ" required></div>
+                            <div class="col-6"><input type="text" name="cidade_uf" class="form-control" placeholder="Cidade - UF"></div>
+                            <div class="col-12"><input type="text" name="endereco" class="form-control" placeholder="Endereço Completo"></div>
+                        </div>
+                        <div class="mt-2 text-end">
+                            <button type="button" onclick="limparFormEmpresa()" class="btn btn-sm btn-outline-secondary">Novo</button>
+                            <button type="submit" class="btn btn-sm btn-success">Salvar Dados</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <script>const BASE_URL = "<?php echo BASE_URL; ?>";</script>
+
+<!-- 1. jQuery (Obrigatório para o JS legado) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- 2. Bootstrap Bundle (Modal) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 3. Scripts Específicos -->
 <script src="<?php echo BASE_URL; ?>/js/sidebar-toggle.js"></script>
 <script src="<?php echo BASE_URL; ?>/js/colaboradores.js"></script>
+
+<?php if ($isGestor): ?>
+    <script src="<?php echo BASE_URL; ?>/js/empresa.js"></script>
+<?php endif; ?>
 
 </body>
 </html>

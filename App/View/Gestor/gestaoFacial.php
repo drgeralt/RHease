@@ -6,71 +6,66 @@
     <title>Gestão de Biometria</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/beneficiostyle.css">
-    <style>
-        /* Estilos específicos para tabela limpa */
-        .table-container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .badge-success { background-color: #d4edda; color: #155724; padding: 5px 10px; border-radius: 15px; font-size: 0.85em; font-weight: 600; }
-        .badge-warning { background-color: #fff3cd; color: #856404; padding: 5px 10px; border-radius: 15px; font-size: 0.85em; font-weight: 600; }
-        .btn-reset { border: 1px solid #dc3545; color: #dc3545; background: transparent; padding: 5px 10px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
-        .btn-reset:hover { background: #dc3545; color: white; }
-    </style>
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/gestaoFacial.css">
 </head>
 <body>
 
 <header>
-    <i class="bi bi-list menu-toggle"></i>
-    <img id="logo" src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="RHease" width="130">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <i class="menu-toggle bi bi-list "></i>
+        <div class="logo"><img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo" style="height:40px;"></div>
+    </div>
+
+    <!-- 1. SELETOR DE EMPRESA -->
+    <div class="header-right">
+        <div class="empresa-selector" onclick="abrirModalEmpresas()">
+            <i class="bi bi-building"></i>
+            <span id="nomeEmpresaAtiva">Carregando...</span>
+            <i class="bi bi-chevron-down small"></i>
+        </div>
+    </div>
 </header>
 
-<div class="container">
+<div class="app-container">
 
-    <div class="sidebar">
-        <ul class="menu">
-            <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
-            <li><a href="<?= BASE_URL ?>/colaboradores"><i class="bi bi-person-vcard-fill"></i> Colaboradores</a></li>
-            <li><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
-            <li><a href="<?= BASE_URL ?>/gestao-facial"><i class="bi bi-person-bounding-box"></i> Biometria Facial</a></li>
-            <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
-            <li><a href="<?= BASE_URL ?>/beneficios"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
-            <li><a href="<?= BASE_URL ?>/vagas/listar"><i class="bi bi-briefcase-fill"></i> Gestão de Vagas</a></li>
-            <li><a href="<?= BASE_URL ?>/contato"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
-        </ul>
-    </div>
+    <!-- 2. SIDEBAR MODULAR -->
+    <?php include BASE_PATH . '/App/View/Common/sidebar.php'; ?>
 
     <div class="content">
         <div class="header-tabela" style="margin-bottom: 20px;">
             <h2>Gestão de Biometria Facial</h2>
-            <p>Gerencie quais colaboradores possuem face cadastrada para o registro de ponto.</p>
+            <p style="color: var(--text-color-light);">Gerencie quais colaboradores possuem face cadastrada para o registro de ponto.</p>
         </div>
 
         <main class="main-content">
-            <div class="table-container">
-                <table style="width: 100%; border-collapse: collapse;">
+            <div class="tabela-container">
+                <table>
                     <thead>
-                    <tr style="text-align: left; border-bottom: 2px solid #eee;">
-                        <th style="padding: 15px;">Colaborador</th>
-                        <th style="padding: 15px;">Matrícula</th>
-                        <th style="padding: 15px;">Status</th>
-                        <th style="padding: 15px;">Ação</th>
+                    <tr>
+                        <th>Colaborador</th>
+                        <th>Matrícula</th>
+                        <th style="text-align: center;">Status</th>
+                        <th style="text-align: center;">Ação</th>
                     </tr>
                     </thead>
                     <tbody>
                     <?php if (!empty($colaboradores)): ?>
                         <?php foreach ($colaboradores as $c): ?>
-                            <tr style="border-bottom: 1px solid #f0f0f0;">
-                                <td style="padding: 15px; font-weight: 500;"><?= htmlspecialchars($c['nome_completo']) ?></td>
-                                <td style="padding: 15px; color: #666;"><?= htmlspecialchars($c['matricula']) ?></td>
-                                <td style="padding: 15px;">
+                            <tr>
+                                <td style="font-weight: 500;"><?= htmlspecialchars($c['nome_completo']) ?></td>
+                                <td style="color: #666;"><?= htmlspecialchars($c['matricula']) ?></td>
+                                <td style="text-align: center;">
                                     <?php if ($c['face_registered_at']): ?>
                                         <span class="badge-success">Cadastrada</span>
                                     <?php else: ?>
                                         <span class="badge-warning">Pendente</span>
                                     <?php endif; ?>
                                 </td>
-                                <td style="padding: 15px;">
+                                <td style="text-align: center;">
                                     <?php if ($c['face_registered_at']): ?>
                                         <button class="btn-reset" onclick="resetarFace(<?= $c['id_colaborador'] ?>)">
                                             <i class="bi bi-arrow-counterclockwise"></i> Forçar Recadastro
@@ -83,7 +78,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="4" style="padding: 20px; text-align: center;">Nenhum colaborador encontrado.</td>
+                            <td colspan="4" style="padding: 20px; text-align: center; font-style: italic;">Nenhum colaborador encontrado.</td>
                         </tr>
                     <?php endif; ?>
                     </tbody>
@@ -93,12 +88,61 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="<?= BASE_URL ?>/js/sidebar-toggle.js"></script>
+<!-- 3. MODAL DE EMPRESAS -->
+<div id="modalEmpresas" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Perfil da Empresa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">Selecionar Filial/Perfil Ativo:</label>
+                <div id="listaEmpresas" class="list-group mb-4">
+                    <!-- Preenchido via JS -->
+                </div>
+
+                <hr>
+                <h6>Editar/Criar Perfil</h6>
+                <form id="formEmpresa">
+                    <input type="hidden" id="empresaId" name="id">
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <input type="text" name="razao_social" class="form-control" placeholder="Razão Social" required>
+                        </div>
+                        <div class="col-6">
+                            <input type="text" name="cnpj" class="form-control" placeholder="CNPJ" required>
+                        </div>
+                        <div class="col-6">
+                            <input type="text" name="cidade_uf" class="form-control" placeholder="Cidade - UF">
+                        </div>
+                        <div class="col-12">
+                            <input type="text" name="endereco" class="form-control" placeholder="Endereço Completo">
+                        </div>
+                    </div>
+                    <div class="mt-2 text-end">
+                        <button type="button" onclick="limparFormEmpresa()" class="btn btn-sm btn-outline-secondary">Novo</button>
+                        <button type="submit" class="btn btn-sm btn-success">Salvar Dados</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     const BASE_URL = "<?= BASE_URL ?>";
+</script>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="<?= BASE_URL ?>/js/sidebar-toggle.js"></script>
+
+<!-- 4. SCRIPT DE EMPRESA -->
+<script src="<?= BASE_URL ?>/js/empresa.js"></script>
+
+<script>
     async function resetarFace(id) {
         if(!confirm("Tem certeza? O colaborador será obrigado a tirar uma nova foto na próxima vez que tentar bater ponto.")) return;
 

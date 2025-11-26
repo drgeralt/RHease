@@ -17,7 +17,6 @@ class ColaboradorController extends Controller
     protected EnderecoModel $enderecoModel;
     protected CargoModel $cargoModel;
     protected SetorModel $setorModel;
-    protected PDO $pdo;
 
     public function __construct(
         ColaboradorModel $colaboradorModel,
@@ -36,8 +35,8 @@ class ColaboradorController extends Controller
 
     public function listar()
     {
+        $this->exigirPermissaoGestor();
         $todosOsColaboradores = $this->colaboradorModel->listarColaboradores();
-        // Passa a BASE_URL para a view, caso não esteja definida globalmente
         return $this->view('Colaborador/tabelaColaborador', [
             'colaboradores' => $todosOsColaboradores
         ]);
@@ -46,6 +45,7 @@ class ColaboradorController extends Controller
     // Método usado pelo AJAX para preencher o Modal de Edição
     public function buscarDados(): void
     {
+        $this->exigirPermissaoGestor();
         header('Content-Type: application/json');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -67,7 +67,8 @@ class ColaboradorController extends Controller
 
     public function criar(): void
     {
-        // Se for criar via AJAX (opcional, mantendo compatibilidade com form submit padrão)
+        $this->exigirPermissaoGestor();
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASE_URL . '/colaboradores');
             exit;
@@ -123,6 +124,7 @@ class ColaboradorController extends Controller
     // CORREÇÃO CRÍTICA: Retorna JSON e trata formatação de dados
     public function atualizar(): void
     {
+        $this->exigirPermissaoGestor();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['erro' => true, 'msg' => 'Método inválido']);
             exit;
@@ -184,6 +186,7 @@ class ColaboradorController extends Controller
     // CORREÇÃO CRÍTICA: Retorna JSON para o AJAX não recarregar a página
     public function toggleStatus(): void
     {
+        $this->exigirPermissaoGestor();
         header('Content-Type: application/json');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -215,6 +218,30 @@ class ColaboradorController extends Controller
     // Método auxiliar necessário para a view funcionar se você a chamar diretamente
     public function novo(): void
     {
+        $this->exigirPermissaoGestor();
         $this->view('Colaborador/tabelaColaborador', ['colaboradores' => []]);
+    }
+    public function buscarAjax(): void
+    {
+        header('Content-Type: application/json');
+        $termo = $_POST['termo'] ?? '';
+
+        if (strlen($termo) < 3) {
+            echo json_encode(['success' => false, 'data' => []]); exit;
+        }
+
+        // Usando SQL direto aqui ou criando um método no Model (recomendado)
+        // Vou colocar a lógica aqui para facilitar, mas o ideal é mover para o Model
+        $sql = "SELECT id_colaborador, nome_completo, matricula 
+                FROM colaborador 
+                WHERE (nome_completo LIKE :t OR matricula LIKE :t) 
+                AND situacao = 'ativo' LIMIT 5";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':t' => "%$termo%"]);
+        $resultados = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        echo json_encode(['success' => true, 'data' => $resultados]);
+        exit;
     }
 }

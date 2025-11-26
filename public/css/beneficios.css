@@ -3,12 +3,10 @@
 .header-tabela h2 { color: var(--green-dark); margin: 0; }
 .header-tabela { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 
-/* Espaçamento de Seções */
 .secao-colaborador { margin-top: 50px; margin-bottom: 40px; }
 .secao-regras { margin-top: 40px; margin-bottom: 60px; }
 
-/* === LARGURA DAS COLUNAS (Catálogo de Benefícios) === */
-/* Colunas: Benefício (25%), Categoria (13%), Valor (11%), Status (12%), Ações (29%) */
+/* === LARGURA DAS COLUNAS (Catálogo) === */
 .tabela-container table:not(.regras-tabela) th:nth-child(1),
 .tabela-container table:not(.regras-tabela) td:nth-child(1) { width: 25%; }
 
@@ -24,11 +22,7 @@
 .tabela-container table:not(.regras-tabela) th:nth-child(5) { padding-left: 15px; }
 .tabela-container table:not(.regras-tabela) td:nth-child(5) { width: 29%; text-align: center; padding: 10px 5px; }
 
-/* Tabela de Regras (Específico) */
-.regras-tabela tbody td { vertical-align: top; line-height: 1.4; }
-.regras-tabela td:nth-child(3) { text-align: center; }
-
-/* === LISTAS DE CHECKBOXES (MODAL) === */
+/* === LISTAS DE CHECKBOXES === */
 #listaBeneficiosRegra, #listaBeneficiosColaborador {
     border: 1px solid #ccc; padding: 15px; height: 250px;
     overflow-y: auto; background-color: #fcfcfc; border-radius: 8px;
@@ -41,10 +35,8 @@
     background-color: #eaf3e8;
 }
 
-/* Pesquisa de Colaborador */
+/* Pesquisa */
 #resultadoPesquisa {
     display: none; position: absolute; z-index: 10; width: 300px;
     background-color: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto;
 }
-.list-group-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
-.list-group-item:hover { background-color: #f5f5f5; }

@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reenviar Verificação - RH ease</title>
+
+    <!-- Fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/auth.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -33,11 +37,11 @@
         </div>
 
         <button type="submit" class="btn full-width">ENVIAR NOVO LINK</button>
-
-        <footer class="login-footer">
-            <a href="<?= BASE_URL ?>/login">Voltar para o Login</a>
-        </footer>
     </form>
+
+    <footer class="login-footer">
+        <p><a href="<?= BASE_URL ?>/login">Voltar para o Login</a></p>
+    </footer>
 </div>
 
 </body>

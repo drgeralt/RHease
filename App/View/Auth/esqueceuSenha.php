@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar Senha - RH ease</title>
+
+    <!-- Fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/auth.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -18,10 +22,14 @@
     </header>
 
     <?php if (isset($data['error'])): ?>
-        <div class="alert alert-danger" style="margin-bottom: 1rem;"><?= htmlspecialchars($data['error']) ?></div>
+        <div class="alert alert-danger" style="margin-bottom: 20px;">
+            <?= htmlspecialchars($data['error']); ?>
+        </div>
     <?php endif; ?>
     <?php if (isset($data['success'])): ?>
-        <div class="alert alert-success" style="margin-bottom: 1rem;"><?= htmlspecialchars($data['success']) ?></div>
+        <div class="alert alert-success" style="margin-bottom: 20px;">
+            <?= htmlspecialchars($data['success']) ?>
+        </div>
     <?php endif; ?>
 
     <form class="login-form" method="POST" action="<?= BASE_URL ?>/solicitar-recuperacao">

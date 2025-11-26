@@ -18,8 +18,7 @@ class GestaoFacialController extends Controller
 
     public function index()
     {
-        // Verifica permissão de gestor aqui se necessário
-
+        $this->exigirPermissaoGestor();
         $colaboradores = $this->colaboradorModel->listarStatusFaces();
 
         require_once BASE_PATH . '/App/View/Gestor/gestaoFacial.php';
@@ -27,6 +26,7 @@ class GestaoFacialController extends Controller
 
     public function resetar()
     {
+        $this->exigirPermissaoGestor();
         header('Content-Type: application/json');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
