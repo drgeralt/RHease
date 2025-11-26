@@ -4,6 +4,8 @@
 
 Sistema completo de automação para Recursos Humanos
 
+---
+
 ## 📚 Informações Acadêmicas
 
 **Universidade:** Universidade Federal do Tocantins - Campus Palmas  
@@ -12,11 +14,26 @@ Sistema completo de automação para Recursos Humanos
 **Semestre:** 2025/2  
 **Professor:** Edeilson Milhomem
 
+---
+
+## 🔗 Links Importantes (Entrega Final)
+
+| Artefato | Link de Acesso |
+|----------|----------------|
+| Landing Page (Produto) | 👉 Acessar Landing Page |
+| Sistema Implantado (Live) | 👉 Acessar Sistema Online |
+| Vídeo de Demonstração | 🎬 Assistir Vídeo |
+| Apresentação Final | 📄 Ver Apresentação |
+
+---
+
 ## 📋 Descrição do Projeto
 
-O RHEase é uma solução de software completa, projetada para automatizar e otimizar os processos-chave do departamento de Recursos Humanos de uma empresa. Com o objetivo de aumentar a eficiência, reduzir a carga de trabalho manual e melhorar a experiência dos colaboradores, este sistema centraliza e simplifica as tarefas diárias, permitindo que a equipe de RH se concentre em atividades mais estratégicas.
+O RHEase é uma solução de software completa, projetada para automatizar e otimizar os processos-chave do departamento de Recursos Humanos de uma empresa. Com foco em eficiência operacional, redução de tarefas manuais e melhoria da experiência dos colaboradores, o sistema centraliza as rotinas de RH em uma única plataforma moderna e integrada.
 
-O sistema abrange todo o ciclo de vida do colaborador, desde a entrada até a saída da empresa, oferecendo uma plataforma integrada que facilita a gestão de pessoas e processos organizacionais.
+A aplicação cobre todo o ciclo de vida do colaborador — desde o recrutamento até o desligamento — permitindo que o setor de RH atue de forma mais estratégica e orientada por dados.
+
+---
 
 ## 🎯 Objetivos
 
@@ -26,63 +43,102 @@ O sistema abrange todo o ciclo de vida do colaborador, desde a entrada até a sa
 - **Aumentar a eficiência operacional:** Otimizar tempo e recursos da equipe de RH
 - **Facilitar tomadas de decisão:** Fornecer relatórios e métricas para gestão estratégica
 
+---
+
 ## ✅ Funcionalidades Implementadas
 
-### 🔍 Recrutamento e Seleção
-- [ ] **RF01** - Gerenciamento de vagas de emprego
-- [ ] **RF02** - Sistema de banco de currículos
+### 🔐 Gestão de Acesso e Segurança
+- ✅ Autenticação segura com hash de senha (password_hash)
+- ✅ Cadastro público de usuários com validação de dados
+- ✅ Ativação de conta por e-mail com token único (PHPMailer / SMTP)
+- ✅ Recuperação de senha com link temporário
+- ✅ Controle de acesso por perfil (RBAC): Gestor/Admin x Colaborador
+- ✅ Multi-tenancy: seletor de empresa/filial impactando relatórios e holerites
 
-### 💬 Comunicação Interna
-- [ ] **RF21** - Canal de comunicação integrado
-- [ ] **RF22** - Sistema de anúncios e comunicados
+### 📊 Dashboards
+**Dashboard do Gestor:**
+- KPIs em tempo real: colaboradores ativos, vagas abertas, benefícios ativos
+- Gráfico Donut de distribuição por tipo de contrato (CLT, PJ, Estágio)
 
-### 💰 Folha de Pagamento
-- [ ] **RF26** - Automação do cálculo de salários
+**Dashboard do Colaborador:**
+- Último registro de ponto
+- Salário base e benefícios ativos
+- Gráficos de horas semanais e composição salarial
+
+### 👥 Gestão de Colaboradores
+- ✅ CRUD completo
+- ✅ Edição em modais via AJAX
+- ✅ Busca em tempo real por nome/matrícula
+- ✅ Desligamento lógico (Soft Delete) com preservação de histórico
+
+### ⏱️ Controle de Frequência (Ponto)
+- ✅ Registro de ponto com relógio em tempo real
+- ✅ Geolocalização obrigatória
+- ✅ Biometria facial com DeepFace (API Python)
+- ✅ Bloqueio automático em caso de falha na validação
+- ✅ Painel de gestão biométrica com reset de cadastro facial
 
 ### 🏥 Gestão de Benefícios
-- [ ] **RF31** - Gerenciamento de planos de saúde
-- [ ] **RF32** - Controle de vale-refeição e vale-transporte
-- [ ] **RF33** - Gestão de seguro de vida
+- ✅ CRUD de benefícios com tipos (Fixo, Variável, Descritivo)
+- ✅ Regras automáticas por tipo de contrato
+- ✅ Gestão de exceções manuais por colaborador
 
-### 👋 Demissões (Offboarding)
-- [ ] **RF36** - Fluxo de trabalho estruturado para saídas
-- [ ] **RF37** - Coleta automatizada de feedback de saída
+### 💰 Folha de Pagamento
+- ✅ Motor de cálculo automático (salário base + benefícios - descontos)
+- ✅ Geração de holerites em PDF (FPDF)
+- ✅ Histórico acessível ao colaborador
 
+### 🧠 Recrutamento e Seleção (ATS com IA)
+- ✅ Gestão completa de vagas
+- ✅ Portal público do candidato
+- ✅ Upload de currículo em PDF
+- ✅ Leitura automática de currículo (pdfparser)
+- ✅ Análise por IA com Google Gemini
+- ✅ Score de aderência (0-100%) com justificativa
+- ✅ Ranking inteligente de candidatos
 
 *Legenda: ✅ Implementado | ❌ Não implementado | 🔄 Em desenvolvimento*
 
 ## 👥 Integrantes da Equipe
 
-| Nome                          | Matrícula   | GitHub User                                           |
-|-------------------------------|-------------|-------------------------------------------------------|
-| Vitória Milhomem Soares       | 2024111648  | [@vitoriamilhomem](https://github.com/vitoriamilhomem)|
-| Matheus de Sousa Silva   | 2024110828  | [@math3us-sousa](https://github.com/math3us-sousa)         |
-| Vitória Ferreira Leal Santos | 2024111649  | [@vitorialeal06](https://github.com/vitorialeal06)     |
-| Rhyan Nascimento de Sousa     | 2024110375  | [@drgeralt](https://github.com/drgeralt)              |
-| Gabriel Rodrigues Costa Ferreira | 2024111694 | [@Gabbilless](https://github.com/Gabbilless)        |
+| Nome | Matrícula | GitHub |
+|------|-----------|--------|
+| Vitória Milhomem Soares | 2024111648 | [@vitoriamilhomem](https://github.com/vitoriamilhomem) |
+| Matheus de Sousa Silva | 2024110828 | [@math3us-sousa](https://github.com/math3us-sousa) |
+| Vitória Ferreira Leal Santos | 2024111649 | [@vitorialeal06](https://github.com/vitorialeal06) |
+| Rhyan Nascimento de Sousa | 2024110375 | [@drgeralt](https://github.com/drgeralt) |
+| Gabriel Rodrigues Costa Ferreira | 2024111694 | [@Gabbilless](https://github.com/Gabbilless) |
+
+---
 
 ## 🎥 Apresentação do Projeto
 
-📹 **[Link do Vídeo de Apresentação](https://youtu.be/N42ZZCQRpSQ)**
+📹 **Link do vídeo demonstrativo:**
 
-*Vídeo demonstrando o funcionamento completo do sistema RHEase e explicando as principais funcionalidades implementadas para automação de RH.*
+*Vídeo apresentando o funcionamento completo do sistema RHEase, suas funcionalidades principais e integração com recursos de inteligência artificial.*
+
+---
 
 ## 🛠️ Tecnologias Utilizadas
 
-*[Preencher com as tecnologias específicas do projeto após análise do código]*
+**Backend:**
+- PHP 8.2+ (MVC Puro)
+- Composer
 
 **Frontend:**
-- HTML, CSS JavaScript
-
-**Backend:**
-- PHP
+- HTML5
+- CSS3 (Bootstrap 5)
+- JavaScript (Vanilla + jQuery)
 
 **Banco de Dados:**
-- MySQL
+- MySQL / MariaDB
 
-**Outras Ferramentas:**
-- GitFlow
-- Padrão MVC
+**Inteligência Artificial & Integrações:**
+- Python (Flask) – API de Reconhecimento Facial (DeepFace)
+- Google Gemini API – Análise de currículos
+- PHPMailer & FPDF – Envio de e-mails e geração de documentos
+
+---
 
 ## ⚙️ Configuração e Execução
 
@@ -90,71 +146,93 @@ O sistema abrange todo o ciclo de vida do colaborador, desde a entrada até a sa
 
 Antes de executar o RHEase, certifique-se de ter instalado:
 
-- XAMPP
+- PHP 8.0+
+- MySQL
+- Python 3.x
+- Composer
+- XAMPP (Recomendado)
+
+---
 
 ### Instalação
 
 1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/drgeralt/RHEase.git
-   cd RHEase
-   Obs: O clone deve ser feito sob o diretório htdocs, sob o diretório de instalação do XAMPP
-   ```
+```bash
+git clone https://github.com/drgeralt/RHEase.git
+cd RHEase
+# Obs: O clone deve ser feito sob o diretório htdocs do XAMPP
+```
 
+2. **Instale dependências e configure o banco:**
+```bash
+composer install
+# Importe o arquivo database.sql no seu MySQL
+# Configure o arquivo .env com suas credenciais
+```
 
-2. **Configure o banco de dados:**
-   ```bash
-   Após rodar o XAMPP e iniciar o Apache e o MySQL, acesse o endereço 127.0.0.1, vá em phpadmin e use o backup do banco de dados chamado database.db
-   ```
+3. **Inicie a API Facial (Python):**
+```bash
+cd app/api/facialapi
+pip install -r requirements.txt
+python app.py
+```
 
+---
 
 ### Execução
 
-1. **Inicie o sistema:**
-   ```Inicie o Apache e MySQL a partir do XAMPP Control panel
-   ```
+1. Inicie o Apache e MySQL pelo XAMPP.
+2. Acesse a aplicação no navegador:
+```
+http://localhost/RHEase/public
+```
 
-2. **Acesse a aplicação:**
-    - Sistema Principal: `http://localhost/RHEase/public`
-
+---
 
 ## 📁 Estrutura do Projeto
 
 ```
 RHEase/
-├── app/                # Código do servidor
-│   ├── Controller/        # Controladores do RHease
-│   ├── models/            # Modelos de dados
-│   ├── Core/              # Códigos comuns
-│   └── views/             # Interfaces de usuário
-├── public/              
-│   ├── src/
-│   │   ├── css/           # Estilização
-│   │   ├── js/            # Scripts .js
-├── config.php             # Configurações do banco de dados
-├── README.md
-└── database.sql
+├── app/                # Core da aplicação (MVC)
+│   ├── Controller/     # Regras de negócio
+│   ├── Model/          # Acesso a dados
+│   ├── Core/           # Router e Configs
+│   └── View/           # Interfaces de usuário
+├── public/             # Assets públicos (CSS, JS, Uploads)
+├── app/api/facialapi/  # API Python de IA
+├── landing-page/       # Site de apresentação
+├── docs/               # Documentação e vídeos
+├── config.php          # Configurações
+├── .env                # Variáveis de ambiente
+└── database.sql        # Schema do banco
 ```
+
+---
 
 ## 🤝 Contribuição
 
 1. Faça um fork do projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade de RH'`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
 4. Push para a branch (`git push origin feature/nova-funcionalidade`)
 5. Abra um Pull Request
 
+---
+
 ## 📄 Licença
 
-Este projeto foi desenvolvido para fins acadêmicos como parte da disciplina de Engenharia de Software da UFT.
-
-## 📞 Contato
-
-Para dúvidas ou sugestões sobre o RHEase, entre em contato com a equipe:
-
-- 📧 Email: [rhyan.sousa@mail.uft.edu.br]
-- 🐙 GitHub: [RHEase Repository](https://github.com/drgeralt/RHEase)
+Este projeto foi desenvolvido exclusivamente para fins acadêmicos como parte da disciplina de Engenharia de Software da Universidade Federal do Tocantins.
 
 ---
 
-*Desenvolvido️ por estudantes de Ciência da Computação na UFT - Campus Palmas*
+## 📞 Contato
+
+Para dúvidas ou sugestões sobre o RHEase:
+
+- 📧 Email: rhyan.sousa@mail.uft.edu.br  
+- 🐙 GitHub: https://github.com/drgeralt/RHEase
+
+---
+
+*Desenvolvido por estudantes de Ciência da Computação da UFT - Campus Palmas*
+
