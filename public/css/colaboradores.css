@@ -1,0 +1,20 @@
+/* public/css/colaboradores.css */
+
+/* larguras específicas para as colunas desta tabela */
+#tabelaColaboradores th:nth-child(1),
+#tabelaColaboradores td:nth-child(1) { width: 10%; } /* Matrícula */
+
+#tabelaColaboradores th:nth-child(2),
+#tabelaColaboradores td:nth-child(2) { width: 25%; } /* Nome */
+
+/* Ajuste fino para os badges de status dentro da tabela */
+.badge {
+    font-weight: 500;
+    padding: 6px 10px;
+}
+
+/* Caso precise sobrescrever algo do Bootstrap só nesta página */
+.modal-header.bg-light {
+    background-color: #f8f9fa !important;
+    border-bottom: 1px solid #dee2e6;
+}

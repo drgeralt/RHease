@@ -239,4 +239,49 @@ class BeneficioModel extends Model
 
         return ['nome' => $nome_colaborador, 'beneficios' => $beneficios];
     }
+    // 1. Busca quais benefícios um colaborador já tem (para preencher os checkboxes)
+    public function getIdsBeneficiosPorColaborador(int $idColaborador): array
+    {
+        // Retorna apenas a coluna id_beneficio
+        $sql = "SELECT id_beneficio FROM colaborador_beneficio WHERE id_colaborador = :id";
+        $stmt = $this->db_connection->prepare($sql);
+        $stmt->execute([':id' => $idColaborador]);
+
+        // Retorna um array simples: [1, 5, 12]
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    // 2. Salva as exceções (A estratégia é: apaga tudo desse cara e insere o que foi marcado)
+    public function salvarVinculosColaborador(int $idColaborador, array $idsBeneficios): bool
+    {
+        try {
+            $this->db_connection->beginTransaction();
+
+            // A. Limpa a ficha do colaborador (Remove tudo anterior)
+            $sqlDelete = "DELETE FROM colaborador_beneficio WHERE id_colaborador = :id";
+            $stmtDelete = $this->db_connection->prepare($sqlDelete);
+            $stmtDelete->execute([':id' => $idColaborador]);
+
+            // B. Insere os novos selecionados (se houver)
+            if (!empty($idsBeneficios)) {
+                $sqlInsert = "INSERT INTO colaborador_beneficio (id_colaborador, id_beneficio, valor_especifico) 
+                              VALUES (:id_col, :id_ben, NULL)";
+                $stmtInsert = $this->db_connection->prepare($sqlInsert);
+
+                foreach ($idsBeneficios as $idBeneficio) {
+                    $stmtInsert->execute([
+                        ':id_col' => $idColaborador,
+                        ':id_ben' => $idBeneficio
+                    ]);
+                }
+            }
+
+            $this->db_connection->commit();
+            return true;
+
+        } catch (\Exception $e) {
+            $this->db_connection->rollBack();
+            return false;
+        }
+    }
 }

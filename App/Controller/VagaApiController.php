@@ -1,188 +1,149 @@
 <?php
-declare(strict_types=1);
 
 namespace App\Controller;
 
 use App\Core\Controller;
 use App\Model\GestaoVagasModel;
-use App\Model\CandidaturaModel;
-use App\Model\SetorModel;
-use App\Model\NovaVagaModel; // Assumindo que este Model existe
 use PDO;
-use PDOException;
 
 class VagaApiController extends Controller
 {
-    // Armazena as dependências injetadas
-    private GestaoVagasModel $gestaoVagasModel;
-    private CandidaturaModel $candidaturaModel;
-    private SetorModel $setorModel;
-    private NovaVagaModel $novaVagaModel;
+    protected GestaoVagasModel $vagaModel;
 
-    // O Construtor agora recebe todos os Models necessários
-    public function __construct(
-        GestaoVagasModel $gestaoVagasModel,
-        CandidaturaModel $candidaturaModel,
-        SetorModel $setorModel,
-        NovaVagaModel $novaVagaModel,
-        PDO $pdo
-    ) {
-        parent::__construct($pdo); // Passa o PDO para o Core\Controller
-        $this->gestaoVagasModel = $gestaoVagasModel;
-        $this->candidaturaModel = $candidaturaModel;
-        $this->setorModel = $setorModel;
-        $this->novaVagaModel = $novaVagaModel;
+    public function __construct(GestaoVagasModel $vagaModel, PDO $pdo)
+    {
+        parent::__construct($pdo);
+        $this->vagaModel = $vagaModel;
     }
 
-    // [API] GET /api/vagas/listar
-    public function listarVagas(): void
+    // 1. LISTAR TODAS (GET /api/vagas/listar)
+    public function listarVagas()
     {
+        header('Content-Type: application/json');
         try {
-            // Usa o Model injetado
-            $vagas = $this->gestaoVagasModel->listarVagas();
-            $this->jsonResponse(true, 'Vagas carregadas com sucesso', $vagas);
-
+            $vagas = $this->vagaModel->listarTodas();
+            echo json_encode(['success' => true, 'data' => $vagas]);
         } catch (\Exception $e) {
-            $this->jsonResponse(false, 'Erro ao consultar o banco.', null, 500);
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
+        exit;
     }
 
-    // [API] POST /api/vagas/salvar
-    public function salvar(): void
+    // 2. SALVAR NOVA (POST /api/vagas/salvar)
+    public function salvar()
     {
-        $dados = json_decode(file_get_contents('php://input'), true);
+        $this->exigirPermissaoGestor();
+        $this->verificarMetodoPost();
 
-        $titulo = trim($dados['titulo'] ?? '');
-        $departamento = trim($dados['departamento'] ?? '');
-
-        if (empty($titulo) || empty($departamento)) {
-            $this->jsonResponse(false, 'Título e Departamento são obrigatórios.', null, 422);
-            return;
-        }
+        $dados = [
+            'titulo' => $_POST['titulo'] ?? '',
+            'departamento' => $_POST['departamento'] ?? '',
+            'descricao' => $_POST['descricao'] ?? '',
+            'status' => $_POST['status'] ?? 'rascunho',
+            'skills_necessarias' => $_POST['skills_necessarias'] ?? '',
+            'skills_recomendadas' => $_POST['skills_recomendadas'] ?? '',
+            'skills_desejadas' => $_POST['skills_desejadas'] ?? ''
+        ];
 
         try {
-            // Usa os Models injetados
-            $idSetor = $this->setorModel->findOrCreateByName($departamento);
-
-            $dadosVaga = [
-                'titulo_vaga' => $titulo,
-                'id_setor' => $idSetor,
-                'situacao' => $dados['status'] ?? 'rascunho',
-                'descricao_vaga' => $dados['descricao'] ?? null,
-                'requisitos_necessarios' => $dados['skills_necessarias'] ?? null,
-                'requisitos_recomendados' => $dados['skills_recomendadas'] ?? null,
-                'requisitos_desejados' => $dados['skills_desejadas'] ?? null,
-                'id_cargo' => null, // Você não está enviando id_cargo, então definimos como null
-            ];
-
-            $novoId = $this->novaVagaModel->criarVaga($dadosVaga);
-            $this->jsonResponse(true, 'Vaga criada com sucesso', ['id_vaga' => $novoId], 201);
-
+            $this->vagaModel->criar($dados);
+            echo json_encode(['success' => true, 'message' => 'Vaga criada com sucesso!']);
         } catch (\Exception $e) {
-            $this->jsonResponse(false, 'Erro ao salvar a vaga no banco.', null, 500);
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
+        exit;
     }
 
-    // [API] GET /api/vagas/editar?id=...
-    public function editar(): void
+    // 3. PEGAR DADOS PARA EDIÇÃO (GET /api/vagas/editar?id=1)
+    public function editar()
     {
-        $idVaga = (int)($_GET['id'] ?? 0);
-        if ($idVaga === 0) {
-            $this->jsonResponse(false, 'ID da vaga não fornecido.', null, 400);
-            return;
-        }
+        $this->exigirPermissaoGestor();
+        header('Content-Type: application/json');
+        $id = (int)($_GET['id'] ?? 0);
 
         try {
-            // Usa o Model injetado
-            $vaga = $this->gestaoVagasModel->buscarPorId($idVaga);
-            if (!$vaga) {
-                $this->jsonResponse(false, 'Vaga não encontrada.', null, 404);
-                return;
+            $vaga = $this->vagaModel->buscarPorId($id);
+            if ($vaga) {
+                echo json_encode(['success' => true, 'data' => $vaga]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Vaga não encontrada.']);
             }
-            $this->jsonResponse(true, 'Vaga encontrada', $vaga);
         } catch (\Exception $e) {
-            $this->jsonResponse(false, 'Erro ao consultar o banco de dados.', null, 500);
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
+        exit;
     }
 
-    // [API] POST /api/vagas/atualizar
-    public function atualizar(): void
+    // 4. ATUALIZAR (POST /api/vagas/atualizar)
+    public function atualizar()
     {
-        $dados = json_decode(file_get_contents('php://input'), true);
+        $this->exigirPermissaoGestor();
+        $this->verificarMetodoPost();
+        $id = (int)($_POST['id_vaga'] ?? 0);
 
-        $idVaga = (int)($dados['id_vaga'] ?? 0);
-        $titulo = trim($dados['titulo'] ?? '');
-        $departamento = trim($dados['departamento'] ?? '');
-
-        if ($idVaga === 0 || $titulo === '' || $departamento === '') {
-            $this->jsonResponse(false, 'Dados inválidos', null, 422);
-            return;
-        }
+        $dados = [
+            'titulo' => $_POST['titulo'],
+            'departamento' => $_POST['departamento'],
+            'descricao' => $_POST['descricao'],
+            'status' => $_POST['status'],
+            'skills_necessarias' => $_POST['skills_necessarias'],
+            'skills_recomendadas' => $_POST['skills_recomendadas'],
+            'skills_desejadas' => $_POST['skills_desejadas']
+        ];
 
         try {
-            // Usa os Models injetados
-            $idSetor = $this->setorModel->findOrCreateByName($departamento);
-
-            $dadosVaga = [
-                'titulo_vaga' => $titulo,
-                'id_setor' => $idSetor,
-                'situacao' => $dados['status'] ?? 'rascunho',
-                'descricao_vaga' => $dados['descricao'] ?? null,
-                'requisitos_necessarios' => $dados['skills_necessarias'] ?? null,
-                'requisitos_recomendados' => $dados['skills_recomendadas'] ?? null,
-                'requisitos_desejados' => $dados['skills_desejadas'] ?? null,
-            ];
-
-            $this->gestaoVagasModel->atualizarVaga($idVaga, $dadosVaga);
-            $this->jsonResponse(true, 'Vaga atualizada com sucesso');
+            $this->vagaModel->atualizar($id, $dados);
+            echo json_encode(['success' => true, 'message' => 'Vaga atualizada!']);
         } catch (\Exception $e) {
-            $this->jsonResponse(false, 'Erro ao atualizar a vaga no banco.', null, 500);
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
+        exit;
     }
 
-    // [API] GET /api/vagas/excluir?id=...
-    public function excluir(): void
+    // 5. EXCLUIR (GET /api/vagas/excluir?id=1)
+    public function excluir()
     {
-        $idVaga = (int)($_GET['id'] ?? 0);
-        if ($idVaga === 0) {
-            $this->jsonResponse(false, 'ID da vaga não fornecido.', null, 400);
-            return;
-        }
+        $this->exigirPermissaoGestor();
+        header('Content-Type: application/json');
+        $id = (int)($_GET['id'] ?? 0);
+
         try {
-            // Usa o Model injetado
-            $this->gestaoVagasModel->excluirVaga($idVaga);
-            $this->jsonResponse(true, 'Vaga excluída com sucesso');
+            $this->vagaModel->excluir($id);
+            echo json_encode(['success' => true, 'message' => 'Vaga excluída.']);
         } catch (\Exception $e) {
-            $this->jsonResponse(false, 'Erro ao excluir a vaga.', null, 500);
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
+        exit;
     }
 
-    // [API] GET /api/vagas/candidatos?id=...
     public function verCandidatos()
     {
-        $idVaga = (int)($_GET['id'] ?? 0);
-        if ($idVaga === 0) {
-            $this->jsonResponse(false, 'ID da vaga não fornecido.', null, 400);
-            return;
-        }
+        $this->exigirPermissaoGestor();
+        header('Content-Type: application/json');
+        $id = (int)($_GET['id'] ?? 0);
 
         try {
-            // Usa os Models injetados
-            $vaga = $this->gestaoVagasModel->buscarPorId($idVaga);
-            $candidatos = $this->candidaturaModel->buscarPorVaga($idVaga);
+            $vaga = $this->vagaModel->buscarPorId($id);
+            $candidatos = $this->vagaModel->listarCandidatos($id);
 
-            if (!$vaga) {
-                $this->jsonResponse(false, 'Vaga não encontrada.', null, 404);
-                return;
-            }
-
-            $this->jsonResponse(true, 'Candidatos encontrados', [
-                'vaga' => $vaga,
-                'candidatos' => $candidatos
+            echo json_encode([
+                'success' => true,
+                'titulo_vaga' => $vaga['titulo'] ?? 'Desconhecida',
+                'data' => $candidatos
             ]);
-
         } catch (\Exception $e) {
-            $this->jsonResponse(false, 'Erro ao consultar o banco de dados.', null, 500);
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    private function verificarMetodoPost()
+    {
+        header('Content-Type: application/json');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método inválido']);
+            exit;
         }
     }
 }

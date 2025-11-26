@@ -147,6 +147,7 @@ class CandidaturaController extends Controller
      */
     public function analisarCurriculo()
     {
+        $this->exigirPermissaoGestor();
         $idCandidatura = (int)($_POST['id_candidatura'] ?? 0);
         if ($idCandidatura === 0) {
             die("Erro: ID da candidatura não fornecido.");
@@ -224,22 +225,56 @@ class CandidaturaController extends Controller
      */
     public function exibirAnaliseIA()
     {
-        $idCandidatura = (int)($_GET['id'] ?? 0);
+        $this->exigirPermissaoGestor();
+        try {
 
-        if ($idCandidatura === 0) {
-            header('Location: ' . BASE_URL . '/vagas/listar');
-            exit;
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                header('Content-Type: application/json');
+
+                $idCandidatura = filter_input(INPUT_POST, 'id_candidatura', FILTER_VALIDATE_INT);
+                if (!$idCandidatura) throw new \Exception('ID não fornecido.');
+
+                $dados = $this->candidaturaModel->buscarAnalisePorId($idCandidatura);
+                if (!$dados) throw new \Exception('Análise não encontrada.');
+
+                echo json_encode([
+                    'success' => true,
+                    'data' => [
+                        'nome_completo' => $dados['nome_completo'],
+                        'titulo_vaga' => $dados['titulo_vaga'],
+                        'pontuacao' => $dados['pontuacao_aderencia'],
+                        'justificativa' => $dados['justificativa_ia']
+                    ]
+                ]);
+                exit;
+            }
+
+            $idCandidatura = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+            if (!$idCandidatura) {
+                header('Location: ' . BASE_URL . '/vagas/listar');
+                exit;
+            }
+
+            $dados = $this->candidaturaModel->buscarAnalisePorId($idCandidatura);
+
+            if (!$dados) {
+                die("Análise não encontrada.");
+            }
+
+            return $this->view('Candidatura/resultado_ia', [
+                'candidatura' => $dados
+            ]);
+
+        } catch (\Exception $e) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                exit;
+            } else {
+                die("Erro: " . $e->getMessage());
+            }
         }
-
-        // Usa o Model injetado
-        $analise = $this->candidaturaModel->buscarAnaliseCompleta($idCandidatura);
-
-        if (!$analise || $analise['pontuacao_aderencia'] === null) {
-            header('Location: ' . BASE_URL . '/vagas/listar?error=analise_nao_encontrada');
-            exit;
-        }
-
-        return $this->view('Candidatura/resultado_ia', ['candidatura' => $analise]);
     }
 
     /**

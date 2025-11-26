@@ -1,60 +1,50 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Core;
-
-use JetBrains\PhpStorm\NoReturn;
-use PDO;
 
 class Controller
 {
-    protected PDO $db_connection;
+    protected $pdo;
 
-    public function __construct(PDO $pdo)
+    public function __construct($pdo = null)
     {
-        $this->db_connection = $pdo;
+        $this->pdo = $pdo;
+        // Inicia sessão se não estiver iniciada (para garantir acesso ao $_SESSION)
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
-    public function view($view, $data = []): void
+    protected function view(string $view, array $data = []): void
     {
         extract($data);
-
-        $viewPath = BASE_PATH . "/App/View/{$view}.php";
+        $viewPath = BASE_PATH . '/App/View/' . $view . '.php';
 
         if (file_exists($viewPath)) {
             require_once $viewPath;
-            return;
+        } else {
+            // Fallback para debug
+            die("View file not found: " . $viewPath);
         }
-
-        self::handleError("View not found: {$viewPath}");
     }
 
-    public static function handleError($message): void
+    // --- SEGURANÇA: BLINDAGEM DE GESTOR ---
+    protected function exigirPermissaoGestor(): void
     {
-        error_log($message);
-        require_once BASE_PATH . '/App/View/Common/error.php';
-        exit;
-    }
-
-    #[NoReturn]
-    protected function jsonResponse(bool $success, string $mensagem, $data = null, int $statusCode = 200) {
-        header('Content-Type: application/json');
-        http_response_code($statusCode);
-
-        $response = ['success' => $success, 'mensagem' => $mensagem];
-        if ($data !== null) {
-            $response['data'] = $data;
+        // 1. Verifica se está logado
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . BASE_URL . '/login');
+            exit;
         }
 
-        echo json_encode($response);
-        exit;
-    }
+        // 2. Verifica o perfil
+        $perfil = $_SESSION['user_perfil'] ?? 'colaborador';
 
-    protected function formatarValor($valor) {
-        if (is_numeric($valor) && $valor > 0) {
-            return 'R$ ' . number_format((float)$valor, 2, ',', '.');
+        // Se NÃO for gestor/admin/diretor, chuta para fora
+        if (!in_array($perfil, ['gestor_rh', 'diretor', 'admin'])) {
+            // Pode redirecionar para o início ou mostrar erro 403
+            header('Location: ' . BASE_URL . '/inicio?msg=acesso_negado');
+            exit;
         }
-        return '';
     }
 }

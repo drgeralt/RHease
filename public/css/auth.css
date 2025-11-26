@@ -1,0 +1,150 @@
+/* ============================================================
+   ESTILOS ESPECÍFICOS: AUTENTICAÇÃO (LOGIN / CADASTRO)
+   ============================================================ */
+
+/* Ajuste do Body para centralizar o card na tela (Flexbox) */
+/* Sobrescreve o comportamento padrão do style.css apenas nestas páginas */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--background-color); /* Usa variável global */
+}
+
+/* --- Container Principal (Card) --- */
+.login-container {
+    background-color: var(--card-background);
+    max-width: 480px;
+    width: 100%;
+    padding: 40px;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Sombra suave */
+}
+
+.login-header .logo {
+    max-width: 180px;
+    margin-bottom: 1.5rem;
+}
+
+.login-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--green-dark); /* Usa variável global */
+    margin-bottom: 2rem;
+}
+
+/* --- Formulário e Inputs Específicos com Ícone --- */
+.login-form { text-align: left; }
+
+.input-group { margin-bottom: 1.25rem; }
+
+.input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-color-dark);
+}
+
+.input-wrapper { position: relative; }
+
+/* Estilo do input (sobrescrevendo o padrão do sistema para acomodar ícone) */
+.input-wrapper input {
+    width: 100%;
+    padding: 12px 15px 12px 45px; /* 45px à esquerda para o ícone */
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif; /* Garante a fonte padrão */
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.input-wrapper input:focus {
+    outline: none;
+    border-color: var(--green-light);
+    box-shadow: 0 0 0 3px rgba(72, 157, 59, 0.2);
+}
+
+/* --- Ícones SVG Embutidos (Pseudo-elements) --- */
+.input-wrapper::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.5;
+    pointer-events: none; /* O clique passa através do ícone */
+}
+
+/* Ícone E-mail */
+.input-wrapper.icon-email::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'%3E%3C/path%3E%3Cpolyline points='22,6 12,13 2,6'%3E%3C/polyline%3E%3C/svg%3E");
+}
+/* Ícone Senha (Cadeado) */
+.input-wrapper.icon-password::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+}
+/* Ícone CPF/Cartão */
+.input-wrapper.icon-cpf::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='16' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3Cline x1='7' y1='15' x2='9' y2='15'%3E%3C/line%3E%3C/svg%3E");
+}
+/* Ícone Usuário */
+.input-wrapper.icon-user::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'%3E%3C/path%3E%3Ccircle cx='12' cy='7' r='4'%3E%3C/circle%3E%3C/svg%3E");
+}
+
+/* --- Botão de Toggle Senha (Olho) --- */
+.toggle-password-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+.toggle-password-icon:hover { opacity: 1; }
+
+/* --- Botões Específicos --- */
+.btn.full-width {
+    width: 100%;
+    display: block;
+    text-align: center;
+    padding: 12px;
+    background-color: var(--green-light);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn.full-width:hover { background-color: #3e8632; }
+
+/* --- Rodapé e Links --- */
+.login-footer { margin-top: 2rem; font-size: 0.9rem; }
+.login-footer a { color: var(--green-light); font-weight: 600; text-decoration: none; }
+.login-footer a:hover { text-decoration: underline; }
+
+/* --- Regras de Senha --- */
+.password-rules {
+    list-style: none; padding: 0; margin: -5px 0 20px 0;
+    font-size: 0.8rem; color: var(--text-color-light); text-align: left;
+}
+.password-rules li { padding-left: 15px; position: relative; margin-bottom: 2px; }
+.password-rules li:not(:first-child)::before {
+    content: '○'; position: absolute; left: 0; top: 1px; font-size: 0.7rem;
+}

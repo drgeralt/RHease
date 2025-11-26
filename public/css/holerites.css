@@ -1,0 +1,51 @@
+/* ============================================================
+   ESTILOS ESPECÍFICOS: HOLERITES E FOLHA DE PAGAMENTO
+   ============================================================ */
+
+/* Formulário de Processamento (Tela do RH) */
+.processar-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Ajuste específico para inputs pequenos de data nessa tela */
+.processar-form input[type="number"],
+.processar-form input[type="text"] {
+    width: 120px;
+}
+
+/* Grupo de botões (Ex: Processar e Voltar) */
+.btn-group {
+    display: flex;
+    gap: 10px;
+    /* Se quiser inverter ordem visualmente: flex-direction: row-reverse; */
+}
+
+/* Mensagens de Feedback de Processamento */
+.messages {
+    margin-top: 25px;
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Informações extras no rodapé da tabela */
+.info-text {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-color-light);
+}
+
+.empty-message {
+    color: var(--text-color-light);
+    font-style: italic;
+    padding: 30px;
+    text-align: center;
+}
