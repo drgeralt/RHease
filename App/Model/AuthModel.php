@@ -64,8 +64,8 @@ class AuthModel extends Model
             $tokenHash = hash('sha256', $token);
             $expiracao = (new \DateTime('+1 hour'))->format('Y-m-d H:i:s');
 
-            $sql = "INSERT INTO colaborador (nome_completo, cpf, email_profissional, senha, token_verificacao, token_expiracao, status_conta, data_admissao) 
-                    VALUES (:nome, :cpf, :email, :senha, :token, :expiracao, 'pendente_verificacao', CURDATE())";
+            $sql = "INSERT INTO colaborador (nome_completo, cpf, email_profissional, senha, token_verificacao, token_expiracao, status_conta, data_admissao, matricula, email_pessoal) 
+                    VALUES (:nome, :cpf, :email, :senha, :token, :expiracao, 'pendente_verificacao', CURDATE(), :cpf, :email)";
             $stmt = $this->db_connection->prepare($sql);
             $stmt->execute([
                 ':nome' => $nome,

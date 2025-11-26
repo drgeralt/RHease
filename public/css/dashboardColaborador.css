@@ -1,258 +1,89 @@
-/* Estilos de cor dos valores */
-.metric-value-main {
-    color: #489D3B; /* Cor verde para os valores principais */
-}
-/* Cor de texto da mensagem abaixo do valor */
-.metric-label-small {
-    color: #757575; /* Cor cinza mais claro */
-    font-size: 14px;
-    font-weight: 500;
+/* ============================================================
+   ESTILOS ESPECÍFICOS: DASHBOARD DO COLABORADOR
+   ============================================================ */
+
+/* Variáveis de Cores Específicas para Gráficos de Dias */
+:root {
+    --color-domingo: #EDADAD;
+    --color-segunda: #ff7213ff;
+    --color-terca: #489D3B;
+    --color-quarta: #3B5A9D;
+    --color-quinta: #D02C2C;
+    --color-sexta: #25621C;
+    --color-sabado: #667080;
 }
 
-/* Estilos do novo grid de painel */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 colunas iguais para métricas */
-    gap: 20px;
-    margin-bottom: 20px; /* Espaço entre a primeira linha de métricas e a segunda de gráficos */
-}
-.chart-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 colunas iguais para gráficos */
-    gap: 20px;
-}
-.metric-card-small {
-    background-color: #ffffff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-.metric-card-small .icon-wrapper-large {
-    background-color: #f0f0f0;
-    color: #757575;
-    border-radius: 50%;
-    width: 50px; /* Maior que o 40px padrão */
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px; /* Icone maior */
-    margin-bottom: 15px;
-}
-.metric-card-small .metric-value-large {
-    font-size: 38px;
-    font-weight: 700;
-    color: #489D3B; /* Verde */
-    margin-bottom: 0px;
-}
-
-.chart-card-colaborador {
-    background-color: #ffffff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-}
-.chart-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 20px;
-}
-.chart-content {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-
-/* Estilos para o Gráfico de Distribuição do Salário (Simulação) */
-.salary-chart-mock {
+/* === Gráfico de Horas (Rosca Específica) === */
+.hours-donut {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background: conic-gradient(
-        #D32F2F 0% 15%,     /* Descontos (Vermelho) ~15% */
-        #489D3B 15% 45%,    /* Benefícios (Verde) ~30% */
-        #25621C 45% 100%    /* Salário Base (Verde Escuro) ~55% */
-    );
-    display: flex;
-    justify-content: center;
-    align-items: center;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
 }
-.salary-chart-mock::before {
+
+.hours-donut::before {
     content: "";
     position: absolute;
-    width: 110px;
-    height: 110px;
-    background: #ffffff;
+    width: 120px;
+    height: 120px;
+    background: #fff;
     border-radius: 50%;
-}
-.salary-chart-center {
-    position: relative;
     z-index: 1;
+}
+
+.hours-donut-center {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
-    line-height: 1.2;
-}
-.salary-chart-value {
-    font-size: 20px;
-    font-weight: 700;
-    color: #333;
-}
-.salary-chart-label {
-    font-size: 12px;
-    font-weight: 500;
-    color: #757575;
+    justify-content: center;
     text-align: center;
-}
-
-/* Legenda do Gráfico de Salário */
-.salary-legend ul {
-    list-style: none;
-    padding: 0;
-    font-size: 14px;
-}
-.salary-legend li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    color: #757575;
-}
-.salary-legend .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 8px;
-}
-.salary-legend .dot-base { background-color: #25621C; } /* Verde Escuro */
-.salary-legend .dot-benefits { background-color: #489D3B; } /* Verde Claro */
-.salary-legend .dot-discounts { background-color: #D32F2F; } /* Vermelho */
-
-
-/* Estilos para o Gráfico de Horas  */
-.hours-chart-mock {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: conic-gradient(
-        #489D3B 0% 45%, 
-        #25621C 45% 100%  
-    );
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-.hours-chart-mock::before {
-    content: "";
-    position: absolute;
-    width: 110px;
-    height: 110px;
-    background: #ffffff;
-    border-radius: 50%;
-}
-.hours-chart-center {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     line-height: 1.2;
 }
+
 .hours-chart-value {
-    font-size: 30px;
+    font-size: 24px;
     font-weight: 700;
     color: #333;
 }
+
 .hours-chart-label {
     font-size: 12px;
     font-weight: 500;
-    color: #757575;
-    text-align: center;
+    color: var(--text-color-light);
 }
 
-/* Legenda do Gráfico de Horas */
-.hours-legend ul {
-    list-style: none;
-    padding: 0;
-    font-size: 12px; 
-}
-.hours-legend li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px; 
-    color: #757575;
-}
-.hours-legend .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 5px;
-}
-/* Cores do gráfico de horas */
-.hours-legend .dot-segunda { background-color: #ff7213ff; }
-.hours-legend .dot-terca { background-color: #489D3B; }
-.hours-legend .dot-quarta { background-color: #3B5A9D; }
-.hours-legend .dot-quinta { background-color: #D02C2C; }
-.hours-legend .dot-sexta { background-color: #25621C; }
-.hours-legend .dot-sabado { background-color: #667080; }
-.hours-legend .dot-domingo { background-color: #EDADAD; }
-
-
-/* Ajuste no menu para destacar o "Painel" corretamente */
-.menu li.active .bi {
-    color: #fff !important; /* Força o ícone a ser branco */
-}
-.menu .bi {
-    color: #757575;
-}
-.menu li.active {
-    background: #489D3B;
-    color: #fff;
-}
-
-/* === Gráfico de Rosca (Donut) === */
-.donut-chart-mock {
+/* === Estado "Sem Dados" === */
+.no-data-placeholder {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    position: relative;
+    margin: 0 auto;
+    background-color: #E0E0E0;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.donut-chart-mock::before {
-    content: "";
-    position: absolute;
-    width: 100px; /* tamanho do furo interno */
-    height: 100px;
-    background: #fff; /* cor de fundo no centro */
-    border-radius: 50%;
-    z-index: 1;
-}
-
-.donut-center {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    line-height: 1.2;
-}
-
-.donut-center-value {
-    font-size: 20px;
-    font-weight: 700;
-    color: #333;
-}
-
-.donut-center-label {
-    font-size: 12px;
-    font-weight: 500;
     color: #757575;
+    font-weight: 500;
+    text-align: center;
+    padding: 10px;
+}
+
+/* === Legendas Específicas (Dias da Semana) === */
+.hours-legend .dot-segunda { background-color: var(--color-segunda); }
+.hours-legend .dot-terca   { background-color: var(--color-terca); }
+.hours-legend .dot-quarta  { background-color: var(--color-quarta); }
+.hours-legend .dot-quinta  { background-color: var(--color-quinta); }
+.hours-legend .dot-sexta   { background-color: var(--color-sexta); }
+.hours-legend .dot-sabado  { background-color: var(--color-sabado); }
+.hours-legend .dot-domingo { background-color: var(--color-domingo); }
+
+/* Ajuste fino para valores monetários nesta tela */
+.metric-value-main {
+    color: var(--green-light);
 }

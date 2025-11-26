@@ -3,11 +3,12 @@
 namespace App\Controller;
 
 use App\Core\Database;
+use App\Core\Controller;
 use App\Model\ColaboradorModel;
 use App\Model\PontoModel;
 use Exception;
 use PDO;
-class PontoController
+class PontoController extends Controller
 {
     protected $facialApiUrl = 'http://localhost:5000/facial-api';
     protected $pontoModel;
@@ -28,17 +29,16 @@ class PontoController
     public function index()
     {
         $userId = $_SESSION['user_id'] ?? null;
-        if (!$userId) {
-            header('Location: ' . BASE_URL . '/login');
-            exit;
-        }
+        if (!$userId) { header('Location: ' . BASE_URL . '/login'); exit; }
 
-        $pdo = Database::getInstance();
+        $pdo = Database::createConnection();
         $pontoModel = new PontoModel($pdo);
         $colaboradorModel = new ColaboradorModel($pdo);
 
-        // Busca os dados do colaborador para a view
         $colaborador = $colaboradorModel->getDadosColaborador($userId);
+
+        // NOVA VERIFICAÇÃO
+        $precisaCadastrarFace = $colaboradorModel->precisaCadastrarFace($userId);
 
         $dataAtual = date('Y-m-d');
         $ultimoPonto = $pontoModel->getUltimoPontoAberto($userId, $dataAtual);
@@ -61,7 +61,7 @@ class PontoController
         try {
             $userId = $_SESSION['user_id'] ?? null;
             if (!$userId) {
-                throw new Exception('Usuário não autenticado. Faça login novamente.');
+                throw new Exception('Usuário não autenticado.');
             }
 
             if (!isset($_POST['imagem']) || empty($_POST['imagem'])) {
@@ -70,7 +70,7 @@ class PontoController
 
             $imgData = $_POST['imagem'];
 
-            // Envia para a API Facial
+            // 1. Envia para a API Facial (Python) para criar o arquivo .pkl
             $payload = json_encode([
                 'imagem' => $imgData,
                 'id_colaborador' => $userId
@@ -87,12 +87,15 @@ class PontoController
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
+            $result = json_decode($response, true);
+
             if ($httpCode !== 200) {
-                $errorData = json_decode($response, true);
-                throw new Exception($errorData['message'] ?? 'Erro ao registrar face na API');
+                throw new Exception($result['message'] ?? 'Erro ao registrar face na API');
             }
 
-            $result = json_decode($response, true);
+            // 2. SUCESSO NA API? Atualiza o MySQL para não pedir mais
+            // Importante: certifique-se que $this->colaboradorModel foi instanciado no __construct
+            $this->colaboradorModel->confirmarCadastroFace($userId);
 
             echo json_encode([
                 'status' => 'success',
@@ -137,7 +140,8 @@ class PontoController
             $payload = json_encode([
                 'imagem' => $imgData,
                 'geolocalizacao' => $geolocalizacao,
-                'ip_address' => $ipAddress
+                'ip_address' => $ipAddress,
+                'id_colaborador' => $userId // IMPORTANTE: Enviar o ID para a API saber quem verificar
             ]);
 
             $ch = curl_init($this->facialApiUrl . '/verify');
@@ -153,22 +157,48 @@ class PontoController
             if (curl_errno($ch)) {
                 $error = curl_error($ch);
                 curl_close($ch);
-                throw new Exception("Erro ao conectar com a API Facial: $error");
+                throw new Exception("Erro de conexão com a API Facial: $error");
             }
 
             curl_close($ch);
-
-            if ($httpCode !== 200) {
-                $errorData = json_decode($response, true);
-                throw new Exception($errorData['message'] ?? 'Face não reconhecida');
-            }
-
             $result = json_decode($response, true);
 
-            // Retorna o resultado da API
-            echo json_encode($result);
+            // --- TRATAMENTO ESPECÍFICO PARA ROSTO NÃO RECONHECIDO (401) ---
+            if ($httpCode === 401) {
+                // Não é erro de servidor, é falha de validação
+                http_response_code(400); // Bad Request (lógica de negócio)
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Rosto não correspondente. Tente melhorar a iluminação ou remova acessórios.'
+                ]);
+                exit;
+            }
+
+            // --- TRATAMENTO PARA OUTROS ERROS ---
+            if ($httpCode !== 200) {
+                $msg = $result['message'] ?? 'Erro desconhecido na API Facial';
+                throw new Exception($msg);
+            }
+
+            // SE CHEGOU AQUI, O ROSTO FOI RECONHECIDO (200)
+
+            // Registra o ponto no banco local (MySQL)
+            $tipoRegistro = $this->pontoModel->registrarPonto(
+                $userId,
+                date('Y-m-d H:i:s'),
+                $geolocalizacao,
+                'caminho/para/foto/temp.jpg', // Você pode salvar a foto no disco se quiser
+                $ipAddress
+            );
+
+            echo json_encode([
+                'status' => 'success',
+                'tipo' => $tipoRegistro == 'entrada' ? 'Entrada' : 'Saída',
+                'horario' => date('H:i')
+            ]);
 
         } catch (Exception $e) {
+            // Só retorna 500 se for erro real de código/conexão
             http_response_code(500);
             echo json_encode([
                 'status' => 'error',

@@ -1,3 +1,13 @@
+<?php
+// 1. Logic for Management Permissions (Multi-tenancy)
+$perfilUsuario = $_SESSION['user_perfil'] ?? 'colaborador';
+$isGestor = in_array($perfilUsuario, ['gestor_rh', 'diretor', 'admin']);
+
+// 2. Logic for Clock-in Data
+$nome_completo = $colaborador['nome_completo'] ?? 'Colaborador';
+$horaEntrada = isset($horaEntrada) ? $horaEntrada : null;
+$precisaCadastrarFace = isset($precisaCadastrarFace) ? $precisaCadastrarFace : false;
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5,50 +15,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frequência</title>
 
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/beneficiostyle.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/registroPonto.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/registroPonto.css">
 
     <style>
+        /* Small inline adjustment for specific text, or move to registroPonto.css */
         .entry-time-info {
             font-size: 16px;
-            color: #555;
+            color: var(--text-color-light);
             margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
+
 <header>
-    <i class="bi bi-list menu-toggle"></i>
-    <img id="logo" src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="RHease" width="130">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <i class="menu-toggle bi bi-list"></i>
+        <div class="logo"><img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo" style="height:40px;"></div>
+    </div>
+
+    <?php if ($isGestor): ?>
+        <!-- COMPANY SELECTOR (Only for Managers) -->
+        <div class="header-right">
+            <div class="empresa-selector" onclick="abrirModalEmpresas()">
+                <i class="bi bi-building"></i>
+                <span id="nomeEmpresaAtiva">Carregando...</span>
+                <i class="bi bi-chevron-down small"></i>
+            </div>
+        </div>
+    <?php endif; ?>
 </header>
 
-<div class="container">
-    <div class="sidebar">
-        <ul class="menu">
-                <li><a href="<?= BASE_URL ?>/inicio"><i class="bi bi-clipboard-data-fill"></i> Painel</a></li>
-                <li><a href="<?= BASE_URL ?>/dados"><i class="bi bi-person-vcard-fill"></i> Dados cadastrais</a></li>
-                <li><a href="<?= BASE_URL ?>/registrarponto"><i class="bi bi-calendar2-check-fill"></i> Frequência</a></li>
-                <li><a href="<?= BASE_URL ?>/meus-holerites"><i class="bi bi-wallet-fill"></i> Salário</a></li>
-                <li><a href="<?= BASE_URL ?>/beneficios"><i class="bi bi-shield-fill-check"></i> Benefícios</a></li>
-                <li><a href="<?= BASE_URL ?>/vagas/listar"><i class="bi bi-briefcase-fill"></i> Gestão de Vagas</a></li>
-                <li><a href="<?= BASE_URL ?>/contato"><i class="bi bi-person-lines-fill"></i> Contato</a></li>
-        </ul>
-    </div>
+<div class="app-container">
+
+    <!-- CENTRALIZED SIDEBAR -->
+    <?php include BASE_PATH . '/App/View/Common/sidebar.php'; ?>
 
     <div class="content">
         <div class="header-tabela" style="margin-bottom: 20px;">
-            <h2>Registo de Ponto</h2>
+            <h2>Registro de Ponto</h2>
         </div>
 
         <main class="main-content">
             <div class="clock-widget">
                 <div id="initial-view">
-                    <h1 class="greeting">Olá, <?= htmlspecialchars($colaborador['nome_completo'] ?? 'Colaborador') ?>!</h1>
-                    <?php if (isset($horaEntrada) && $horaEntrada): ?>
-                        <p class="entry-time-info">A sua entrada foi registada às <strong><?php echo $horaEntrada; ?></strong>.</p>
+                    <h1 class="greeting">Olá, <?= htmlspecialchars($nome_completo) ?>!</h1>
+
+                    <?php if ($horaEntrada): ?>
+                        <p class="entry-time-info">A sua entrada foi registrada às <strong><?= htmlspecialchars($horaEntrada) ?></strong>.</p>
                     <?php endif; ?>
 
                     <div id="current-time" class="time-display">--:--</div>
@@ -62,138 +85,70 @@
                 <div id="feedback-container"></div>
 
                 <button id="register-button" class="register-btn">
-                    <?php echo (isset($horaEntrada) && $horaEntrada) ? 'REGISTAR SAÍDA' : 'REGISTAR ENTRADA'; ?>
+                    <?= ($horaEntrada) ? 'REGISTRAR SAÍDA' : 'REGISTRAR ENTRADA'; ?>
                 </button>
             </div>
         </main>
-    </div> </div> <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </div>
+</div>
+
+<?php if ($isGestor): ?>
+    <!-- COMPANY MODAL (Only loaded for Managers) -->
+    <div id="modalEmpresas" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Perfil da Empresa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Selecionar Filial/Perfil Ativo:</label>
+                    <div id="listaEmpresas" class="list-group mb-4"></div>
+                    <hr>
+                    <h6>Editar/Criar Perfil</h6>
+                    <form id="formEmpresa">
+                        <input type="hidden" id="empresaId" name="id">
+                        <div class="row g-2">
+                            <div class="col-12"><input type="text" name="razao_social" class="form-control" placeholder="Razão Social" required></div>
+                            <div class="col-6"><input type="text" name="cnpj" class="form-control" placeholder="CNPJ" required></div>
+                            <div class="col-6"><input type="text" name="cidade_uf" class="form-control" placeholder="Cidade - UF"></div>
+                            <div class="col-12"><input type="text" name="endereco" class="form-control" placeholder="Endereço Completo"></div>
+                        </div>
+                        <div class="mt-2 text-end">
+                            <button type="button" onclick="limparFormEmpresa()" class="btn btn-sm btn-outline-secondary">Novo</button>
+                            <button type="submit" class="btn btn-sm btn-success">Salvar Dados</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!-- GLOBAL CONFIGURATION FOR JS -->
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const baseUrl = '<?php echo BASE_URL; ?>';
-        const registerButton = document.getElementById('register-button');
-        const initialView = document.getElementById('initial-view');
-        const cameraView = document.getElementById('camera-view');
-        const videoElement = document.getElementById('camera-feed');
-        const canvasElement = document.getElementById('photo-canvas');
-        const feedbackContainer = document.getElementById('feedback-container');
-        const timeElement = document.getElementById('current-time');
-        const exitButton = document.getElementById('exit-button');
-        let videoStream = null;
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            if (timeElement) timeElement.textContent = `${hours}:${minutes}`;
-        }
-        updateClock();
-        setInterval(updateClock, 1000);
-        registerButton.addEventListener('click', handleRegistrationStep);
+    const BASE_URL = "<?= BASE_URL ?>";
 
-        async function handleRegistrationStep() {
-            if (!videoStream) {
-                await startCamera();
-            } else {
-                await captureAndSend();
-            }
-        }
-
-        async function startCamera() {
-            try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                videoElement.srcObject = videoStream;
-                initialView.classList.add('hidden');
-                cameraView.classList.remove('hidden');
-                const buttonActionText = '<?php echo (isset($horaEntrada) && $horaEntrada) ? "CONFIRMAR SAÍDA" : "CONFIRMAR ENTRADA"; ?>';
-                registerButton.textContent = `TIRAR FOTO E ${buttonActionText}`;
-            } catch (error) {
-                console.error("Erro ao aceder à câmera:", error);
-                showFeedback('Não foi possível aceder à câmera.', 'error');
-            }
-        }
-
-        async function captureAndSend() {
-            registerButton.disabled = true;
-            registerButton.textContent = 'PROCESSANDO...';
-            feedbackContainer.innerHTML = '';
-            try {
-                const location = await getGeoLocation();
-                const context = canvasElement.getContext('2d');
-                canvasElement.width = videoElement.videoWidth;
-                canvasElement.height = videoElement.videoHeight;
-                context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-                const imageData = canvasElement.toDataURL('image/jpeg');
-                stopCamera();
-                
-                const formData = new FormData();
-                formData.append('imagem', imageData);
-                formData.append('geolocalizacao', location);
-
-                // CORREÇÃO FINAL: Usando a URL correta do roteador: /registrarponto/salvar
-                const response = await fetch(`${baseUrl}/registrarponto/salvar`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Erro no servidor: ${response.status} ${errorText}`);
-                }
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    showFeedback(`Registo de ${result.tipo} às ${result.horario}! Processando...`, 'success');
-                    registerButton.classList.add('hidden');
-                    if (exitButton) exitButton.classList.add('hidden');
-                    setTimeout(() => { window.location.reload(); }, 2500);
-                } else {
-                    throw new Error(result.message || 'Erro desconhecido no backend.');
-                }
-            } catch (error) {
-                console.error("Falha:", error);
-                showFeedback(`Falha: ${error.message}`, 'error');
-                restoreInitialState();
-            }
-        }
-
-        function getGeoLocation() {
-            return new Promise((resolve) => {
-                if (!navigator.geolocation) {
-                    resolve('Geolocalização não suportada.');
-                    return;
-                }
-                navigator.geolocation.getCurrentPosition(
-                    (position) => resolve(`${position.coords.latitude},${position.coords.longitude}`),
-                    () => resolve('Permissão de localização negada.')
-                );
-            });
-        }
-
-        function stopCamera() {
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-            }
-        }
-
-        function showFeedback(message, type) {
-            feedbackContainer.innerHTML = `<div class="feedback-message ${type}">${message}</div>`;
-        }
-
-        function restoreInitialState() {
-            stopCamera();
-            cameraView.classList.add('hidden');
-            initialView.classList.remove('hidden');
-            registerButton.disabled = false;
-            const originalButtonText = '<?php echo (isset($horaEntrada) && $horaEntrada) ? "REGISTAR SAÍDA" : "REGISTAR ENTRADA"; ?>';
-            registerButton.textContent = originalButtonText;
-        }
-
-    });
+    // Variables for registroPonto.js
+    const PontoConfig = {
+        baseUrl: "<?= BASE_URL ?>",
+        isSaida: <?= ($horaEntrada) ? 'true' : 'false' ?>,
+        precisaCadastrarFace: <?= ($precisaCadastrarFace) ? 'true' : 'false' ?>
+    };
 </script>
 
-<script>
-    const BASE_URL = "<?php echo BASE_URL; ?>";
-</script>
-<script src="<?php echo BASE_URL; ?>/js/sidebar-toggle.js"></script>
+<!-- SCRIPTS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="<?= BASE_URL ?>/js/sidebar-toggle.js"></script>
+
+<!-- Specific Scripts -->
+<script src="<?= BASE_URL ?>/js/registroPonto.js"></script>
+
+<?php if ($isGestor): ?>
+    <script src="<?= BASE_URL ?>/js/empresa.js"></script>
+<?php endif; ?>
+
 </body>
 </html>

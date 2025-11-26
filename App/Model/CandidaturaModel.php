@@ -141,5 +141,22 @@ class CandidaturaModel extends Model
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    public function buscarAnalisePorId(int $idCandidatura)
+    {
+        $sql = "SELECT 
+                    c.nome_completo, 
+                    v.titulo_vaga, 
+                    cand.pontuacao_aderencia, 
+                    cand.justificativa_ia
+                FROM candidaturas cand
+                JOIN candidato c ON cand.id_candidato = c.id_candidato
+                JOIN vaga v ON cand.id_vaga = v.id_vaga
+                WHERE cand.id_candidatura = :id";
+
+        $stmt = $this->db_connection->prepare($sql);
+        $stmt->execute([':id' => $idCandidatura]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
 }

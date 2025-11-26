@@ -3,11 +3,12 @@
 namespace App\Controller;
 
 use App\Core\Controller;
-use App\Core\Database;
 use App\Model\ColaboradorModel;
 use PDO;
 
-class HomeController extends Controller{
+class HomeController extends Controller
+{
+    protected ColaboradorModel $colaboradorModel;
 
     public function __construct(ColaboradorModel $colaboradorModel, PDO $pdo)
     {
@@ -17,14 +18,9 @@ class HomeController extends Controller{
 
     public function show_index(): void
     {
-        $pdo = Database::getInstance();
+        // CORRECT: Uses the injected instance
+        $colaboradores = $this->colaboradorModel->getAll();
 
-        $colaboradorModel = new ColaboradorModel($pdo);
-
-        $colaboradores = $colaboradorModel->getAll();
-
-        $this->view('Colaborador/tabelaColaborador', ['colaboradores' => $colaboradores]);;
+        $this->view('Colaborador/tabelaColaborador', ['colaboradores' => $colaboradores]);
     }
-
-
 }

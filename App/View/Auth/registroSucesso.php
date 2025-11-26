@@ -4,19 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro Realizado com Sucesso</title>
-    <link rel="stylesheet" href="<?= BASE_URL ?>/css/login.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/auth.css">
 </head>
 <body>
 
 <div class="login-container">
-    <div class="content-box">
+
+    <!-- Cabeçalho Padronizado -->
+    <header class="login-header">
         <img src="<?= BASE_URL ?>/img/rhease-ease 1.png" alt="Logo RH Ease" class="logo">
-        <p>Você irá receber um link de ativação no e-mail fornecido. Após receber o e-mail, clique no link para ativar sua conta e fazer login.</p>
-        <a href="<?= BASE_URL ?>/login" class="btn btn-primary">VOLTAR PARA O LOGIN</a>
-    </div>
+        <h1 style="font-size: 1.5rem; margin-bottom: 1rem;">Cadastro Realizado!</h1>
+    </header>
+
+    <!-- Mensagem -->
+    <p style="margin-bottom: 30px; color: var(--text-color-dark); font-size: 1rem; line-height: 1.5;">
+        Você irá receber um link de ativação no e-mail fornecido. Após receber o e-mail, clique no link para ativar sua conta e fazer login.
+    </p>
+
+    <!-- Ação -->
+    <a href="<?= BASE_URL ?>/login" class="btn full-width" style="text-decoration: none; display: block; text-align: center;">
+        VOLTAR PARA O LOGIN
+    </a>
 </div>
 
 </body>

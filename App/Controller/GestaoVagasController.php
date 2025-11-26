@@ -1,54 +1,33 @@
 <?php
-declare(strict_types=1);
 
 namespace App\Controller;
 
 use App\Core\Controller;
 use App\Model\GestaoVagasModel;
-use App\Model\CandidaturaModel;
+// use App\Model\CandidaturaModel; // <--- REMOVIDO
 use PDO;
 
 class GestaoVagasController extends Controller
 {
-    protected GestaoVagasModel $vagasModel;
-    protected CandidaturaModel $candidaturaModel;
+    protected GestaoVagasModel $vagaModel;
+    // protected CandidaturaModel $candidaturaModel; // <--- REMOVIDO
 
-    public function __construct(
-        GestaoVagasModel $vagasModel,
-        CandidaturaModel $candidaturaModel,
-        PDO $pdo
-    ) {
+    // CONSTRUTOR ATUALIZADO: Aceita apenas 2 argumentos agora
+    public function __construct(GestaoVagasModel $vagaModel, PDO $pdo)
+    {
         parent::__construct($pdo);
-        $this->vagasModel = $vagasModel;
-        $this->candidaturaModel = $candidaturaModel;
+        $this->vagaModel = $vagaModel;
+        // $this->candidaturaModel = $candidaturaModel; // <--- REMOVIDO
+        $this->pdo = $pdo;
     }
 
-    public function listarVagas(): void
+    public function listarVagas()
     {
-        $vagas = $this->vagasModel->listarVagas();
-        $this->view('vaga/gestaoVagas', ['vagas' => $vagas]);
-    }
+        $this->exigirPermissaoGestor();
+        $vagas = $this->vagaModel->listarTodas();
 
-    public function criar(): void
-    {
-        $this->view('vaga/novaVaga');
-    }
-
-    public function editar(): void
-    {
-        $this->view('vaga/editarVaga');
-    }
-
-    public function verCandidatos()
-    {
-        $idVaga = (int)($_GET['id'] ?? 0);
-
-        $vaga = $this->vagasModel->buscarPorId($idVaga);
-        $candidatos = $this->candidaturaModel->buscarPorVaga($idVaga);
-
-        $this->view('Candidatura/lista_candidatos', [
-            'vaga' => $vaga,
-            'candidatos' => $candidatos
+        return $this->view('Vaga/gestaoVagas', [
+            'vagas' => $vagas
         ]);
     }
 }
