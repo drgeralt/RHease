@@ -108,9 +108,10 @@ A aplicação cobre todo o ciclo de vida do colaborador — desde o recrutamento
 | Vitória Ferreira Leal Santos | 2024111649 | [@vitorialeal06](https://github.com/vitorialeal06) |
 | Rhyan Nascimento de Sousa | 2024110375 | [@drgeralt](https://github.com/drgeralt) |
 | Gabriel Rodrigues Costa Ferreira | 2024111694 | [@Gabbilless](https://github.com/Gabbilless) |
+| Rick Ribeiro | 202411**** | [@rickribeiroo](https://github.com/rickribeiroo) |
 
 ---
-
+https://github.com/rickribeiroo
 ## 🎥 Apresentação do Projeto
 
 📹 **Link do vídeo demonstrativo:**
