@@ -22,8 +22,8 @@ Sistema completo de automação para Recursos Humanos
 |----------|----------------|
 | Landing Page (Produto) | 👉 [Acessar Landing Page](https://vitoriamilhomem.github.io/RHease/) |
 | Sistema Implantado (Live) | 👉 Acessar Sistema Online |
-| Vídeo de Demonstração | 🎬 [Assistir Vídeo](https://www.youtube.com/watch?v=N42ZZCQRpSQ) |
-| Apresentação Final | 📄 [Ver Apresentação](https://drive.google.com/drive/folders/13AThi8dqd-rTsLYX4jF6sVVDR2c1kGFw?usp=drive_link) |
+| Vídeo de Demonstração | 🎬 [Assistir Vídeo](https://youtu.be/jL8caFVqQlw) |
+| Apresentação Final | 📄 [Ver Apresentação](https://www.canva.com/design/DAG5yNtOFZM/CNEEnDvNRJE3n5qi2iYXog/view?utm_content=DAG5yNtOFZM&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hb3086eeb7b ) |
 
 ---
 
